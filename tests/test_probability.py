@@ -2,7 +2,7 @@
 import pytest
 
 from src.core.tiles import create_tile, GameState, Meld
-from src.core.probability import TileCounter, count_remaining_tiles
+from src.core.probability import TileCounter, count_remaining_tiles, discard_risk
 
 
 class TestTileCounter:
@@ -79,3 +79,38 @@ class TestCountRemaining:
         rem = count_remaining_tiles(state)
         assert rem[create_tile("万", 1)] == 2   # 4 - 1 hand - 1 discard
         assert rem[create_tile("三元", "中")] == 3
+
+
+class TestDiscardRisk:
+    """discard_risk is a heuristic (安全/中/危险), not an exact probability."""
+
+    def test_flower_is_safe(self):
+        # flowers can't be part of a winning structure, so never deal into one
+        assert discard_risk(create_tile("三元", "中"), GameState()) == "安全"
+
+    def test_exhausted_tile_is_safe(self):
+        # all four copies visible -> no hidden copies -> safe
+        state = GameState(
+            my_hand=[create_tile("万", 5)],
+            discards={"left": [create_tile("万", 5)] * 3, "right": [], "opposite": []},
+        )
+        assert discard_risk(create_tile("万", 5), state) == "安全"
+
+    def test_genbutu_seen_in_discard_is_safe(self):
+        # an opponent already discarded it -> low ron risk (现物 heuristic)
+        state = GameState(discards={"left": [create_tile("万", 5)], "right": [], "opposite": []})
+        assert discard_risk(create_tile("万", 5), state) == "安全"
+
+    def test_unseen_middle_tile_is_dangerous(self):
+        # 4/5/6 are the most-wanted tiles; unseen and live -> dangerous
+        state = GameState()
+        assert discard_risk(create_tile("万", 5), state) == "危险"
+
+    def test_unseen_honor_is_medium(self):
+        state = GameState()
+        assert discard_risk(create_tile("风", "南"), state) == "中"
+
+    def test_unseen_terminal_is_medium(self):
+        state = GameState()
+        assert discard_risk(create_tile("万", 1), state) == "中"
+

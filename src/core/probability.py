@@ -62,3 +62,42 @@ def count_remaining_tiles(state: GameState) -> Dict[Tile, int]:
                 counter.remove(tile)
 
     return counter.all_counts()
+
+
+# Note: risk labels are a human-style heuristic, not a computed probability.
+_SAFE, _MEDIUM, _DANGER = "安全", "中", "危险"
+
+
+def discard_risk(tile: Tile, state: GameState) -> str:
+    """Heuristic ron-risk label ("安全" / "中" / "危险") for discarding `tile`.
+
+    This is intentionally crude — a "现物/中张" style rule of thumb, not an
+    exact probability. Signals, in order:
+
+    - flower tiles can never complete a structure -> 安全;
+    - all four copies already visible (remaining == 0) -> 安全 (no hidden copies);
+    - the tile was already discarded by an opponent (现物) -> 安全 (low ron risk);
+    - unseen, live middle tiles 4/5/6 are the most-wanted -> 危险;
+    - everything else (unseen honors, terminals, 2/3/7/8) -> 中.
+    """
+    if tile.is_flower:
+        return _SAFE
+
+    remaining = count_remaining_tiles(state)
+    if remaining.get(tile, 0) == 0:
+        return _SAFE
+
+    seen_in_discards = sum(
+        1 for pl in state.discards.values() for t in pl if t == tile
+    )
+    if seen_in_discards >= 1:
+        return _SAFE
+
+    if tile.suit == "风":  # 南西北 honors
+        return _MEDIUM
+
+    if tile.value in (4, 5, 6):
+        return _DANGER
+
+    return _MEDIUM
+
