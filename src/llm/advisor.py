@@ -22,6 +22,13 @@ from ..core.tiles import GameState, Meld, Tile
 # Default model per the claude-api skill (override via MAHJONG_ADVISOR_MODEL).
 DEFAULT_MODEL = "claude-opus-5"
 
+SYSTEM_PROMPT = (
+    "你是麻将策略助手。下面的【计算结果】由确定性引擎给出（向听数、进张、听牌、"
+    "剩余张数、出牌风险），请直接采信，不要重新计算或质疑这些数字。你的职责是读牌"
+    "推理、权衡每张牌的风险与收益、并给出有理由的出牌建议。用通俗中文，不要用"
+    "日式麻将术语（如两面/嵌张/雀头）。"
+)
+
 
 @dataclass
 class AnalysisBundle:
@@ -126,3 +133,38 @@ def build_prompt(state: GameState, analysis: AnalysisBundle) -> str:
 3. 如果我有花牌，给出杠牌建议（是否该等听牌时杠开）
 4. 给出最终推荐（3-5个选项）及简短理由
 """
+
+
+def get_advice(
+    state: GameState,
+    analysis: AnalysisBundle,
+    *,
+    client=None,
+    model: str = None,
+) -> str:
+    """Ask Claude for discard advice. `client` is injectable for testing.
+
+    Defaults to a real ``anthropic.Anthropic()`` (resolved from the environment)
+    and ``claude-opus-5`` (overridable via ``model`` or MAHJONG_ADVISOR_MODEL).
+    """
+    import anthropic  # imported lazily so the module loads without the SDK
+
+    if client is None:
+        client = anthropic.Anthropic()
+    model = model or os.environ.get("MAHJONG_ADVISOR_MODEL", DEFAULT_MODEL)
+
+    response = client.messages.create(
+        model=model,
+        max_tokens=8192,  # headroom for adaptive thinking + the advice
+        thinking={"type": "adaptive"},
+        system=SYSTEM_PROMPT,
+        messages=[{"role": "user", "content": build_prompt(state, analysis)}],
+    )
+
+    if response.stop_reason == "refusal":
+        raise ValueError("模型因安全策略拒绝了这个请求，请换种问法或换一个模型。")
+
+    text = "".join(
+        b.text for b in response.content if getattr(b, "type", None) == "text"
+    )
+    return text.strip() or "（模型未返回文本）"
