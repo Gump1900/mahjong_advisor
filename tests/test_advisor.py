@@ -3,7 +3,7 @@ import pytest
 
 from src.core.tiles import create_tile, GameState
 from src.core.hand_analyzer import calculate_shanten, get_waiting_tiles
-from src.llm.advisor import analyze, build_prompt
+from src.llm.advisor import analyze, build_prompt, get_advice, DEFAULT_MODEL
 
 _SUIT = {"m": "万", "p": "饼", "s": "条"}
 
@@ -94,3 +94,60 @@ class TestBuildPrompt:
         prompt = build_prompt(state, analyze(state))
         assert "上家" in prompt
         assert "9万" in prompt
+
+
+# --- get_advice with an injected (fake) client — no network -----------------
+class _FakeBlock:
+    def __init__(self, text):
+        self.type = "text"
+        self.text = text
+
+
+class _FakeResp:
+    def __init__(self, text, stop_reason="end_turn"):
+        self.content = [_FakeBlock(text)]
+        self.stop_reason = stop_reason
+
+
+class _FakeClient:
+    """Minimal stand-in for anthropic.Anthropic(): client.messages.create(...)."""
+
+    def __init__(self, text="建议正文", stop_reason="end_turn"):
+        self._text = text
+        self._stop = stop_reason
+        self.captured = None
+
+    @property
+    def messages(self):
+        return self
+
+    def create(self, **kwargs):
+        self.captured = kwargs
+        return _FakeResp(self._text, self._stop)
+
+
+class TestGetAdvice:
+    def test_returns_response_text(self):
+        client = _FakeClient("打五万最稳")
+        out = get_advice(_state("m123 p456 s789 南南南 西"), analyze(_state("m123 p456 s789 南南南 西")), client=client)
+        assert out == "打五万最稳"
+
+    def test_uses_default_model_and_adaptive_thinking(self):
+        client = _FakeClient()
+        get_advice(_state("m123 p456 s789 南南南 西"), analyze(_state("m123 p456 s789 南南南 西")), client=client)
+        kw = client.captured
+        assert kw["model"] == DEFAULT_MODEL
+        assert kw["thinking"] == {"type": "adaptive"}
+        # the rendered prompt is the user message content
+        assert "向听数" in kw["messages"][0]["content"]
+
+    def test_model_override(self):
+        client = _FakeClient()
+        get_advice(_state("m123 p456 s789 南南南 西"), analyze(_state("m123 p456 s789 南南南 西")),
+                   client=client, model="claude-sonnet-5")
+        assert client.captured["model"] == "claude-sonnet-5"
+
+    def test_refusal_raises(self):
+        client = _FakeClient(stop_reason="refusal")
+        with pytest.raises(ValueError):
+            get_advice(_state("m123 p456 s789 南南南 西"), analyze(_state("m123 p456 s789 南南南 西")), client=client)
