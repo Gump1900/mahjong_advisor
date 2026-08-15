@@ -57,8 +57,10 @@ def find_kong_opportunities(state: GameState) -> List[Dict]:
 
     - 暗杠: 4 identical playable tiles concealed in hand
     - 加杠: a peng meld plus the drawn 4th copy in hand
-    - 花牌自杠: 4 identical 中发白东 held un-konged (only these flowers have
-      4 copies; seasons exist once each)
+    - 花牌自杠: 4 identical 中发白东 held un-konged (12花 vs 6花 held), and
+      EVERY held season flower (春夏秋冬梅兰竹菊) — seasons score 1花 konged
+      or held alike, so their kong value is purely the timing: kong at
+      tenpai and win on the replacement draw = 杠开.
     """
     opps: List[Dict] = []
     hand_counts = Counter(t for t in state.my_hand if not t.is_flower)
@@ -80,11 +82,17 @@ def find_kong_opportunities(state: GameState) -> List[Dict]:
 
     flower_counts = Counter(state.flowers_in_hand)
     for tile, n in flower_counts.items():
-        if n >= 4 and (tile.suit == "三元" or (tile.suit == "风" and tile.value == "东")):
-            held = HELD_FLOWER_TIERS[4]
+        if tile.suit == "三元" or (tile.suit == "风" and tile.value == "东"):
+            if n >= 4:
+                held = HELD_FLOWER_TIERS[4]
+                opps.append({
+                    "tile": tile, "kind": "花牌自杠", "hua": kong_value("an_gang", tile),
+                    "note": f"留4张={held}花 / 杠=12花（暗杠后不算花）；留到听牌杠搏杠开",
+                })
+        elif tile.suit == "季节":
             opps.append({
-                "tile": tile, "kind": "花牌自杠", "hua": kong_value("an_gang", tile),
-                "note": f"留4张={held}花 / 杠=12花（暗杠后不算花）；留到听牌杠搏杠开",
+                "tile": tile, "kind": "花牌自杠", "hua": 1,
+                "note": "季节花杠/留都是1花，价值在时机：留到听牌杠搏杠开",
             })
     return opps
 
