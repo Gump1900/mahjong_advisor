@@ -211,3 +211,46 @@ class TestRiskEstimates:
         state = _state("m123 p456 s789 南南南 西西 北")
         prompt = build_prompt(state, analyze(state))
         assert "被吃" in prompt and "点炮" in prompt and "%" in prompt
+
+
+class TestKongOpportunities:
+    def test_concealed_quad_detected(self):
+        # 9条×4 in hand -> an-kong opportunity (+10)
+        state = _state("m123 p456 s9999 南南 南")
+        opps = analyze(state).kong_opportunities
+        assert any(op["kind"] == "暗杠" and str(op["tile"]) == "9条" and op["hua"] == 10
+                   for op in opps)
+
+    def test_peng_upgrade_detected(self):
+        state = GameState(
+            my_hand=H("m123 p456 s789 南南 南"),
+            my_melds=[Meld(type="peng", tiles=[create_tile("风", "南")] * 3)],
+        )
+        opps = analyze(state).kong_opportunities
+        assert any(op["kind"] == "加杠" and str(op["tile"]) == "南风" and op["hua"] == 6
+                   for op in opps)
+
+    def test_held_flower_set_detected(self):
+        state = GameState(
+            my_hand=H("m123 p456 s789 南南南 西"),
+            flowers_in_hand=[create_tile("三元", "中")] * 4,
+        )
+        opps = analyze(state).kong_opportunities
+        flower_ops = [op for op in opps if op["kind"] == "花牌自杠"]
+        assert len(flower_ops) == 1
+        assert flower_ops[0]["hua"] == 12
+        assert "留4张=6花" in flower_ops[0]["note"]
+
+    def test_no_opportunities_when_none(self):
+        assert analyze(_state("m123 p456 s789 南南南 西")).kong_opportunities == []
+
+    def test_tenpai_kongkai_note_in_prompt(self):
+        # tenpai + a holdable flower set -> prompt carries the 杠开 line
+        state = GameState(
+            my_hand=H("m2345666 p111 s222"),           # tenpai waits 1,2,4,5,7万
+            flowers_in_hand=[create_tile("三元", "中")] * 4,
+        )
+        prompt = build_prompt(state, analyze(state))
+        assert "杠牌/杠开机会" in prompt
+        assert "杠开" in prompt
+        assert "现在杠任意一组" in prompt

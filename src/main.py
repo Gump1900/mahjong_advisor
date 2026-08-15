@@ -84,6 +84,12 @@ def _print_analysis(a) -> None:
             f"  - 打 {tile}：打出后向听数 {after}；"
             f"点炮风险 {a.risks[tile]}（该牌剩余 {a.remaining.get(tile, 0)} 张）"
         )
+    if a.kong_opportunities:
+        print("杠牌/杠开机会：")
+        for op in a.kong_opportunities:
+            print(f"  - {op['kind']} {op['tile']}：杠分 {op['hua']}花；{op['note']}")
+        if a.is_tenpai:
+            print("  ★ 已听牌：现在杠任意一组，补牌成胡 = 杠开（底分8花，上不封顶叠加）")
 
 
 def main() -> None:

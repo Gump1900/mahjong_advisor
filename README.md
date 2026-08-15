@@ -39,7 +39,7 @@
 
 | 模块 | 说明 |
 |------|------|
-| `advisor.py` | `analyze(state)` 编排引擎产出结构化结果；`build_prompt` 按模板拼局面；`get_advice` 调 Claude 给读牌建议。 |
+| `advisor.py` | `analyze(state)` 编排引擎产出结构化结果（含**杠开机会**：手里的暗杠料/加杠/留花，听牌时标注"现在杠=杠开"）；`build_prompt` 按模板拼局面；`get_advice` 调 Claude 给读牌建议。 |
 | `probability.py` 的 `discard_risk` | 启发式点炮风险（安全/中/危险，非精确概率）。 |
 | `main.py` | 交互式命令行。 |
 

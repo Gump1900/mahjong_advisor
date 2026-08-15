@@ -178,6 +178,16 @@ def _wind_triplet_hua(hand: List[Tile], melds: List[Meld]) -> Tuple[int, List[st
     return hua, parts
 
 
+def kong_value(kong_type: str, tile: Tile) -> int:
+    """花 of one kong: 明杠 万饼条 5 / 南西北 6; 暗杠 万饼条 10 / 中发白东南西北 12.
+
+    Flowers (中发白东) can only be self-konged -> the 暗杠 12.
+    """
+    if kong_type == "ming_gang":
+        return 6 if tile.suit == "风" else 5
+    return 12 if tile.suit in ("风", "三元") else 10
+
+
 def _kong_hua(melds: List[Meld]) -> Tuple[int, List[str]]:
     """花 from kongs among my_melds: 明杠 5 (南西北 6) / 暗杠 10 (中发白东南西北 12)."""
     total = 0
@@ -186,12 +196,8 @@ def _kong_hua(melds: List[Meld]) -> Tuple[int, List[str]]:
         if m.type not in ("ming_gang", "an_gang"):
             continue
         tile = m.tiles[0]
-        if m.type == "ming_gang":
-            value = 6 if tile.suit == "风" else 5
-            label = "明杠"
-        else:   # an_gang: 南西北(风) and 中发白(三元) all count 12
-            value = 12 if tile.suit in ("风", "三元") else 10
-            label = "暗杠"
+        value = kong_value(m.type, tile)
+        label = "明杠" if m.type == "ming_gang" else "暗杠"
         total += value
         parts.append(f"{label}{tile} {value}花")
     return total, parts
