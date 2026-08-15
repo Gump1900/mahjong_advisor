@@ -16,10 +16,17 @@ Total = 底分 + Σ番型分 + 花牌数.
   双豪华    40 / 20  — 七对里有两组4张一样的
   七对/豪华/双豪华互斥，按最高档计；清一色等其余番型照常叠加.
 
-花牌: 每张 1 花（手里 + 已杠）.
+杠分 (each kong adds its own 花):
+  明杠 万饼条 +5 / 南西北 +6;  暗杠 万饼条 +10 / 中发白东南西北 +12.
+  花牌（中发白东）没人打得出来，只能自杠 -> 按暗杠 +12.
+
+花牌分:
+  中发白东（未杠，拿手里，按同款张数）: 1张=1花, 2张=2花, 3张=4花, 4张=6花
+  （杠掉则拿杠分 12花，替代手持档位——"留花还是杠花"的博弈）
+  春夏秋冬梅兰竹菊: 每张 1 花.
 """
 from dataclasses import dataclass, field
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
 from .tiles import Meld, Tile
 
@@ -35,6 +42,11 @@ PATTERN_VALUES: Dict[str, tuple] = {
     "豪华七对": (20, 10),
     "双豪华": (40, 20),
 }
+
+# held 中发白东 by identical-copies count -> 花
+HELD_FLOWER_TIERS = {1: 1, 2: 2, 3: 4, 4: 6}
+FLOWER_KONG_HUA = 12              # konged 中发白东 (4张同, 自杠) -> 12花, replaces the tier
+_MULTI_FLOWERS = ("中", "发", "白", "东风")   # by str(tile); 东 normalizes to 东风
 
 _TRIPLET_MELDS = ("peng", "ming_gang", "an_gang")
 _NUMBER_SUITS = ("万", "饼", "条")
@@ -104,6 +116,62 @@ def _is_qing_yi_se(hand: List[Tile], melds: List[Meld]) -> bool:
     return len(suits) == 1 and suits.issubset(set(_NUMBER_SUITS))
 
 
+def _flower_name(f) -> str:
+    """Normalize a flower entry (name string or Tile) to its display name."""
+    name = f if isinstance(f, str) else str(f)
+    return "东风" if name == "东" else name
+
+
+def _held_flower_hua(flowers: list) -> int:
+    """花 from un-konged flowers: 中发白东 by tier (1/2/4/6), seasons 1 each."""
+    counts: Dict[str, int] = {}
+    for f in flowers or []:
+        name = _flower_name(f)
+        counts[name] = counts.get(name, 0) + 1
+    hua = 0
+    for name, n in counts.items():
+        if name in _MULTI_FLOWERS:
+            hua += HELD_FLOWER_TIERS[min(n, 4)]
+        else:
+            hua += n   # season flowers exist once each -> 1花 per tile
+    return hua
+
+
+def _konged_flower_hua(konged_flowers: list) -> int:
+    """花 from konged flowers: each 中发白东 type konged = 12花 (replaces the
+    held tier); season flowers count 1花 each even when set aside."""
+    counts: Dict[str, int] = {}
+    for f in konged_flowers or []:
+        name = _flower_name(f)
+        counts[name] = counts.get(name, 0) + 1
+    hua = 0
+    for name, n in counts.items():
+        if name in _MULTI_FLOWERS:
+            hua += FLOWER_KONG_HUA
+        else:
+            hua += n
+    return hua
+
+
+def _kong_hua(melds: List[Meld]) -> Tuple[int, List[str]]:
+    """花 from kongs among my_melds: 明杠 5 (南西北 6) / 暗杠 10 (中发白东南西北 12)."""
+    total = 0
+    parts: List[str] = []
+    for m in melds:
+        if m.type not in ("ming_gang", "an_gang"):
+            continue
+        tile = m.tiles[0]
+        if m.type == "ming_gang":
+            value = 6 if tile.suit == "风" else 5
+            label = "明杠"
+        else:   # an_gang: 南西北(风) and 中发白(三元) all count 12
+            value = 12 if tile.suit in ("风", "三元") else 10
+            label = "暗杠"
+        total += value
+        parts.append(f"{label}{tile} {value}花")
+    return total, parts
+
+
 def score_hand(
     hand: List[Tile],
     my_melds: List[Meld] = None,
@@ -144,9 +212,14 @@ def score_hand(
         hua += value
         breakdown.append(f"{name} {value}花")
 
-    flower_count = len(flowers or []) + len(konged_flowers or [])
-    if flower_count:
-        hua += flower_count
-        breakdown.append(f"花牌 {flower_count}花（每张1花）")
+    kong_hua, kong_parts = _kong_hua(melds)
+    if kong_hua:
+        hua += kong_hua
+        breakdown.extend(kong_parts)
 
-    return ScoringResult(hua=hua, flowers=flower_count, breakdown=breakdown)
+    flower_hua = _held_flower_hua(flowers) + _konged_flower_hua(konged_flowers)
+    if flower_hua:
+        hua += flower_hua
+        breakdown.append(f"花牌 {flower_hua}花")
+
+    return ScoringResult(hua=hua, flowers=flower_hua, breakdown=breakdown)
