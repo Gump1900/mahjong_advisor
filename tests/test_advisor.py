@@ -279,3 +279,37 @@ class TestSeasonFlowerOpportunity:
         assert (create_tile("三元", "中"), 12) in kinds
         assert (create_tile("季节", "夏"), 1) in kinds
         assert "杠开" in build_prompt(state, a)
+
+
+class TestFirstWinSpeed:
+    """一胡即终局 -> 速度优先：同向听时进张（种数/张数）多的候选排前面。"""
+
+    def test_discard_speed_covers_candidates(self):
+        a = analyze(_state("m123 p456 s78 南南南 西西 北"))
+        assert set(a.discard_speed) == {t for t, _ in a.discards_ranked}
+        for v in a.discard_speed.values():
+            assert v["types"] >= 0 and v["tiles"] >= 0
+
+    def test_speed_matches_engine_ukeire(self):
+        from src.core.hand_analyzer import get_ukeire as gu
+        from src.core.tiles import parse_tile
+        state = _state("m123 p456 s78 南南南 西西 北")
+        a = analyze(state)
+        tile = state.my_hand[0]
+        rest = list(state.my_hand)
+        rest.remove(tile)
+        assert a.discard_speed[tile]["types"] == len(gu(rest))
+
+    def test_same_shanten_sorted_by_speed(self):
+        a = analyze(_state("m123 p456 s78 南南南 西西 北"))
+        ranked = a.discards_ranked
+        for (t1, s1), (t2, s2) in zip(ranked, ranked[1:]):
+            if s1 == s2:
+                assert a.discard_speed[t1]["tiles"] >= a.discard_speed[t2]["tiles"]
+
+    def test_prompt_carries_first_win_rule(self):
+        state = _state("m123 p456 s789 南南南 西")
+        prompt = build_prompt(state, analyze(state))
+        assert "一胡即终局" in prompt
+        assert "快胡" in prompt
+        assert "速度" in prompt or "进张" in prompt

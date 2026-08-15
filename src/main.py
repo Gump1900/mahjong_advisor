@@ -78,10 +78,12 @@ def _print_analysis(a) -> None:
         print(f"向听数：{a.shanten}（还差 {a.shanten} 步听牌）")
         print(f"进张牌：{_join(a.ukeire) or '无'}")
     print(f"全桌剩余牌：{a.remaining_total} 张")
-    print("出牌候选（按打出后向听数排序，越小越值得保留进张）：")
+    print("出牌候选（向听数优先，同向听按进张速度排序——一胡即终局，快胡优先）：")
     for tile, after in a.discards_ranked[:6]:
+        speed = a.discard_speed[tile]
         print(
             f"  - 打 {tile}：打出后向听数 {after}；"
+            f"进张 {speed['types']}种/{speed['tiles']}张；"
             f"点炮风险 {a.risks[tile]}（该牌剩余 {a.remaining.get(tile, 0)} 张）"
         )
     if a.kong_opportunities:
