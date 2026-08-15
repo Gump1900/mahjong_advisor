@@ -7,6 +7,7 @@ explaining the recommendation in natural language. The LLM never computes
 shanten or tile counts.
 """
 import os
+from collections import Counter
 from dataclasses import dataclass, field
 from typing import Dict, List, Tuple
 
@@ -21,6 +22,7 @@ from ..core.probability import (
     discard_risk,
     estimate_discard_risks,
 )
+from ..core.scoring import HELD_FLOWER_TIERS, kong_value
 from ..core.tiles import GameState, Meld, Tile
 
 # Default model per the claude-api skill (override via MAHJONG_ADVISOR_MODEL).
@@ -47,6 +49,44 @@ class AnalysisBundle:
     risk_estimates: Dict[Tile, Dict[str, float]]  # {chi, peng, ron, label}
     remaining: Dict[Tile, int]
     remaining_total: int
+    kong_opportunities: List[Dict] = field(default_factory=list)
+
+
+def find_kong_opportunities(state: GameState) -> List[Dict]:
+    """Kong-able assets the player can TIME (留花/择时杠 for the 杠开 shot).
+
+    - 暗杠: 4 identical playable tiles concealed in hand
+    - 加杠: a peng meld plus the drawn 4th copy in hand
+    - 花牌自杠: 4 identical 中发白东 held un-konged (only these flowers have
+      4 copies; seasons exist once each)
+    """
+    opps: List[Dict] = []
+    hand_counts = Counter(t for t in state.my_hand if not t.is_flower)
+
+    for tile, n in hand_counts.items():
+        if n == 4:
+            opps.append({
+                "tile": tile, "kind": "暗杠", "hua": kong_value("an_gang", tile),
+                "note": "4张在手，可留到听牌时再暗杠",
+            })
+
+    for m in state.my_melds:
+        if m.type == "peng" and m.tiles and hand_counts.get(m.tiles[0], 0) >= 1:
+            tile = m.tiles[0]
+            opps.append({
+                "tile": tile, "kind": "加杠", "hua": kong_value("ming_gang", tile),
+                "note": f"碰{tile}后又摸到一张，可加杠（风刻+1升级为杠分）",
+            })
+
+    flower_counts = Counter(state.flowers_in_hand)
+    for tile, n in flower_counts.items():
+        if n >= 4 and (tile.suit == "三元" or (tile.suit == "风" and tile.value == "东")):
+            held = HELD_FLOWER_TIERS[4]
+            opps.append({
+                "tile": tile, "kind": "花牌自杠", "hua": kong_value("an_gang", tile),
+                "note": f"留4张={held}花 / 杠=12花（暗杠后不算花）；留到听牌杠搏杠开",
+            })
+    return opps
 
 
 def analyze(state: GameState) -> AnalysisBundle:
@@ -71,6 +111,7 @@ def analyze(state: GameState) -> AnalysisBundle:
         risk_estimates=risk_estimates,
         remaining=remaining,
         remaining_total=sum(remaining.values()),
+        kong_opportunities=find_kong_opportunities(state),
     )
 
 
@@ -107,6 +148,19 @@ def build_prompt(state: GameState, analysis: AnalysisBundle) -> str:
         for tile, after in a.discards_ranked[:6]
     ) or "- （没有可打牌）"
 
+    kong_section = ""
+    if a.kong_opportunities:
+        kong_lines = [
+            f"- {op['kind']} {op['tile']}：杠分 {op['hua']}花；{op['note']}"
+            for op in a.kong_opportunities
+        ]
+        if a.is_tenpai:
+            kong_lines.append(
+                "（当前已听牌：现在杠任意一组，补牌成胡即杠开——底分8花替代2/4，"
+                "且与番型/杠分/花全部叠加，上不封顶）"
+            )
+        kong_section = "【杠牌/杠开机会】\n" + "\n".join(kong_lines) + "\n\n"
+
     waiting_line = ""
     if a.is_tenpai:
         waiting_line = (
@@ -141,10 +195,10 @@ def build_prompt(state: GameState, analysis: AnalysisBundle) -> str:
 候选出牌（按"打出后向听数"从小到大排序，越小越该保留进张）：
 {candidates}
 
-请分析：
+{kong_section}请分析：
 1. 推断各对手可能在做什么牌型（结合他们的弃牌与明牌）
 2. 评估每个候选出牌的风险和收益
-3. 如果我有花牌，给出杠牌建议（是否该等听牌时杠开）
+3. 结合【杠牌/杠开机会】：哪些杠该留到听牌时再开（搏杠开8花），哪些该现在开
 4. 给出最终推荐（3-5个选项）及简短理由
 """
 
