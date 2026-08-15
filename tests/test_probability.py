@@ -193,3 +193,12 @@ class TestEstimateDiscardRisks:
         state = GameState()
         for tile in (create_tile("万", 5), create_tile("风", "南"), create_tile("万", 1)):
             assert estimate_discard_risks(tile, state)["label"] == discard_risk(tile, state)
+
+
+class TestMyDiscards:
+    def test_my_discards_subtracted(self):
+        state = GameState(my_hand=[create_tile("万", 5)],
+                          my_discards=[create_tile("万", 3), create_tile("条", 9)])
+        rem = count_remaining_tiles(state)
+        assert rem[create_tile("万", 3)] == 3   # my discard is visible
+        assert rem[create_tile("条", 9)] == 3

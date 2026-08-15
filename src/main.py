@@ -6,6 +6,7 @@ the tool prints the engine analysis and a prompt preview instead of crashing.
 """
 from .core.tiles import GameState, Meld, parse_tile
 from .llm.advisor import analyze, build_prompt, get_advice
+from .session import print_analysis, run_session
 
 # meld keywords -> (MeldType, tile copies)
 _MELD_TYPES = {
@@ -68,36 +69,24 @@ def _input_tiles(prompt: str):
     return [parse_tile(s) for s in line.split()]
 
 
-def _print_analysis(a) -> None:
-    print("\n【分析结果】")
-    if a.shanten == -1:
-        print("已经胡了！")
-    elif a.shanten == 0:
-        print(f"听牌！胡：{_join(a.waiting) or '（无）'}")
-    else:
-        print(f"向听数：{a.shanten}（还差 {a.shanten} 步听牌）")
-        print(f"进张牌：{_join(a.ukeire) or '无'}")
-    print(f"全桌剩余牌：{a.remaining_total} 张")
-    print("出牌候选（向听数优先，同向听按进张速度排序——一胡即终局，快胡优先）：")
-    for tile, after in a.discards_ranked[:6]:
-        speed = a.discard_speed[tile]
-        print(
-            f"  - 打 {tile}：打出后向听数 {after}；"
-            f"进张 {speed['types']}种/{speed['tiles']}张；"
-            f"点炮风险 {a.risks[tile]}（该牌剩余 {a.remaining.get(tile, 0)} 张）"
-        )
-    if a.kong_opportunities:
-        print("杠牌/杠开机会：")
-        for op in a.kong_opportunities:
-            print(f"  - {op['kind']} {op['tile']}：杠分 {op['hua']}花；{op['note']}")
-        if a.is_tenpai:
-            print("  ★ 已听牌：现在杠任意一组，补牌成胡 = 杠开（底分8花，上不封顶叠加）")
+def _session_mode() -> None:
+    hand = _input_tiles("请输入起手暗牌（13张；已有明牌则输剩余暗牌）:\n> ")
+    flowers = _input_tiles("请输入起手花牌（未杠，直接回车跳过）:\n> ")
+    state = GameState(my_hand=hand, flowers_in_hand=flowers)
+    run_session(state)
 
 
 def main() -> None:
     print("=== 麻将策略助手 ===\n")
     print("牌的写法：3万 / 9条 / 1饼 / 东风 / 南风 / 中 / 春 等，用空格分隔。")
     print("（东风、中发白、春夏秋冬梅兰竹菊是花牌，写在“花牌”那行，不要写进手牌）\n")
+    print("1) 对局模式（推荐）：输一次起手牌，之后每回合只输事件，摸牌后自动给建议")
+    print("2) 一次性输入：一次输全局面（含各家弃牌）再分析\n")
+    choice = input("选择 [1]: ").strip() or "1"
+
+    if choice == "1":
+        _session_mode()
+        return
 
     hand = _input_tiles(
         "请输入你的手牌（暗牌，不含明牌；如：2万 3万 4万 5万 6万 6万 6万 1饼 1饼 1饼 2条 2条 2条）:\n> "
@@ -118,7 +107,7 @@ def main() -> None:
     analysis = analyze(state)
     if my_melds:
         print(f"\n我的明牌：{_melds_str(my_melds)}")
-    _print_analysis(analysis)
+    print_analysis(analysis)
 
     print("\n正在获取 AI 建议...")
     try:
