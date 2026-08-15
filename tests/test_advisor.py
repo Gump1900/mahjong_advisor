@@ -4,6 +4,7 @@ import pytest
 from src.core.tiles import create_tile, GameState, Meld
 from src.core.hand_analyzer import calculate_shanten, get_waiting_tiles
 from src.llm.advisor import analyze, build_prompt, get_advice, DEFAULT_MODEL
+from src.main import parse_melds
 
 _SUIT = {"m": "万", "p": "饼", "s": "条"}
 
@@ -163,3 +164,36 @@ class TestAnalyzeWithMelds:
         a = analyze(state)
         assert a.shanten == -1
         assert a.remaining[create_tile("饼", 1)] == 1   # peng counted in remaining
+
+
+class TestParseMelds:
+    def test_empty(self):
+        assert parse_melds("") == []
+        assert parse_melds("  ") == []
+
+    def test_single_peng(self):
+        melds = parse_melds("peng 5饼")
+        assert len(melds) == 1
+        assert melds[0].type == "peng"
+        assert melds[0].tiles == [create_tile("饼", 5)] * 3
+
+    def test_chi_explicit_tiles(self):
+        melds = parse_melds("chi 3万 4万 5万")
+        assert melds[0].type == "chi"
+        assert melds[0].tiles == [create_tile("万", i) for i in (3, 4, 5)]
+
+    def test_multiple_melds(self):
+        melds = parse_melds("peng 5饼, ming_gang 9条, an_gang 南风")
+        assert [m.type for m in melds] == ["peng", "ming_gang", "an_gang"]
+        assert melds[1].tiles == [create_tile("条", 9)] * 4
+        assert melds[2].tiles == [create_tile("风", "南")] * 4
+
+    def test_comma_or_space_separated(self):
+        assert len(parse_melds("peng 1万 peng 2万")) == 2
+        assert len(parse_melds("peng 1万，peng 2万")) == 2   # 全角逗号也认
+
+    def test_invalid_raises(self):
+        with pytest.raises(ValueError):
+            parse_melds("peng")             # no tile
+        with pytest.raises(ValueError):
+            parse_melds("bogus 5饼")       # unknown meld type

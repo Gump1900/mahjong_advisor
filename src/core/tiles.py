@@ -57,6 +57,8 @@ def parse_tile(s: str) -> Tile:
         return create_tile(s[1], int(s[0]))
     if len(s) == 2 and s[1] == "风":
         return create_tile("风", s[0])
+    if s in ("东", "南", "西", "北"):  # bare wind char, e.g. '南'
+        return create_tile("风", s)
     if s in ("中", "发", "白"):
         return create_tile("三元", s)
     if s in ("春", "夏", "秋", "冬", "梅", "兰", "竹", "菊"):

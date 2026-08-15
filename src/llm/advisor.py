@@ -117,6 +117,7 @@ def build_prompt(state: GameState, analysis: AnalysisBundle) -> str:
 
 【当前局面】
 我的手牌：[{_tiles(state.my_hand)}]
+我的明牌：[{_melds(state.my_melds)}]
 我的花牌（未杠）：[{_tiles(state.flowers_in_hand)}]
 {chr(10).join(sections)}
 全桌剩余牌：{a.remaining_total} 张
