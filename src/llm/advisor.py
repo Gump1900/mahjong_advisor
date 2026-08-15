@@ -31,8 +31,9 @@ DEFAULT_MODEL = "claude-opus-5"
 SYSTEM_PROMPT = (
     "你是麻将策略助手。下面的【计算结果】由确定性引擎给出（向听数、进张、听牌、"
     "剩余张数、出牌风险），请直接采信，不要重新计算或质疑这些数字。你的职责是读牌"
-    "推理、权衡每张牌的风险与收益、并给出有理由的出牌建议。用通俗中文，不要用"
-    "日式麻将术语（如两面/嵌张/雀头）。"
+    "推理、权衡每张牌的风险与收益、并给出有理由的出牌建议。这套玩法一胡即终局"
+    "（不是血流成河）：任意一家胡牌本局立即结束——把快胡的累积收益计入权衡，"
+    "速度通常比牌型大小更重要。用通俗中文，不要用日式麻将术语（如两面/嵌张/雀头）。"
 )
 
 
@@ -50,6 +51,7 @@ class AnalysisBundle:
     remaining: Dict[Tile, int]
     remaining_total: int
     kong_opportunities: List[Dict] = field(default_factory=list)
+    discard_speed: Dict[Tile, Dict[str, int]] = field(default_factory=dict)  # 进张 per discard
 
 
 def find_kong_opportunities(state: GameState) -> List[Dict]:
@@ -104,11 +106,26 @@ def analyze(state: GameState) -> AnalysisBundle:
     shanten = calculate_shanten(hand, fuuro)
     is_tenpai = shanten == 0
     discards_ranked = rank_discards(hand, fuuro)
+    remaining = count_remaining_tiles(state)
+
+    # 一胡即终局 -> 速度优先：同向听时，打出后进张（种数/活张数）多的排前面
+    discard_speed: Dict[Tile, Dict[str, int]] = {}
+    for tile, _after in discards_ranked:
+        remaining_hand = list(hand)
+        remaining_hand.remove(tile)
+        ukeire = get_ukeire(remaining_hand, fuuro)
+        discard_speed[tile] = {
+            "types": len(ukeire),
+            "tiles": sum(remaining.get(u, 0) for u in ukeire),
+        }
+    discards_ranked.sort(
+        key=lambda x: (x[1], -discard_speed[x[0]]["tiles"], str(x[0]))
+    )
+
     risks = {tile: discard_risk(tile, state) for tile, _ in discards_ranked}
     risk_estimates = {
         tile: estimate_discard_risks(tile, state) for tile, _ in discards_ranked
     }
-    remaining = count_remaining_tiles(state)
     return AnalysisBundle(
         shanten=shanten,
         is_tenpai=is_tenpai,
@@ -120,6 +137,7 @@ def analyze(state: GameState) -> AnalysisBundle:
         remaining=remaining,
         remaining_total=sum(remaining.values()),
         kong_opportunities=find_kong_opportunities(state),
+        discard_speed=discard_speed,
     )
 
 
@@ -149,7 +167,9 @@ def build_prompt(state: GameState, analysis: AnalysisBundle) -> str:
         shanten_desc = f"{a.shanten}（还差 {a.shanten} 步听牌）"
 
     candidates = "\n".join(
-        f"- 打 {tile}：打出后向听数 {after}；点炮风险 {a.risks[tile]}"
+        f"- 打 {tile}：打出后向听数 {after}；"
+        f"进张 {a.discard_speed[tile]['types']}种/{a.discard_speed[tile]['tiles']}张（速度）；"
+        f"点炮风险 {a.risks[tile]}"
         f"（被吃 {a.risk_estimates[tile]['chi']:.0%} / 被碰 {a.risk_estimates[tile]['peng']:.0%}"
         f" / 点炮 {a.risk_estimates[tile]['ron']:.0%}，启发式估计）；"
         f"该牌剩余 {a.remaining.get(tile, 0)} 张"
@@ -188,6 +208,8 @@ def build_prompt(state: GameState, analysis: AnalysisBundle) -> str:
 - 花牌（东风、中发白、春夏秋冬梅兰竹菊）不能打出，可留着杠开，不参与胡牌结构
 - 吃只能上家（left），碰三家都可以
 - 胡牌：4组面子（顺子或刻子）+ 1对，或七对
+- 本玩法一胡即终局（不是血流成河/血战到底）：任意一家胡牌本局立即结束、
+  直接下一把——先胡先得，快胡的累积进账常常优于憋大牌，速度很重要
 
 【当前局面】
 我的手牌：[{_tiles(state.my_hand)}]
@@ -205,7 +227,7 @@ def build_prompt(state: GameState, analysis: AnalysisBundle) -> str:
 
 {kong_section}请分析：
 1. 推断各对手可能在做什么牌型（结合他们的弃牌与明牌）
-2. 评估每个候选出牌的风险和收益
+2. 评估每个候选出牌的风险和收益；一胡即终局，把"快听快胡"的累积收益计入权衡
 3. 结合【杠牌/杠开机会】：哪些杠该留到听牌时再开（搏杠开8花），哪些该现在开
 4. 给出最终推荐（3-5个选项）及简短理由
 """
