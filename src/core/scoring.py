@@ -160,10 +160,11 @@ def _konged_flower_hua(konged_flowers: list) -> int:
 def _wind_triplet_hua(hand: List[Tile], melds: List[Meld]) -> Tuple[int, List[str]]:
     """南/西/北 wind triplet -> +1花: a peng meld, or exactly 3 concealed.
 
-    Drawing the 4th after a peng upgrades it to a ming kong (+6, REPLACING
-    the +1 — the upgrade path 本来+1 -> 明杠+6). Konged winds never add this
-    花 on top of the kong value. 4 copies fully concealed and un-konged score
-    nothing — an un-konged quad can't fit the 4-melds+pair win shape.
+    Drawing the 4th 南 after a peng has exactly two outcomes at a win: kong it
+    (+1 upgraded to the ming-kong +6, replacement) or discard it (the peng
+    stays +1). Holding it un-konged can never reach a win — the 4th copy
+    pairs with nothing — so that state doesn't occur in a scored hand. A
+    fully concealed un-konged quad likewise scores nothing.
     """
     hua = 0
     parts: List[str] = []
