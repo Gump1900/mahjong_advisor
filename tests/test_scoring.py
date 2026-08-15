@@ -272,15 +272,22 @@ class TestWindTripletHua:
         assert r.hua == 4 + 1
 
     def test_peng_counts(self):
-        hand = H("m123 p456 s789 南南")           # 11 tiles + 1 peng = win
+        # peng 南 (3 copies, none left in hand) + 西西 pair; 3 runs concealed
+        hand = H("m123 p456 s789 西西")           # 11 tiles + 1 peng = win
         r = score_hand(hand, my_melds=[_peng(create_tile("风", "南"))], win_method="zimo")
         assert "南风刻 1花" in r.breakdown
         assert r.hua == 4 + 1
 
-    def test_concealed_quad_counts(self):
-        # 4 in hand (not konged) still satisfies "3个一样"
+    def test_concealed_quad_is_nothing(self):
+        # 4 held without konging can't fit the win shape -> scores nothing
         r = score_hand(H("m123 p456 s789 南南南 南"), win_method="zimo")
-        assert "南风刻 1花" in r.breakdown
+        assert all("南风刻" not in b for b in r.breakdown)
+
+    def test_peng_plus_one_in_hand_is_nothing(self):
+        # peng(3) + 1 more in hand = 4 un-konged copies -> nothing
+        hand = H("m123 p456 s789 南南 南")   # deliberately 4 南 total, no kong
+        r = score_hand(hand, my_melds=[_peng(create_tile("风", "南"))], win_method="zimo")
+        assert all("南风刻" not in b for b in r.breakdown)
 
     def test_two_wind_triplets(self):
         r = score_hand(H("m123 p456 南南南 北北北 西西"), win_method="zimo")
