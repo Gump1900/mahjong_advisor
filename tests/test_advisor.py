@@ -254,3 +254,28 @@ class TestKongOpportunities:
         assert "杠牌/杠开机会" in prompt
         assert "杠开" in prompt
         assert "现在杠任意一组" in prompt
+
+
+class TestSeasonFlowerOpportunity:
+    def test_held_season_detected(self):
+        # every held season flower is a kong-able asset (1花, value = 杠开 timing)
+        state = GameState(
+            my_hand=H("m123 p456 s789 南南南 西"),
+            flowers_in_hand=[create_tile("季节", "春"), create_tile("季节", "菊")],
+        )
+        opps = analyze(state).kong_opportunities
+        season_ops = [op for op in opps if op["tile"].suit == "季节"]
+        assert {str(op["tile"]) for op in season_ops} == {"春", "菊"}
+        assert all(op["kind"] == "花牌自杠" and op["hua"] == 1 for op in season_ops)
+        assert all("杠开" in op["note"] for op in season_ops)
+
+    def test_season_and_multi_flower_together(self):
+        state = GameState(
+            my_hand=H("m2345666 p111 s222"),          # tenpai
+            flowers_in_hand=[create_tile("三元", "中")] * 4 + [create_tile("季节", "夏")],
+        )
+        a = analyze(state)
+        kinds = {(op["tile"], op["hua"]) for op in a.kong_opportunities}
+        assert (create_tile("三元", "中"), 12) in kinds
+        assert (create_tile("季节", "夏"), 1) in kinds
+        assert "杠开" in build_prompt(state, a)
