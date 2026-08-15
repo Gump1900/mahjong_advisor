@@ -2,6 +2,8 @@
 
 基于"计算引擎 + LLM 推理"的混合架构，像麻将老手一样读牌、给出出牌建议。
 
+> 完整系统设计（规则权威口径、算法、计分表、架构、路线）：[docs/design/mahjong_advisor_system_design.md](docs/design/mahjong_advisor_system_design.md)
+
 > **Phase 1（核心引擎）+ Phase 2（LLM 顾问 + 命令行）已完成。** 引擎算出确定性事实（向听/进张/听牌/出牌候选/剩余张数/风险），LLM 负责读牌推理与出牌建议；命令行可交互使用。计分（花数/杠开）仍待做。
 
 ## 规则基线
