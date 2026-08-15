@@ -2,7 +2,12 @@
 import pytest
 
 from src.core.tiles import create_tile, GameState, Meld
-from src.core.probability import TileCounter, count_remaining_tiles, discard_risk
+from src.core.probability import (
+    TileCounter,
+    count_remaining_tiles,
+    discard_risk,
+    estimate_discard_risks,
+)
 
 
 class TestTileCounter:
@@ -70,6 +75,12 @@ class TestCountRemaining:
         rem = count_remaining_tiles(state)
         assert rem[create_tile("万", 3)] == 1   # 4 - 3 in the peng
 
+    def test_subtracts_my_melds(self):
+        meld = Meld(type="peng", tiles=[create_tile("万", 3)] * 3)
+        state = GameState(my_melds=[meld])
+        rem = count_remaining_tiles(state)
+        assert rem[create_tile("万", 3)] == 1   # 4 - 3 in my peng
+
     def test_full_state(self):
         state = GameState(
             my_hand=[create_tile("万", 1)],
@@ -114,3 +125,71 @@ class TestDiscardRisk:
         state = GameState()
         assert discard_risk(create_tile("万", 1), state) == "中"
 
+
+
+class TestEstimateDiscardRisks:
+    """estimate_discard_risks is a transparent heuristic (0..1 estimates + label)."""
+
+    def test_structure(self):
+        r = estimate_discard_risks(create_tile("万", 5), GameState())
+        assert set(r) == {"chi", "peng", "ron", "label"}
+        for key in ("chi", "peng", "ron"):
+            assert 0.0 <= r[key] <= 1.0
+        assert r["label"] in ("安全", "中", "危险")
+
+    def test_flower_never_risks(self):
+        r = estimate_discard_risks(create_tile("三元", "中"), GameState())
+        assert (r["chi"], r["peng"], r["ron"]) == (0.0, 0.0, 0.0)
+        assert r["label"] == "安全"
+
+    def test_genbutu_ron_near_zero(self):
+        # a tile already discarded by an opponent: ron risk drops toward 0
+        state = GameState(discards={"left": [create_tile("万", 5)], "right": [], "opposite": []})
+        safe = estimate_discard_risks(create_tile("万", 5), state)
+        unseen = estimate_discard_risks(create_tile("万", 5), GameState())
+        assert safe["ron"] < unseen["ron"]
+        assert safe["ron"] < 0.05
+        assert safe["label"] == "安全"
+
+    def test_exhausted_ron_zero(self):
+        state = GameState(
+            my_hand=[create_tile("万", 5)],
+            discards={"left": [create_tile("万", 5)] * 3, "right": [], "opposite": []},
+        )
+        r = estimate_discard_risks(create_tile("万", 5), state)
+        assert r["ron"] == 0.0
+
+    def test_honor_cannot_be_chied(self):
+        r = estimate_discard_risks(create_tile("风", "南"), GameState())
+        assert r["chi"] == 0.0
+
+    def test_chi_only_from_left(self):
+        # left throwing lots of 万 -> discarding 万 is likelier to be chied
+        base = estimate_discard_risks(create_tile("万", 5), GameState())
+        left_throws_wan = GameState(discards={
+            "left": [create_tile("万", v) for v in (1, 2, 4, 9)],
+            "right": [create_tile("饼", v) for v in (1, 2, 3)],
+            "opposite": [],
+        })
+        biased = estimate_discard_risks(create_tile("万", 5), left_throws_wan)
+        assert biased["chi"] > base["chi"]
+
+    def test_peng_scales_with_hidden_copies(self):
+        # fewer hidden copies -> lower peng chance
+        full = estimate_discard_risks(create_tile("万", 5), GameState())
+        drained = GameState(discards={
+            "left": [create_tile("万", 5)], "right": [create_tile("万", 5)], "opposite": [],
+        })
+        thin = estimate_discard_risks(create_tile("万", 5), drained)
+        assert thin["peng"] < full["peng"]
+
+    def test_middle_tile_more_dangerous_than_terminal(self):
+        mid = estimate_discard_risks(create_tile("万", 5), GameState())
+        edge = estimate_discard_risks(create_tile("万", 1), GameState())
+        assert mid["ron"] > edge["ron"]
+
+    def test_matches_legacy_label(self):
+        # the old coarse label and the new estimate agree on the label
+        state = GameState()
+        for tile in (create_tile("万", 5), create_tile("风", "南"), create_tile("万", 1)):
+            assert estimate_discard_risks(tile, state)["label"] == discard_risk(tile, state)

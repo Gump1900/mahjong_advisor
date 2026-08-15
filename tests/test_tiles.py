@@ -68,6 +68,16 @@ class TestParseTile:
         assert t.value == value
         assert t.is_flower is flower
 
+    @pytest.mark.parametrize("s,wind", [
+        ("东", "东"), ("南", "南"), ("西", "西"), ("北", "北"),
+    ])
+    def test_parse_bare_wind(self, s, wind):
+        # single wind chars are accepted for CLI convenience
+        t = parse_tile(s)
+        assert t.suit == "风"
+        assert t.value == wind
+        assert t == parse_tile(wind + "风")
+
     def test_parse_sanyuan(self):
         for v in ("中", "发", "白"):
             t = parse_tile(v)
@@ -158,6 +168,7 @@ class TestGameState:
         assert s.my_hand == []
         assert s.discards == {"left": [], "right": [], "opposite": []}
         assert s.melds == {"left": [], "right": [], "opposite": []}
+        assert s.my_melds == []
         assert s.flowers_in_hand == []
         assert s.konged_flowers == []
         assert s.current_turn == "me"

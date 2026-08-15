@@ -20,8 +20,9 @@
 | 模块 | 说明 |
 |------|------|
 | `tiles.py` | 牌的数据结构、创建/解析、花牌判定、30 种可组牌索引。 |
-| `hand_analyzer.py` | 向听数（标准形 + 七对取最小）、听牌、进张、出牌候选排序。 |
-| `probability.py` | 全 144 张计数器；按局面统计各牌剩余张数。 |
+| `hand_analyzer.py` | 向听数（标准形 + 七对取最小，**支持明牌后按 4−N 组面子算**）、听牌、进张、出牌候选排序。 |
+| `probability.py` | 全 144 张计数器；剩余张数；`discard_risk` 三档标签；`estimate_discard_risks` 给被吃/被碰/点炮的启发式概率估计。 |
+| `scoring.py` | 花数计分：实现设计文档已列的规则（4明刻=5花/4暗刻=10花/杠开=8花不封顶）+ 每张花牌1花；其余番型是显式扩展点 `PATTERN_TABLE`。 |
 
 向听约定：**胡牌 = -1，听牌 = 0**。听牌/进张会枚举所有合法拆法并取并集——例如：
 
@@ -65,7 +66,26 @@ python -m src.main
 export MAHJONG_ADVISOR_MODEL=claude-sonnet-5
 ```
 
-分步输入手牌 → 花牌 → 上家/下家/对家弃牌，先打印【分析结果】（向听/听牌/进张/出牌候选/剩余张数/风险），再请求【AI建议】。**没有 API key 或网络不通时不会崩溃**，会退化为只展示分析结果 + 给模型的 Prompt 预览。
+分步输入手牌（暗牌）→ 花牌 → 自己的明牌 → 上家/下家/对家弃牌，先打印【分析结果】（向听/听牌/进张/出牌候选/剩余张数/风险估计），再请求【AI建议】。**没有 API key 或网络不通时不会崩溃**，会退化为只展示分析结果 + 给模型的 Prompt 预览。
+
+明牌写法：`peng 5饼`、`chi 3万 4万 5万`、`ming_gang 9条`、`an_gang 南风`，多组用空格或逗号分隔（全角逗号也行）。碰过之后手牌只输剩下的暗牌，向听会按"还差 4−明牌数 组面子"计算。
+
+计分（作为库）：
+
+```python
+from src.core.scoring import score_hand
+from src.core.tiles import create_tile, Meld
+
+result = score_hand(
+    hand=[create_tile("万", i) for i in (1, 2, 3, 4, 5, 6)],  # 暗牌
+    my_melds=[Meld("peng", [create_tile("饼", 5)] * 3)],
+    flowers=["中"],          # 持有的花牌名
+    win_method="gangkai",    # zimo / dianpao / gangkai
+)
+print(result.hua, result.breakdown)
+```
+
+> **计分口径（待你校准）**：目前只实现了设计文档列出的三条（4明刻=5花、4暗刻=10花、杠开=8花上不封顶）+ 约定的"每张花牌 1 花"。其他番型（对对胡/清一色/七对…）在 `src/core/scoring.py` 的 `PATTERN_TABLE` 留了扩展点，补上完整花数表即可。风险估计同理是透明启发式（公式写在 `estimate_discard_risks` 的 docstring 里），不是精确概率。
 
 ### 作为库
 
@@ -82,7 +102,6 @@ print(get_waiting_tiles(hand))          # [1万, 4万, 7万]
 
 ## 后续路线图
 
-- 计分（花数、杠开 = 8 花等）——按设计文档"MVP 暂不实现计分"延后。
-- 概率风险从启发式升级为更精细的吃/碰/点炮概率模型。
-- 命令行支持明牌（吃/碰/杠）输入（当前仅手牌 + 弃牌）。
+- 补全花数表（对对胡/清一色/字一色/七对…）——填 `PATTERN_TABLE` 即可。
+- 风险估计从透明启发式升级（结合对手听牌推断）。
 - Web UI / 拍照识别 / 语音输入（设计文档 Phase 3-5）。

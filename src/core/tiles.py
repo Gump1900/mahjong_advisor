@@ -57,6 +57,8 @@ def parse_tile(s: str) -> Tile:
         return create_tile(s[1], int(s[0]))
     if len(s) == 2 and s[1] == "风":
         return create_tile("风", s[0])
+    if s in ("东", "南", "西", "北"):  # bare wind char, e.g. '南'
+        return create_tile("风", s)
     if s in ("中", "发", "白"):
         return create_tile("三元", s)
     if s in ("春", "夏", "秋", "冬", "梅", "兰", "竹", "菊"):
@@ -122,6 +124,7 @@ class GameState:
     my_hand: List[Tile] = field(default_factory=list)
     discards: Dict[str, List[Tile]] = field(default_factory=_three_player_dict)
     melds: Dict[str, List[Meld]] = field(default_factory=_three_player_dict)
+    my_melds: List[Meld] = field(default_factory=list)  # my own chi/peng/gang calls
     flowers_in_hand: List[Tile] = field(default_factory=list)
     konged_flowers: List[Tile] = field(default_factory=list)
     current_turn: Literal["me", "left", "right", "opposite"] = "me"

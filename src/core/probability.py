@@ -61,6 +61,10 @@ def count_remaining_tiles(state: GameState) -> Dict[Tile, int]:
             for tile in meld.tiles:
                 counter.remove(tile)
 
+    for meld in state.my_melds:
+        for tile in meld.tiles:
+            counter.remove(tile)
+
     return counter.all_counts()
 
 
@@ -101,3 +105,84 @@ def discard_risk(tile: Tile, state: GameState) -> str:
 
     return _MEDIUM
 
+
+
+# --- richer (still heuristic) discard-risk estimates -------------------------
+def _sequence_shapes(tile: Tile) -> int:
+    """How many runs this tile can complete in its suit (centrality proxy).
+
+    5 participates in 3 runs (345/456/567); 1 and 9 in only 1. Honors: 0.
+    """
+    if tile.suit not in ("万", "饼", "条"):
+        return 0
+    v = tile.value
+    return sum(
+        1 for start in range(v - 2, v + 1) if 1 <= start and start + 2 <= 9
+    )
+
+
+def estimate_discard_risks(tile: Tile, state: GameState) -> Dict[str, float]:
+    """Transparent heuristic estimates for discarding `tile`.
+
+    Returns {"chi": p, "peng": p, "ron": p, "label": 安全/中/危险} with p in
+    [0, 1]. NOT exact probabilities — a readable formula, not a solver:
+
+    chi  = 0                          if honor (only sequences can be chied)
+         = 0.12 * suit_bias + 0.08 * shapes/3
+           suit_bias: share of left's (the only player who can chi) discards
+                      in this suit — collecting that suit shows there
+           shapes:   how many runs the tile completes (centrality)
+    peng = 0.35 * hidden_copies/3 * attractiveness
+           hidden_copies: copies not visible anywhere (fewer -> less chance)
+           attractiveness: 1.0 middle (4/5/6), 0.8 for 3/7, 0.6 for 2/8,
+                           0.5 terminals, 0.7 honors
+    ron  = 0                          if flower, exhausted, or 现物 (seen in
+                                      an opponent's discards)
+         = 0.4 * shapes/3 * hidden_copies/3
+           (middle tiles with many hidden copies are the classic dangerous
+            discard; terminals/honors scale down via shapes/attractiveness)
+    """
+    if tile.is_flower:
+        return {"chi": 0.0, "peng": 0.0, "ron": 0.0, "label": _SAFE}
+
+    remaining = count_remaining_tiles(state)
+    hidden = remaining.get(tile, 0)
+    seen = sum(1 for pl in state.discards.values() for t in pl if t == tile)
+
+    shapes = _sequence_shapes(tile)
+    is_honor = tile.suit == "风"
+
+    # --- chi: only the left player can chi; lean on their suit tendency ---
+    if is_honor:
+        chi = 0.0
+    else:
+        left_discards = state.discards.get("left", [])
+        suit_bias = (
+            sum(1 for t in left_discards if t.suit == tile.suit) / len(left_discards)
+            if left_discards else 0.25
+        )
+        chi = round(0.12 * suit_bias + 0.08 * shapes / 3, 4)
+
+    # --- peng: any of the three; scales with hidden copies & attractiveness
+    if is_honor:
+        attract = 0.7
+    else:
+        attract = {5: 1.0, 4: 1.0, 6: 1.0, 3: 0.8, 7: 0.8,
+                   2: 0.6, 8: 0.6, 1: 0.5, 9: 0.5}[tile.value]
+    peng = round(0.35 * (hidden / 3) * attract, 4)
+
+    # --- ron: 现物 / exhausted tiles can't deal into a hidden pair-wait ---
+    if hidden == 0 or seen >= 1:
+        ron = 0.0
+    else:
+        ron = round(0.4 * (shapes / 3 if not is_honor else 0.4) * (hidden / 3), 4)
+
+    # --- label: same coarse buckets as discard_risk ---
+    if ron == 0.0 and seen >= 1 or hidden == 0 or tile.is_flower:
+        label = _SAFE
+    elif not is_honor and tile.value in (4, 5, 6) and ron > 0.2:
+        label = _DANGER
+    else:
+        label = _MEDIUM
+
+    return {"chi": chi, "peng": peng, "ron": ron, "label": label}
