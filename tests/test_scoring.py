@@ -38,31 +38,32 @@ def _chi(a, b, c):
 # --- base -------------------------------------------------------------------
 class TestBase:
     def test_plain_zimo(self):
-        assert score_hand(H("m123 p456 s789 南南南 西西"), win_method="zimo").hua == 4
+        assert score_hand(H("m123 m456 p789 s123 s99"), win_method="zimo").hua == 4
 
     def test_plain_dianpao(self):
-        assert score_hand(H("m123 p456 s789 南南南 西西"), win_method="dianpao").hua == 2
+        assert score_hand(H("m123 m456 p789 s123 s99"), win_method="dianpao").hua == 2
 
     def test_gangkai_replaces_base(self):
         # 杠开已有8花，不额外加自摸4
-        r = score_hand(H("m123 p456 s789 南南南 西西"), win_method="gangkai")
+        r = score_hand(H("m123 m456 p789 s123 s99"), win_method="gangkai")
         assert r.hua == 8
         assert r.breakdown[0] == "杠开 8花"
 
     def test_invalid_win_method(self):
         with pytest.raises(ValueError):
-            score_hand(H("m123 p456 s789 南南南 西西"), win_method="bogus")
+            score_hand(H("m123 m456 p789 s123 s99"), win_method="bogus")
 
 
 # --- patterns ----------------------------------------------------------------
 class TestPengPeng:
     def test_concealed_zimo(self):
         r = score_hand(H("m111 p222 s333 南南南 西西"), win_method="zimo")
-        assert r.hua == 4 + 10
+        assert r.hua == 4 + 10 + 1   # 碰碰胡 + 南风刻
         assert "碰碰胡 10花" in r.breakdown
+        assert "南风刻 1花" in r.breakdown
 
     def test_concealed_dianpao(self):
-        assert score_hand(H("m111 p222 s333 南南南 西西"), win_method="dianpao").hua == 2 + 5
+        assert score_hand(H("m111 p222 s333 南南南 西西"), win_method="dianpao").hua == 2 + 5 + 1   # +南风刻
 
     def test_with_called_pengs(self):
         hand = H("m111 p222 南南")   # 2 concealed triplets + pair, 2 pengs called
@@ -155,7 +156,7 @@ class TestCombinations:
     def test_gangkai_plus_pengpeng(self):
         # 杠开按自摸档计番型: 8 + 10
         r = score_hand(H("m111 p222 s333 南南南 西西"), win_method="gangkai")
-        assert r.hua == 8 + 10
+        assert r.hua == 8 + 10 + 1   # +南风刻
         assert r.breakdown[0] == "杠开 8花"
 
     def test_qingyise_seven_pairs_stacks(self):
@@ -163,7 +164,7 @@ class TestCombinations:
         assert r.hua == 4 + 10 + 10   # 清一色 + 七对
 
     def test_flowers_add(self):
-        r = score_hand(H("m123 p456 s789 南南南 西西"),
+        r = score_hand(H("m123 m456 p789 s123 s99"),
                        flowers=["中", "春"], konged_flowers=["夏"], win_method="zimo")
         assert r.hua == 4 + 3
         assert r.flowers == 3
@@ -220,7 +221,7 @@ class TestKongHua:
 
 class TestHeldFlowerTiers:
     def _plain(self, flowers):
-        return score_hand(H("m123 p456 s789 南南南 西西"), flowers=flowers, win_method="zimo")
+        return score_hand(H("m123 m456 p789 s123 s99"), flowers=flowers, win_method="zimo")
 
     def test_tier_one_two(self):
         assert self._plain(["中"]).hua == 4 + 1
@@ -241,22 +242,59 @@ class TestHeldFlowerTiers:
 class TestKongedFlowers:
     def test_konged_flower_replaces_tier(self):
         # 4个中杠掉 = 12花（不再叠手持4张档的6花）
-        r = score_hand(H("m123 p456 s789 南南南 西西"),
+        r = score_hand(H("m123 m456 p789 s123 s99"),
                        konged_flowers=["中"] * 4, win_method="zimo")
         assert "花牌 12花" in r.breakdown
         assert r.hua == 4 + 12
 
     def test_two_konged_flower_types(self):
-        r = score_hand(H("m123 p456 s789 南南南 西西"),
+        r = score_hand(H("m123 m456 p789 s123 s99"),
                        konged_flowers=["中"] * 4 + ["东风"] * 4, win_method="zimo")
         assert r.hua == 4 + 24
 
     def test_konged_seasons_still_one_each(self):
-        r = score_hand(H("m123 p456 s789 南南南 西西"),
+        r = score_hand(H("m123 m456 p789 s123 s99"),
                        konged_flowers=["夏", "菊"], win_method="zimo")
         assert r.hua == 4 + 2
 
     def test_dong_normalization(self):
         # both 东 and 东风 spell the multi-flower type
-        assert score_hand(H("m123 p456 s789 南南南 西西"),
+        assert score_hand(H("m123 m456 p789 s123 s99"),
                           flowers=["东", "东", "东"], win_method="zimo").hua == 4 + 4
+
+
+class TestWindTripletHua:
+    """南/西/北 3个一样（碰的或手上的）= +1花；杠了不另加。"""
+
+    def test_concealed_triplet(self):
+        r = score_hand(H("m123 p456 s789 南南南 西西"), win_method="zimo")
+        assert "南风刻 1花" in r.breakdown
+        assert r.hua == 4 + 1
+
+    def test_peng_counts(self):
+        hand = H("m123 p456 s789 南南")           # 11 tiles + 1 peng = win
+        r = score_hand(hand, my_melds=[_peng(create_tile("风", "南"))], win_method="zimo")
+        assert "南风刻 1花" in r.breakdown
+        assert r.hua == 4 + 1
+
+    def test_concealed_quad_counts(self):
+        # 4 in hand (not konged) still satisfies "3个一样"
+        r = score_hand(H("m123 p456 s789 南南南 南"), win_method="zimo")
+        assert "南风刻 1花" in r.breakdown
+
+    def test_two_wind_triplets(self):
+        r = score_hand(H("m123 p456 南南南 北北北 西西"), win_method="zimo")
+        assert r.hua == 4 + 1 + 1   # 南刻 + 北刻
+
+    def test_pair_alone_is_zero(self):
+        r = score_hand(H("m123 m456 p789 s123 s99"), win_method="zimo")
+        assert all("风刻" not in b for b in r.breakdown)
+        assert r.hua == 4
+
+    def test_konged_wind_no_extra(self):
+        # 明杠南=6、暗杠南=12 已含；不再+1
+        hand = H("m111 p222 南南")
+        melds = [Meld("ming_gang", [create_tile("风", "南")] * 4), _peng(create_tile("饼", 5))]
+        r = score_hand(hand, my_melds=melds, win_method="zimo")
+        assert all("南风刻" not in b for b in r.breakdown)
+        assert r.hua == 4 + 10 + 6   # 自摸+碰碰胡+明杠南
