@@ -122,6 +122,7 @@ class GameState:
     """
 
     my_hand: List[Tile] = field(default_factory=list)
+    my_discards: List[Tile] = field(default_factory=list)  # my own discard river
     discards: Dict[str, List[Tile]] = field(default_factory=_three_player_dict)
     melds: Dict[str, List[Meld]] = field(default_factory=_three_player_dict)
     my_melds: List[Meld] = field(default_factory=list)  # my own chi/peng/gang calls

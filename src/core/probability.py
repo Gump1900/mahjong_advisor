@@ -47,6 +47,8 @@ def count_remaining_tiles(state: GameState) -> Dict[Tile, int]:
 
     for tile in state.my_hand:
         counter.remove(tile)
+    for tile in state.my_discards:
+        counter.remove(tile)
     for tile in state.flowers_in_hand:
         counter.remove(tile)
     for tile in state.konged_flowers:
