@@ -22,13 +22,16 @@ Total = 底分 + Σ番型分 + 花牌数.
 
 花牌分:
   中发白东（未杠，拿手里，按同款张数）: 1张=1花, 2张=2花, 3张=4花, 4张=6花
-  （杠掉则拿杠分 12花，替代手持档位——"留花还是杠花"的博弈）
+  （暗杠后牌面朝下没翻出来，不算花，只拿暗杠 12花——"留花还是杠花"的博弈）
   春夏秋冬梅兰竹菊: 每张 1 花.
+
+西南北风刻: 南/西/北 有 3 个一样的（碰的或手上的都行）另 +1 花；
+杠了的不另加（明杠南=6、暗杠南=12 已含）.
 """
 from dataclasses import dataclass, field
 from typing import Dict, List, Tuple
 
-from .tiles import Meld, Tile
+from .tiles import Meld, Tile, create_tile
 
 VALID_WIN_METHODS = ("zimo", "dianpao", "gangkai")
 
@@ -153,6 +156,27 @@ def _konged_flower_hua(konged_flowers: list) -> int:
     return hua
 
 
+def _wind_triplet_hua(hand: List[Tile], melds: List[Meld]) -> Tuple[int, List[str]]:
+    """南/西/北 each: 3 identical copies (peng or concealed) -> +1花.
+
+    Konged winds do NOT get the extra 花 (the kong value 6/12 already covers
+    it, per user rule). A concealed quad (4 in hand, not konged) counts.
+    """
+    hua = 0
+    parts: List[str] = []
+    for wind in ("南", "西", "北"):
+        tile = create_tile("风", wind)
+        copies = sum(1 for t in hand if t == tile)
+        copies += sum(
+            len(m.tiles) for m in melds
+            if m.type == "peng" and m.tiles and m.tiles[0] == tile
+        )
+        if copies >= 3:
+            hua += 1
+            parts.append(f"{wind}风刻 1花")
+    return hua, parts
+
+
 def _kong_hua(melds: List[Meld]) -> Tuple[int, List[str]]:
     """花 from kongs among my_melds: 明杠 5 (南西北 6) / 暗杠 10 (中发白东南西北 12)."""
     total = 0
@@ -216,6 +240,11 @@ def score_hand(
     if kong_hua:
         hua += kong_hua
         breakdown.extend(kong_parts)
+
+    wind_hua, wind_parts = _wind_triplet_hua(hand, melds)
+    if wind_hua:
+        hua += wind_hua
+        breakdown.extend(wind_parts)
 
     flower_hua = _held_flower_hua(flowers) + _konged_flower_hua(konged_flowers)
     if flower_hua:
