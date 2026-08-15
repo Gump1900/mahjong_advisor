@@ -283,11 +283,19 @@ class TestWindTripletHua:
         r = score_hand(H("m123 p456 s789 南南南 南"), win_method="zimo")
         assert all("南风刻" not in b for b in r.breakdown)
 
-    def test_peng_plus_one_in_hand_is_nothing(self):
-        # peng(3) + 1 more in hand = 4 un-konged copies -> nothing
-        hand = H("m123 p456 s789 南南 南")   # deliberately 4 南 total, no kong
+    def test_peng_plus_drawn_fourth_still_one_until_kong(self):
+        # 碰3张南 + 摸回第4张（还没杠）: 仍是碰刻 +1；开明杠后才升级为 +6（替代）
+        hand = H("m123 p456 s789 南 南")       # extra 南 in hand beside the peng
         r = score_hand(hand, my_melds=[_peng(create_tile("风", "南"))], win_method="zimo")
-        assert all("南风刻" not in b for b in r.breakdown)
+        assert "南风刻 1花" in r.breakdown
+
+    def test_peng_upgrade_to_ming_kang_replaces_one(self):
+        # 碰后开明杠: +1 变 +6（替代，不是 6+1=7）
+        hand = H("m111 p222 南南")
+        melds = [Meld("ming_gang", [create_tile("风", "南")] * 4), _peng(create_tile("饼", 5))]
+        r = score_hand(hand, my_melds=melds, win_method="zimo")
+        assert "南风刻" not in r.breakdown     # +1 replaced by the kong value
+        assert r.hua == 4 + 10 + 6             # 自摸 + 碰碰胡 + 明杠南
 
     def test_two_wind_triplets(self):
         r = score_hand(H("m123 p456 南南南 北北北 西西"), win_method="zimo")
