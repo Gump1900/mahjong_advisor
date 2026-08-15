@@ -179,3 +179,84 @@ class TestResultShape:
     def test_pattern_table_has_both_levels(self):
         for name, (zimo, dianpao) in PATTERN_VALUES.items():
             assert zimo > dianpao, name
+
+
+# --- kong & flower-tile 花 (user-confirmed second table) ----------------------
+class TestKongHua:
+    def _win_with_kong(self, kong):
+        # 2 concealed triplets + pair + 1 kong + 1 peng = valid win
+        hand = H("m111 p222 南南")
+        melds = [kong, _peng(create_tile("饼", 5))]
+        return score_hand(hand, my_melds=melds, win_method="zimo")
+
+    def test_ming_gang_number_is_five(self):
+        r = self._win_with_kong(Meld("ming_gang", [create_tile("条", 9)] * 4))
+        assert "明杠9条 5花" in r.breakdown
+        assert r.hua == 4 + 10 + 5   # 自摸 + 碰碰胡 + 明杠
+
+    def test_ming_gang_wind_is_six(self):
+        r = self._win_with_kong(Meld("ming_gang", [create_tile("风", "南")] * 4))
+        assert "明杠南风 6花" in r.breakdown
+        assert r.hua == 4 + 10 + 6
+
+    def test_an_gang_number_is_ten(self):
+        r = self._win_with_kong(Meld("an_gang", [create_tile("条", 9)] * 4))
+        assert "暗杠9条 10花" in r.breakdown
+        assert r.hua == 4 + 10 + 10
+
+    def test_an_gang_wind_is_twelve(self):
+        r = self._win_with_kong(Meld("an_gang", [create_tile("风", "南")] * 4))
+        assert r.hua == 4 + 10 + 12
+
+    def test_multiple_kongs_stack(self):
+        hand = [create_tile("风", "西")]
+        melds = [Meld("ming_gang", [create_tile("条", 9)] * 4),
+                 Meld("an_gang", [create_tile("万", 3)] * 4),
+                 _peng(create_tile("饼", 5)), _peng(create_tile("条", 1))]
+        r = score_hand(hand, my_melds=melds, win_method="zimo")
+        # 大吊车 + 明杠5 + 暗杠10
+        assert r.hua == 4 + 20 + 5 + 10
+
+
+class TestHeldFlowerTiers:
+    def _plain(self, flowers):
+        return score_hand(H("m123 p456 s789 南南南 西西"), flowers=flowers, win_method="zimo")
+
+    def test_tier_one_two(self):
+        assert self._plain(["中"]).hua == 4 + 1
+        assert self._plain(["中", "中"]).hua == 4 + 2
+
+    def test_tier_three_four(self):
+        assert self._plain(["中"] * 3).hua == 4 + 4
+        assert self._plain(["中"] * 4).hua == 4 + 6
+
+    def test_seasons_one_each(self):
+        assert self._plain(["春", "夏", "菊"]).hua == 4 + 3
+
+    def test_mixed_multi_flowers(self):
+        # 3个中(4花) + 2个发(2花) + 春(1花)
+        assert self._plain(["中"] * 3 + ["发", "发"] + ["春"]).hua == 4 + 4 + 2 + 1
+
+
+class TestKongedFlowers:
+    def test_konged_flower_replaces_tier(self):
+        # 4个中杠掉 = 12花（不再叠手持4张档的6花）
+        r = score_hand(H("m123 p456 s789 南南南 西西"),
+                       konged_flowers=["中"] * 4, win_method="zimo")
+        assert "花牌 12花" in r.breakdown
+        assert r.hua == 4 + 12
+
+    def test_two_konged_flower_types(self):
+        r = score_hand(H("m123 p456 s789 南南南 西西"),
+                       konged_flowers=["中"] * 4 + ["东风"] * 4, win_method="zimo")
+        assert r.hua == 4 + 24
+
+    def test_konged_seasons_still_one_each(self):
+        r = score_hand(H("m123 p456 s789 南南南 西西"),
+                       konged_flowers=["夏", "菊"], win_method="zimo")
+        assert r.hua == 4 + 2
+
+    def test_dong_normalization(self):
+        # both 东 and 东风 spell the multi-flower type
+        assert score_hand(H("m123 p456 s789 南南南 西西"),
+                          flowers=["东", "东", "东"], win_method="zimo").hua == 4 + 4
