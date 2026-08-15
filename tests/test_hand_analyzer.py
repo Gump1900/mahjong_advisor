@@ -152,6 +152,34 @@ def test_rank_discards_breaking_structure_is_worse():
     assert ranked[create_tile("条", 8)] > 0
 
 
+# --- Called melds (fuuro) change the structure target -----------------------
+def test_fuuro_reduces_needed_melds():
+    # after one peng, the concealed 10 tiles need 3 melds + 1 pair
+    hand = H("m123 p456 s789 南南")
+    assert calculate_shanten(hand, fuuro=1) == -1   # win: 3 melds + pair + the peng
+    assert is_agari(hand, fuuro=1) is True
+
+def test_fuuro_tenpai():
+    hand = H("m123 p456 s78 南南")
+    assert calculate_shanten(hand, fuuro=1) == 0
+    # 3 melds + head + s78 partial + the peng -> waits 6条/9条
+    assert set(get_waiting_tiles(hand, fuuro=1)) == {create_tile("条", 6), create_tile("条", 9)}
+
+def test_fuuro_blocks_seven_pairs():
+    hand = H("m11 m22 p33 p44 s55 s66 南")
+    # chiitoitsu is impossible with a call; without fuuro this is tenpai
+    assert calculate_shanten(hand, fuuro=0) == 0
+    assert calculate_shanten(hand, fuuro=1) > 0
+
+def test_fuuro_threaded_through_discards_and_ukeire():
+    hand = H("m123 p456 s78 南南")   # 12 tiles + 1 peng = 13
+    ukeire = get_ukeire(hand, fuuro=1)
+    assert create_tile("条", 6) in ukeire
+    assert create_tile("条", 9) in ukeire
+    ranked = rank_discards(hand, fuuro=1)
+    assert len(ranked) > 0
+    assert all(s >= 0 for _, s in ranked)   # discarding never reaches a win
+
 # --- Flowers are excluded from the structure -------------------------------
 def test_flowers_excluded_from_shanten():
     base = H("m123 p456 s78 南南南 西 北")          # shanten 1

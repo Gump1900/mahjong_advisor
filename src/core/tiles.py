@@ -122,6 +122,7 @@ class GameState:
     my_hand: List[Tile] = field(default_factory=list)
     discards: Dict[str, List[Tile]] = field(default_factory=_three_player_dict)
     melds: Dict[str, List[Meld]] = field(default_factory=_three_player_dict)
+    my_melds: List[Meld] = field(default_factory=list)  # my own chi/peng/gang calls
     flowers_in_hand: List[Tile] = field(default_factory=list)
     konged_flowers: List[Tile] = field(default_factory=list)
     current_turn: Literal["me", "left", "right", "opposite"] = "me"

@@ -1,7 +1,7 @@
 """Advisor orchestration tests: analyze() + build_prompt() (no network)."""
 import pytest
 
-from src.core.tiles import create_tile, GameState
+from src.core.tiles import create_tile, GameState, Meld
 from src.core.hand_analyzer import calculate_shanten, get_waiting_tiles
 from src.llm.advisor import analyze, build_prompt, get_advice, DEFAULT_MODEL
 
@@ -151,3 +151,15 @@ class TestGetAdvice:
         client = _FakeClient(stop_reason="refusal")
         with pytest.raises(ValueError):
             get_advice(_state("m123 p456 s789 南南南 西"), analyze(_state("m123 p456 s789 南南南 西")), client=client)
+
+
+class TestAnalyzeWithMelds:
+    def test_meld_reduces_shanten(self):
+        # concealed 10 + one peng: win shape is 3 melds + pair (+ the peng)
+        state = GameState(
+            my_hand=H("m123 p456 s789 南南"),
+            my_melds=[Meld(type="peng", tiles=[create_tile("饼", 1)] * 3)],
+        )
+        a = analyze(state)
+        assert a.shanten == -1
+        assert a.remaining[create_tile("饼", 1)] == 1   # peng counted in remaining

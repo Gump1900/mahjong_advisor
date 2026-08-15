@@ -61,6 +61,10 @@ def count_remaining_tiles(state: GameState) -> Dict[Tile, int]:
             for tile in meld.tiles:
                 counter.remove(tile)
 
+    for meld in state.my_melds:
+        for tile in meld.tiles:
+            counter.remove(tile)
+
     return counter.all_counts()
 
 

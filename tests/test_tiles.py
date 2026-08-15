@@ -158,6 +158,7 @@ class TestGameState:
         assert s.my_hand == []
         assert s.discards == {"left": [], "right": [], "opposite": []}
         assert s.melds == {"left": [], "right": [], "opposite": []}
+        assert s.my_melds == []
         assert s.flowers_in_hand == []
         assert s.konged_flowers == []
         assert s.current_turn == "me"

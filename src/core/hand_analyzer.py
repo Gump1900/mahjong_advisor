@@ -112,13 +112,13 @@ def _combine(front_lists):
 
 def _standard_shanten(counts, fuuro=0) -> int:
     fronts = [_decompose_suit(counts[s:e], shuntsu) for s, e, shuntsu in _SEGMENTS]
-    best = 8
+    best = 8 - 2 * fuuro   # each called meld is a complete mentsu already
     mentsu_needed = 4 - fuuro
     for sets, taatsu, toitsu in _combine(fronts):
         head_bonus = 1 if toitsu >= 1 else 0
         partial_slots = taatsu + max(0, toitsu - 1)  # reserve one pair as head
         usable = max(0, min(partial_slots, mentsu_needed - sets))
-        shanten = 8 - 2 * sets - usable - head_bonus
+        shanten = 8 - 2 * fuuro - 2 * sets - usable - head_bonus
         if shanten < best:
             best = shanten
     return best

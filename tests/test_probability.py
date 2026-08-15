@@ -70,6 +70,12 @@ class TestCountRemaining:
         rem = count_remaining_tiles(state)
         assert rem[create_tile("万", 3)] == 1   # 4 - 3 in the peng
 
+    def test_subtracts_my_melds(self):
+        meld = Meld(type="peng", tiles=[create_tile("万", 3)] * 3)
+        state = GameState(my_melds=[meld])
+        rem = count_remaining_tiles(state)
+        assert rem[create_tile("万", 3)] == 1   # 4 - 3 in my peng
+
     def test_full_state(self):
         state = GameState(
             my_hand=[create_tile("万", 1)],

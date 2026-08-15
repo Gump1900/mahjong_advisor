@@ -47,16 +47,17 @@ class AnalysisBundle:
 def analyze(state: GameState) -> AnalysisBundle:
     """Run the engine over the state and collect every fact the advisor needs."""
     hand = state.my_hand
-    shanten = calculate_shanten(hand)
+    fuuro = len(state.my_melds)  # each called meld is a finished mentsu
+    shanten = calculate_shanten(hand, fuuro)
     is_tenpai = shanten == 0
-    discards_ranked = rank_discards(hand)
+    discards_ranked = rank_discards(hand, fuuro)
     risks = {tile: discard_risk(tile, state) for tile, _ in discards_ranked}
     remaining = count_remaining_tiles(state)
     return AnalysisBundle(
         shanten=shanten,
         is_tenpai=is_tenpai,
-        ukeire=get_ukeire(hand),
-        waiting=get_waiting_tiles(hand) if is_tenpai else [],
+        ukeire=get_ukeire(hand, fuuro),
+        waiting=get_waiting_tiles(hand, fuuro) if is_tenpai else [],
         discards_ranked=discards_ranked,
         risks=risks,
         remaining=remaining,
