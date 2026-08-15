@@ -16,7 +16,11 @@ from ..core.hand_analyzer import (
     get_waiting_tiles,
     rank_discards,
 )
-from ..core.probability import count_remaining_tiles, discard_risk
+from ..core.probability import (
+    count_remaining_tiles,
+    discard_risk,
+    estimate_discard_risks,
+)
 from ..core.tiles import GameState, Meld, Tile
 
 # Default model per the claude-api skill (override via MAHJONG_ADVISOR_MODEL).
@@ -39,7 +43,8 @@ class AnalysisBundle:
     ukeire: List[Tile]
     waiting: List[Tile]
     discards_ranked: List[Tuple[Tile, int]]
-    risks: Dict[Tile, str]
+    risks: Dict[Tile, str]                    # coarse label, kept for the UI
+    risk_estimates: Dict[Tile, Dict[str, float]]  # {chi, peng, ron, label}
     remaining: Dict[Tile, int]
     remaining_total: int
 
@@ -52,6 +57,9 @@ def analyze(state: GameState) -> AnalysisBundle:
     is_tenpai = shanten == 0
     discards_ranked = rank_discards(hand, fuuro)
     risks = {tile: discard_risk(tile, state) for tile, _ in discards_ranked}
+    risk_estimates = {
+        tile: estimate_discard_risks(tile, state) for tile, _ in discards_ranked
+    }
     remaining = count_remaining_tiles(state)
     return AnalysisBundle(
         shanten=shanten,
@@ -60,6 +68,7 @@ def analyze(state: GameState) -> AnalysisBundle:
         waiting=get_waiting_tiles(hand, fuuro) if is_tenpai else [],
         discards_ranked=discards_ranked,
         risks=risks,
+        risk_estimates=risk_estimates,
         remaining=remaining,
         remaining_total=sum(remaining.values()),
     )
@@ -91,7 +100,10 @@ def build_prompt(state: GameState, analysis: AnalysisBundle) -> str:
         shanten_desc = f"{a.shanten}（还差 {a.shanten} 步听牌）"
 
     candidates = "\n".join(
-        f"- 打 {tile}：打出后向听数 {after}；点炮风险 {a.risks[tile]}；该牌剩余 {a.remaining.get(tile, 0)} 张"
+        f"- 打 {tile}：打出后向听数 {after}；点炮风险 {a.risks[tile]}"
+        f"（被吃 {a.risk_estimates[tile]['chi']:.0%} / 被碰 {a.risk_estimates[tile]['peng']:.0%}"
+        f" / 点炮 {a.risk_estimates[tile]['ron']:.0%}，启发式估计）；"
+        f"该牌剩余 {a.remaining.get(tile, 0)} 张"
         for tile, after in a.discards_ranked[:6]
     ) or "- （没有可打牌）"
 

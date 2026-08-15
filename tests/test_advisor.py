@@ -197,3 +197,17 @@ class TestParseMelds:
             parse_melds("peng")             # no tile
         with pytest.raises(ValueError):
             parse_melds("bogus 5饼")       # unknown meld type
+
+
+class TestRiskEstimates:
+    def test_bundle_has_estimates(self):
+        a = analyze(_state("m123 p456 s789 南南南 西西 北"))
+        for tile, _ in a.discards_ranked:
+            est = a.risk_estimates[tile]
+            assert set(est) == {"chi", "peng", "ron", "label"}
+            assert est["label"] == a.risks[tile]   # consistent with coarse label
+
+    def test_prompt_contains_percentages(self):
+        state = _state("m123 p456 s789 南南南 西西 北")
+        prompt = build_prompt(state, analyze(state))
+        assert "被吃" in prompt and "点炮" in prompt and "%" in prompt
