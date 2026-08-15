@@ -25,9 +25,9 @@ Total = 底分 + Σ番型分 + 花牌数.
   （暗杠后牌面朝下没翻出来，不算花，只拿暗杠 12花——"留花还是杠花"的博弈）
   春夏秋冬梅兰竹菊: 每张 1 花.
 
-西南北风刻: 南/西/北 恰好 3 个一样的（碰的或手上的都行）另 +1 花；
-杠了的不另加（明杠南=6、暗杠南=12 已含）；手里 4 张不杠什么都不算
-（4 张同款组不进 4面子+1对，这手牌胡不了，要胡只能杠）.
+西南北风刻: 南/西/北 碰了（明刻）或手里恰好 3 张（暗刻）-> +1 花.
+碰后摸回第 4 张可开明杠: +1 升级为 +6（替代，不是 +7）. 手里 4 张
+没碰没杠什么都不算（组不进 4面子+1对，胡不了，要胡只能杠）.
 """
 from dataclasses import dataclass, field
 from typing import Dict, List, Tuple
@@ -158,22 +158,20 @@ def _konged_flower_hua(konged_flowers: list) -> int:
 
 
 def _wind_triplet_hua(hand: List[Tile], melds: List[Meld]) -> Tuple[int, List[str]]:
-    """南/西/北 each: EXACTLY 3 identical copies (peng or concealed) -> +1花.
+    """南/西/北 wind triplet -> +1花: a peng meld, or exactly 3 concealed.
 
-    Konged winds do NOT get the extra 花 (the kong value 6/12 already covers
-    it). 4 copies held without konging score NOTHING — an un-konged quad
-    can't fit the 4-melds+pair shape, so that hand can't win anyway.
+    Drawing the 4th after a peng upgrades it to a ming kong (+6, REPLACING
+    the +1 — the upgrade path 本来+1 -> 明杠+6). Konged winds never add this
+    花 on top of the kong value. 4 copies fully concealed and un-konged score
+    nothing — an un-konged quad can't fit the 4-melds+pair win shape.
     """
     hua = 0
     parts: List[str] = []
     for wind in ("南", "西", "北"):
         tile = create_tile("风", wind)
-        copies = sum(1 for t in hand if t == tile)
-        copies += sum(
-            len(m.tiles) for m in melds
-            if m.type == "peng" and m.tiles and m.tiles[0] == tile
-        )
-        if copies == 3:
+        penged = any(m.type == "peng" and m.tiles and m.tiles[0] == tile for m in melds)
+        concealed = sum(1 for t in hand if t == tile)
+        if penged or concealed == 3:
             hua += 1
             parts.append(f"{wind}风刻 1花")
     return hua, parts
