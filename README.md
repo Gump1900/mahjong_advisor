@@ -60,13 +60,22 @@ python -m pytest -v
 
 > 注意：本仓库的 `.venv/bin/pytest` 入口指向一个旧路径（shebang 失效），请用 `python -m pytest` 调用。
 
+### Web 界面（推荐）
+
+```bash
+export ANTHROPIC_API_KEY=your_key      # 或先 ant auth login（不设也能用引擎分析）
+python -m src.web                      # 打开 http://127.0.0.1:8765
+# 可选配置
+export MAHJONG_ADVISOR_MODEL=claude-sonnet-5        # 换模型（默认 claude-opus-5）
+export MAHJONG_ADVISOR_THINKING=adaptive            # 开深度思考（默认 disabled，兼容各类 Anthropic 兼容端点且响应快）
+```
+
+浏览器里点着打：手牌点一下=打出；摸牌/对手吃碰杠用牌库点选；右侧引擎分析实时更新（出牌候选带进张速度和风险条），「问 LLM」拿读牌建议；输错点撤销。零额外依赖（Python 标准库起服务）。
+
 ### 命令行助手
 
 ```bash
-export ANTHROPIC_API_KEY=your_key      # 或先 ant auth login
 python -m src.main
-# 可选：换更省更快模型（默认 claude-opus-5）
-export MAHJONG_ADVISOR_MODEL=claude-sonnet-5
 ```
 
 **对局模式（真打牌推荐）**：开局输一次起手牌，之后每回合只输事件——`摸 5万`、`打 2万`、`l 3条`（上家打）、`r碰 5饼`、`l吃 3万 4万 5万`、`o杠 9条`、`kg 中`（我杠花）、`an 9条`（暗杠）、`ka 南`（加杠）、`看/局/撤/q`。摸牌后自动出完整分析；碰/吃/杠自动从牌河移走源牌，输错可撤。
