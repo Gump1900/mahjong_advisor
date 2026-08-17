@@ -2,15 +2,17 @@
 
 > 文档性质：产品与技术一体化总体设计
 >
-> 版本：1.1
+> 版本：1.2
 >
-> 日期：2026-08-15
+> 日期：2026-08-16
 >
 > 目标读者：产品负责人、算法工程师、后端工程师、测试工程师
 >
 > 文档状态：核心引擎、LLM 顾问、计分系统均已实现并通过 204 项测试；本文为已实现系统的完整设计基线与后续演进依据
 
 > 1.1 修订：新增对局会话模式（§5.4，增量事件输入与局面维护）； GameState 增加 my_discards 并计入剩余张数；测试计数同步至 204。
+
+> 1.2 修订：新增本地 Web 界面（§5.5，`python -m src.web`，标准库后端 + 单文件前端，零新增依赖）；get_advice 默认关闭思考（Anthropic 兼容端点上 adaptive 思考会耗尽预算导致截断，`MAHJONG_ADVISOR_THINKING=adaptive` 可开）、显式处理 max_tokens 截断与 refusal；测试计数同步至 210。
 
 > 说明：本文取代 `docs/plans/2026-02-27-mahjong-advisor-design.md`（早期概要设计）与 `docs/plans/2026-02-27-mahjong-advisor-impl.md`（含错误向听占位实现的早期计划）。两份早期文档中的规则矛盾与算法缺陷已在实现中修正，修正口径全部并入本文。
 
@@ -110,7 +112,7 @@
 | 听牌并集正确率（多拆法牌例） | 100% |
 | 剩余张数正确率 | 100% |
 | 计分与确认规则的一致性 | 100% |
-| 单测数量（当前） | 204 项全绿 |
+| 单测数量（当前） | 210 项全绿 |
 | LLM 建议中的数值来源 | 100% 来自引擎注入 |
 
 ### 3.3 非目标
@@ -146,6 +148,14 @@ LLM 的对手推断是**启发性判断**，不是读心术。系统承诺的是
 ---
 
 ## 5. 产品形态与交互流程
+
+### 5.5 本地 Web 界面（推荐体验形态）
+
+`python -m src.web` 后浏览器打开 `http://127.0.0.1:8765`：
+
+- **后端**（`src/web.py`）：Python 标准库 `http.server`，JSON API（`/api/new`、`/api/event`、`/api/state`、`/api/advice`）直接复用会话层与引擎，零新增依赖；
+- **前端**（`src/webapp/index.html` 单文件，无构建步骤）：手牌点一下=打出；摸牌/对手吃碰杠/杠花/暗杠/加杠用牌库点选；右侧引擎分析实时更新（出牌候选含进张速度与风险条），「问 LLM」取读牌建议（无 key 时展示 Prompt 预览）；支持撤销与新对局；
+- 单用户本地工具：一局状态与撤销栈驻留内存。
 
 ### 5.1 命令行交互
 
@@ -263,6 +273,7 @@ GameState（局面快照）
 | 编排层 | 汇总引擎事实 + 杠开机会 | `advisor.py: analyze / find_kong_opportunities` |
 | 推理层 | 读牌与建议（LLM） | `advisor.py: build_prompt / get_advice` |
 | 会话层 | 对局事件解析与局面增量维护（碰/吃/杠记账、撤销） | `session.py` |
+| Web 层 | 本地单页界面与 JSON API | `web.py` + `webapp/index.html` |
 | 表现层 | 命令行交互与呈现 | `main.py` |
 
 ---
@@ -544,7 +555,7 @@ ron  = 0                                    花牌 / 已现尽 / 现物
 
 - 官方 `anthropic` SDK，客户端零参构造（`ANTHROPIC_API_KEY` / `ANTHROPIC_AUTH_TOKEN` / `ant auth login` profile 解析），不硬编码 key；
 - 模型默认 `claude-opus-5`，`MAHJONG_ADVISOR_MODEL` 环境变量可覆盖（交互式工具换 `claude-sonnet-5` 提速省钱是用户决定）；
-- adaptive thinking（读牌推理受益于思考），`max_tokens=8192` 给思考+回答留余量；
+- 思考模式默认 `disabled`（Anthropic 兼容端点如 BigModel 上 adaptive 会耗尽 16384 预算导致空回答/截断；直连官方 API 可设 `MAHJONG_ADVISOR_THINKING=adaptive` 取得更深推理），`max_tokens=16384`，`stop_reason` 的 `max_tokens`/`refusal` 均显式处理；
 - `stop_reason == "refusal"` 显式处理并抛可读错误；
 - `client` 参数可注入——单元测试用假 client，不触网。
 
@@ -646,7 +657,7 @@ result = score_hand(hand, my_melds, flowers, konged_flowers,
 
 ## 16. 质量保障与测试设计
 
-### 16.1 测试策略（TDD，当前 204 项全绿）
+### 16.1 测试策略（TDD，当前 210 项全绿）
 
 | 类别 | 代表用例 |
 |---|---|
@@ -656,6 +667,7 @@ result = score_hand(hand, my_melds, flowers, konged_flowers,
 | 计分 | 底分/番型/杠分/花牌阶梯/风刻全部口径、组合（叠加/独立/互斥）、杠开替代 |
 | 顾问 | analyze 交叉验证、build_prompt 关键内容、get_advice 注入假 client（不触网）、杠开机会四类 |
 | 会话 | 事件解析（中/拼音/家前缀）、碰/吃/杠牌河记账（不重复扣减）、杠花/暗杠/加杠/摸打校验、撤销 |
+| Web | 起服后走 HTTP：页面可达、new/event/state 全流程（含撤销与记账）、非法事件报错、advice 在线/离线两态 |
 | 集成 | 端到端：局面→分析→剩余一致性、明牌场景、花牌跨模块 |
 
 ### 16.2 关键不变量（测试钉死）
@@ -690,8 +702,9 @@ result = score_hand(hand, my_melds, flowers, konged_flowers,
 | `src/core/scoring.py` | ✅ 完成（完整花数表） |
 | `src/llm/advisor.py` | ✅ 完成（analyze/prompt/advice/杠开机会） |
 | `src/session.py` | ✅ 完成（对局会话：事件输入、记账、撤销、摸牌后自动分析） |
+| `src/web.py` + `src/webapp/` | ✅ 完成（本地 Web 界面，零新增依赖） |
 | `src/main.py` | ✅ 完成（模式菜单 + 一次性输入 + 降级） |
-| 测试 | ✅ 204 项全绿 |
+| 测试 | ✅ 210 项全绿 |
 
 早期文档 `docs/plans/` 下两份文件仅作历史存档，不再作为实现依据。
 
@@ -762,7 +775,7 @@ my_melds 贯穿、风险估计细化、完整花数表、杠开机会识别。
 ### 21.2 正确性验收
 
 - 用户手算锚点牌例（23456、2345666、明牌听牌、计分算例）逐项通过；
-- 204 项测试全绿；
+- 210 项测试全绿；
 - 计分 breakdown 与本第 9 章口径逐条一致。
 
 ### 21.3 架构验收

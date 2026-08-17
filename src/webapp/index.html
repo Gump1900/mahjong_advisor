@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>麻将策略助手</title>
+<style>
+  :root{
+    --felt:#1d4d3a; --felt2:#173f30; --panel:#fbf8ef; --ink:#33302a;
+    --line:#d8d2c0; --accent:#c8542f; --gold:#b98a2f; --safe:#4a7d52;
+    --warn:#c9a227; --danger:#b3402e; --muted:#8a8474;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:linear-gradient(160deg,var(--felt),var(--felt2));
+       color:var(--ink);font:15px/1.5 -apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+  header{display:flex;align-items:center;gap:12px;padding:12px 18px;color:#fff}
+  header h1{font-size:19px;margin:0;font-weight:600}
+  header .sub{opacity:.75;font-size:12.5px}
+  header .sp{flex:1}
+  button{font:inherit;border:1px solid var(--line);background:#fff;color:var(--ink);
+         border-radius:8px;padding:6px 14px;cursor:pointer}
+  button:hover{border-color:var(--accent);color:var(--accent)}
+  button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  button.primary:hover{opacity:.9;color:#fff}
+  button.ghost{background:transparent;color:#fff;border-color:rgba(255,255,255,.4)}
+  button.ghost:hover{border-color:#fff;color:#fff}
+  button:disabled{opacity:.5;cursor:default}
+  main{display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:14px;padding:0 18px 18px}
+  .card{background:var(--panel);border-radius:12px;padding:12px 14px;box-shadow:0 2px 10px rgba(0,0,0,.25)}
+  .card h3{margin:0 0 8px;font-size:13.5px;color:var(--muted);font-weight:600;letter-spacing:.5px}
+  .col{display:flex;flex-direction:column;gap:14px;min-width:0}
+  /* tiles */
+  .tile{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;
+        width:46px;height:60px;margin:2px;background:#fff;border:1px solid #cfc9b8;border-bottom-width:3px;
+        border-radius:6px;cursor:pointer;user-select:none;font-weight:700;line-height:1.15}
+  .tile .n{font-size:20px}
+  .tile .s{font-size:12px;color:#7a7462}
+  .tile.honor .n{font-size:17px}
+  .tile.flower{background:#fdf3dd;border-color:#d9c48a}
+  .tile.flower .n{color:#9a7418;font-size:16px}
+  .tile.small{width:32px;height:42px}
+  .tile.small .n{font-size:14px}.tile.small .s{font-size:10px}
+  .tile:hover{transform:translateY(-3px);border-color:var(--accent)}
+  .tile.flat{cursor:default}
+  .tile.flat:hover{transform:none;border-color:#cfc9b8}
+  .river{min-height:46px;padding:4px 6px;background:#efe9d8;border-radius:8px;line-height:0}
+  /* opponents */
+  .opps{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .opp h3{display:flex;justify-content:space-between}
+  .opp .cnt{color:var(--accent)}
+  .melds{margin-top:6px;font-size:12px;color:var(--muted)}
+  .melds .grp{display:inline-block;background:#efe9d8;border-radius:6px;padding:2px 6px;margin:2px 2px 0 0}
+  /* my area */
+  .row{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:8px}
+  .row .lbl{font-size:12.5px;color:var(--muted);min-width:64px}
+  .hand .tile{width:52px;height:68px}
+  /* action bar */
+  .actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  .chip{padding:5px 12px;border-radius:999px;border:1px solid var(--line);background:#fff;cursor:pointer;font-size:13.5px}
+  .chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .picker{margin-top:8px;display:none}
+  .picker.show{display:block}
+  .picker .grp{margin:4px 0}
+  .picker .glabel{font-size:12px;color:var(--muted);margin-right:6px}
+  .pending{margin-top:6px;font-size:13px;color:var(--accent);min-height:20px}
+  /* analysis */
+  .status{font-size:16px;font-weight:700;margin-bottom:6px}
+  .substat{font-size:12.5px;color:var(--muted);margin-bottom:8px}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{color:var(--muted);font-weight:600;text-align:left;padding:4px 6px;border-bottom:1px solid var(--line);font-size:12px}
+  td{padding:5px 6px;border-bottom:1px dashed #e7e1d0;vertical-align:middle}
+  tr.cand{cursor:pointer}
+  tr.cand:hover td{background:#f4efdf}
+  .risk{display:inline-block;padding:1px 8px;border-radius:999px;font-size:12px;color:#fff}
+  .risk.安全{background:var(--safe)} .risk.中{background:var(--warn)} .risk.危险{background:var(--danger)}
+  .bars{display:flex;gap:6px;margin-top:2px}
+  .bar{width:44px;height:4px;background:#e7e1d0;border-radius:2px;overflow:hidden}
+  .bar i{display:block;height:100%;background:var(--muted)}
+  .bar.r i{background:var(--danger)}
+  .kong{margin-top:10px;border-top:1px solid var(--line);padding-top:8px}
+  .kong li{margin:3px 0;font-size:13px}
+  .star{color:var(--accent);font-weight:700;font-size:13px;margin-top:4px}
+  .advice{white-space:pre-wrap;font-size:14px;max-height:420px;overflow:auto;background:#f4efdf;
+          border-radius:8px;padding:10px 12px}
+  .hint{color:var(--muted);font-size:13px}
+  .err{color:var(--danger)}
+  /* modal */
+  .mask{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center}
+  .mask.show{display:flex}
+  .modal{background:var(--panel);border-radius:14px;padding:20px;width:min(520px,92vw)}
+  .modal h2{margin:0 0 12px;font-size:17px}
+  .modal input{width:100%;font:inherit;padding:8px 10px;border:1px solid var(--line);border-radius:8px;margin-bottom:10px}
+  .modal .btns{display:flex;gap:10px;justify-content:flex-end}
+  @media (max-width:900px){main{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+  <h1>🀄 麻将策略助手</h1>
+  <span class="sub">引擎算事实 · LLM 做读牌 · 一胡即终局，快胡优先</span>
+  <span class="sp"></span>
+  <button class="ghost" onclick="undo()">↩ 撤销</button>
+  <button class="ghost" onclick="showNew()">✚ 新对局</button>
+</header>
+
+<main>
+  <div class="col">
+    <div class="card opps" id="opps"></div>
+
+    <div class="card">
+      <div class="row"><span class="lbl">未杠花牌</span><span id="flowers" class="river" style="line-height:1.6"><span class="hint">无</span></span></div>
+      <div class="row"><span class="lbl">我的明牌</span><span id="mymelds" class="melds" style="margin:0">无</span></div>
+      <div class="row"><span class="lbl">我的暗牌</span><span id="hand" class="hand" style="line-height:0"><span class="hint">点「新对局」开始</span></span>
+        <span style="font-size:12px;color:var(--muted)">（点一张 = 打出）</span></div>
+      <div class="row"><span class="lbl">我的弃牌</span><span id="myriver" class="river"><span class="hint">无</span></span></div>
+    </div>
+
+    <div class="card">
+      <h3>操作</h3>
+      <div class="actions" id="actions">
+        <span class="chip" data-mode="draw" onclick="setMode('draw','摸牌')">摸牌</span>
+        <span style="color:var(--line)">|</span>
+        <span class="chip" data-p="l" onclick="setPlayer('l')">上家</span>
+        <span class="chip" data-p="r" onclick="setPlayer('r')">下家</span>
+        <span class="chip" data-p="o" onclick="setPlayer('o')">对家</span>
+        <span class="chip" data-mode="od" onclick="setMode('od','打')">打</span>
+        <span class="chip" data-mode="op" onclick="setMode('op','碰')">碰</span>
+        <span class="chip" data-mode="oc" onclick="setMode('oc','吃')">吃</span>
+        <span class="chip" data-mode="og" onclick="setMode('og','杠')">杠</span>
+        <span style="color:var(--line)">|</span>
+        <span class="chip" data-mode="kg" onclick="setMode('kg','杠花')">杠花</span>
+        <span class="chip" data-mode="an" onclick="setMode('an','暗杠')">暗杠</span>
+        <span class="chip" data-mode="ka" onclick="setMode('ka','加杠')">加杠</span>
+      </div>
+      <div class="picker" id="picker"></div>
+      <div class="pending" id="pending"></div>
+    </div>
+  </div>
+
+  <div class="col">
+    <div class="card">
+      <h3>分析（引擎）</h3>
+      <div id="analysis" class="hint">开始对局后，摸牌自动更新</div>
+    </div>
+    <div class="card">
+      <h3>AI 建议
+        <button class="primary" id="adviceBtn" style="float:right;padding:3px 12px" onclick="advice()">问 LLM</button>
+      </h3>
+      <div id="advice" class="hint">需要 ANTHROPIC_API_KEY；引擎分析无需联网</div>
+    </div>
+  </div>
+</main>
+
+<div class="mask" id="mask">
+  <div class="modal">
+    <h2>新对局</h2>
+    <input id="inHand" placeholder="起手暗牌 13 张，如：2万 3万 4万 5万 6万 6万 6万 1饼 1饼 1饼 2条 2条 2条">
+    <input id="inFlowers" placeholder="起手花牌（可空），如：中 中">
+    <div class="btns">
+      <button onclick="fillSample()">填个示例</button>
+      <button onclick="hideNew()">取消</button>
+      <button class="primary" onclick="startGame()">开始</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+let mode = null, player = 'l', pending = [];
+
+const SUITS = [
+  {label:'万', n:9, prefix:''}, {label:'饼', n:9}, {label:'条', n:9},
+];
+const HONORS = ['南风','西风','北风'];
+const FLOWERS = ['中','发','白','东风','春','夏','秋','冬','梅','兰','竹','菊'];
+const SEASON = new Set(['春','夏','秋','冬','梅','兰','竹','菊']);
+
+function tileHTML(name, cls='', click=''){
+  let n = name, s = '';
+  const m = name.match(/^([1-9])([万饼条])$/);
+  if (m){ n = m[1]; s = m[2]; }
+  else { s = ''; }
+  const flower = !m;
+  return `<span class="tile ${cls} ${flower?'flower':''} ${m?'':'honor'}" ${click?`onclick="${click}"`:''}>` +
+         `<span class="n">${n}</span>${s?`<span class="s">${s}</span>`:''}</span>`;
+}
+
+/* ---------- server calls ---------- */
+async function api(path, body){
+  const r = await fetch(path, body ? {method:'POST',headers:{'Content-Type':'application/json'},
+                                          body:JSON.stringify(body)} : undefined);
+  return r.json();
+}
+async function refresh(){
+  const d = await api('/api/state');
+  if (!d.ok){ return; }
+  render(d.state); renderAnalysis(d.analysis);
+}
+async function send(line){
+  const d = await api('/api/event', {line});
+  if (!d.ok){ flash(d.error || '操作失败'); return false; }
+  await refresh(); return true;
+}
+function flash(msg){
+  const p = $('pending'); p.textContent = '⚠ ' + msg;
+  setTimeout(()=>{ if(p.textContent.startsWith('⚠')) p.textContent=''; }, 2500);
+}
+
+/* ---------- render ---------- */
+function render(st){
+  // opponents
+  const names = {l:'上家', r:'下家', o:'对家'};
+  $('opps').innerHTML = ['l','r','o'].map(k=>{
+    const p = st.players[k==='l'?'left':k==='r'?'right':'opposite'];
+    const river = p.discards.length ? p.discards.map(t=>tileHTML(t,'small','flat')).join('') : '<span class="hint">无弃牌</span>';
+    const melds = p.melds.length ? p.melds.map(m=>`<span class="grp">${m.type} ${m.tiles.join(' ')}</span>`).join(' ') : '无明牌';
+    return `<div class="card opp"><h3>${names[k]} <span class="cnt">${p.discards.length}张弃牌</span></h3>
+            <div class="river">${river}</div><div class="melds">${melds}</div></div>`;
+  }).join('');
+
+  $('flowers').innerHTML = st.flowers.length
+    ? st.flowers.map(t=>tileHTML(t,'small',`send('kg ${t}')`)).join('') +
+      '<span class="hint" style="font-size:11px;margin-left:6px">点花=杠掉</span>'
+    : '<span class="hint">无</span>';
+  $('mymelds').innerHTML = st.my_melds.length
+    ? st.my_melds.map(m=>`<span class="grp">${m.type} ${m.tiles.join(' ')}</span>`).join(' ') : '无';
+  $('hand').innerHTML = st.hand.length
+    ? st.hand.map(t=>tileHTML(t,'',`send('打 ${t}')`)).join('')
+    : '<span class="hint">空</span>';
+  $('myriver').innerHTML = st.my_discards.length
+    ? st.my_discards.map(t=>tileHTML(t,'small','flat')).join('') : '<span class="hint">无</span>';
+}
+
+function renderAnalysis(a){
+  if (!a){ return; }
+  let head;
+  if (a.shanten === -1) head = '🎉 已经胡了！';
+  else if (a.is_tenpai) head = `📣 听牌！胡：${a.waiting.join(' ')}`;
+  else head = `向听数 ${a.shanten}｜进张：${a.ukeire.join(' ') || '无'}`;
+  let html = `<div class="status">${head}</div>
+              <div class="substat">全桌剩余 ${a.remaining_total} 张 · 一胡即终局，快胡优先</div>`;
+  if (a.candidates.length){
+    html += `<table><tr><th>打</th><th>向听</th><th>进张</th><th>风险</th><th>剩</th></tr>` +
+      a.candidates.map(c=>`
+        <tr class="cand" onclick="send('打 ${c.tile}')">
+          <td><b>${c.tile}</b></td>
+          <td>${c.shanten_after}</td>
+          <td>${c.speed_types}种/${c.speed_tiles}张</td>
+          <td><span class="risk ${c.risk}">${c.risk}</span>
+              <div class="bars">
+                <div class="bar" title="被吃 ${fmt(c.chi)}"><i style="width:${c.chi*100}%"></i></div>
+                <div class="bar" title="被碰 ${fmt(c.peng)}"><i style="width:${c.peng*100}%"></i></div>
+                <div class="bar r" title="点炮 ${fmt(c.ron)}"><i style="width:${c.ron*100}%"></i></div>
+              </div></td>
+          <td>${c.remaining}</td>
+        </tr>`).join('') + `</table>`;
+  }
+  if (a.kong_opportunities.length){
+    html += `<div class="kong"><b>杠牌/杠开机会</b><ul style="margin:4px 0 0 18px;padding:0">` +
+      a.kong_opportunities.map(o=>`<li>${o.kind} ${o.tile}：${o.hua}花；${o.note}</li>`).join('') +
+      `</ul>${a.is_tenpai ? '<div class="star">★ 已听牌：现在杠任意一组，补牌成胡 = 杠开（8花起，上不封顶）</div>' : ''}</div>`;
+  }
+  $('analysis').innerHTML = html;
+}
+const fmt = p => (p*100).toFixed(0) + '%';
+
+/* ---------- actions ---------- */
+function setPlayer(p){
+  player = p;
+  document.querySelectorAll('[data-p]').forEach(e=>e.classList.toggle('on', e.dataset.p===p));
+  if (!mode) setMode('od','打');
+  else renderPicker();
+}
+function setMode(m, label){
+  mode = m; pending = [];
+  document.querySelectorAll('[data-mode]').forEach(e=>e.classList.toggle('on', e.dataset.mode===m));
+  $('pending').textContent = m ? `待选牌（${label}）…` : '';
+  renderPicker();
+}
+const MODES = {
+  draw:{cnt:1, line:t=>`摸 ${t}`},
+  od:  {cnt:1, line:t=>`${player} ${t}`},
+  op:  {cnt:1, line:t=>`${player}碰 ${t}`},
+  oc:  {cnt:3, line:t=>`${player}吃 ${t.join(' ')}`},
+  og:  {cnt:1, line:t=>`${player}杠 ${t}`},
+  kg:  {cnt:1, line:t=>`kg ${t}`},
+  an:  {cnt:1, line:t=>`an ${t}`},
+  ka:  {cnt:1, line:t=>`ka ${t}`},
+};
+function renderPicker(){
+  const p = $('picker');
+  if (!mode){ p.className='picker'; p.innerHTML=''; return; }
+  p.className = 'picker show';
+  let html = '';
+  for (const s of SUITS){
+    html += `<div class="grp"><span class="glabel">${s.label}</span>` +
+      Array.from({length:9},(_,i)=>tileHTML(`${i+1}${s.label}`,'small',`pick('${i+1}${s.label}')`)).join('') + `</div>`;
+  }
+  html += `<div class="grp"><span class="glabel">字</span>` +
+    HONORS.map(t=>tileHTML(t,'small',`pick('${t}')`)).join('') + `</div>`;
+  if (['draw','kg'].includes(mode)){
+    html += `<div class="grp"><span class="glabel">花</span>` +
+      FLOWERS.map(t=>tileHTML(SEASON.has(t)?t:t,'small',`pick('${t}')`)).join('') + `</div>`;
+  }
+  p.innerHTML = html;
+}
+async function pick(t){
+  if (!mode) return;
+  const m = MODES[mode];
+  if (mode==='kg'){ send(`kg ${t}`); return; }        // 杠花直接执行
+  pending.push(t);
+  if (pending.length < m.cnt){
+    $('pending').textContent = `待选牌：${pending.join(' ')}${mode==='oc' ? '（吃还需 '+(m.cnt-pending.length)+' 张）' : ''}`;
+    return;
+  }
+  const line = m.line(m.cnt===1 ? pending[0] : pending);
+  pending = [];
+  $('pending').textContent = '';
+  await send(line);
+}
+async function undo(){ pending=[]; $('pending').textContent=''; await send('撤'); }
+
+async function advice(){
+  const btn = $('adviceBtn'), out = $('advice');
+  btn.disabled = true; btn.textContent = '思考中…';
+  out.className = 'advice'; out.textContent = 'LLM 正在读牌（可能需要十几秒）…';
+  try{
+    const d = await api('/api/advice', {});
+    if (d.ok){ out.textContent = d.advice; }
+    else {
+      out.innerHTML = `<span class="err">获取失败：${d.error}</span>` +
+        (d.prompt ? `<details style="margin-top:8px"><summary>Prompt 预览（可复制给任意模型）</summary>
+                     <div style="white-space:pre-wrap;font-size:12.5px;margin-top:6px">${d.prompt}</div></details>` : '');
+    }
+  } finally { btn.disabled = false; btn.textContent = '问 LLM'; }
+}
+
+/* ---------- new game ---------- */
+function showNew(){ $('mask').className = 'mask show'; $('inHand').focus(); }
+function hideNew(){ $('mask').className = 'mask'; }
+function fillSample(){
+  $('inHand').value = '2万 3万 4万 5万 6万 6万 6万 1饼 1饼 1饼 2条 2条 2条';
+  $('inFlowers').value = '中';
+}
+async function startGame(){
+  const d = await api('/api/new', {hand:$('inHand').value.trim(), flowers:$('inFlowers').value.trim()});
+  if (!d.ok){ alert(d.error); return; }
+  hideNew(); setMode(null,''); await refresh();
+}
+
+/* boot */
+setPlayer('l'); setMode(null,'');
+$('mask').className = 'mask show';
+refresh();
+</script>
+</body>
+</html>

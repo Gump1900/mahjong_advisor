@@ -133,14 +133,20 @@ class TestGetAdvice:
         out = get_advice(_state("m123 p456 s789 南南南 西"), analyze(_state("m123 p456 s789 南南南 西")), client=client)
         assert out == "打五万最稳"
 
-    def test_uses_default_model_and_adaptive_thinking(self):
+    def test_uses_default_model_and_thinking_disabled(self):
         client = _FakeClient()
         get_advice(_state("m123 p456 s789 南南南 西"), analyze(_state("m123 p456 s789 南南南 西")), client=client)
         kw = client.captured
         assert kw["model"] == DEFAULT_MODEL
-        assert kw["thinking"] == {"type": "adaptive"}
+        assert kw["thinking"] == {"type": "disabled"}
         # the rendered prompt is the user message content
         assert "向听数" in kw["messages"][0]["content"]
+
+    def test_thinking_env_override(self, monkeypatch):
+        monkeypatch.setenv("MAHJONG_ADVISOR_THINKING", "adaptive")
+        client = _FakeClient()
+        get_advice(_state("m123 p456 s789 南南南 西"), analyze(_state("m123 p456 s789 南南南 西")), client=client)
+        assert client.captured["thinking"] == {"type": "adaptive"}
 
     def test_model_override(self):
         client = _FakeClient()

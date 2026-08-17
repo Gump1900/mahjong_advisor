@@ -34,6 +34,7 @@ SYSTEM_PROMPT = (
     "推理、权衡每张牌的风险与收益、并给出有理由的出牌建议。这套玩法一胡即终局"
     "（不是血流成河）：任意一家胡牌本局立即结束——把快胡的累积收益计入权衡，"
     "速度通常比牌型大小更重要。用通俗中文，不要用日式麻将术语（如两面/嵌张/雀头）。"
+    "回答保持简洁：推理点到为止，最终建议用列表呈现。"
 )
 
 
@@ -253,14 +254,20 @@ def get_advice(
 
     response = client.messages.create(
         model=model,
-        max_tokens=8192,  # headroom for adaptive thinking + the advice
-        thinking={"type": "adaptive"},
+        max_tokens=16384,  # hard cap; plenty when thinking is off
+        # Anthropic-compatible proxies (e.g. BigModel) may ignore adaptive-
+        # thinking params and burn the whole budget "thinking" — default to
+        # disabled for a fast, robust interactive answer; set
+        # MAHJONG_ADVISOR_THINKING=adaptive for deeper reasoning on first-party API.
+        thinking={"type": os.environ.get("MAHJONG_ADVISOR_THINKING", "disabled")},
         system=SYSTEM_PROMPT,
         messages=[{"role": "user", "content": build_prompt(state, analysis)}],
     )
 
     if response.stop_reason == "refusal":
         raise ValueError("模型因安全策略拒绝了这个请求，请换种问法或换一个模型。")
+    if response.stop_reason == "max_tokens":
+        raise ValueError("回答被长度上限截断（思考占满了预算），请重试一次。")
 
     text = "".join(
         b.text for b in response.content if getattr(b, "type", None) == "text"
