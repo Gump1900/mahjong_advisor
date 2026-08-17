@@ -58,7 +58,7 @@ pip install -r requirements.txt
 python -m pytest -v
 ```
 
-> 注意：本仓库的 `.venv/bin/pytest` 入口指向一个旧路径（shebang 失效），请用 `python -m pytest` 调用。
+> 历史：本仓库目录曾从带连字符路径改名为下划线路径，旧 `.venv` 里的绝对路径（activate/脚本 shebang）随之失效导致 `python` 找不到——已于 2026-08-17 原地重建 venv 修复。若再遇到同类问题，删除 `.venv` 后用 `python3 -m venv .venv && .venv/bin/python -m pip install -r requirements.txt` 重建即可。
 
 ### Web 界面（推荐）
 
