@@ -128,36 +128,22 @@ class _FakeClient:
 
 
 class TestGetAdvice:
-    def test_returns_response_text(self):
-        client = _FakeClient("打五万最稳")
-        out = get_advice(_state("m123 p456 s789 南南南 西"), analyze(_state("m123 p456 s789 南南南 西")), client=client)
-        assert out == "打五万最稳"
-
-    def test_uses_default_model_and_thinking_disabled(self):
+    @pytest.mark.parametrize("model",[None,DEFAULT_MODEL,"claude-sonnet-5"])
+    def test_legacy_free_prose_cannot_bypass_guard_or_bill(self,model):
         client = _FakeClient()
-        get_advice(_state("m123 p456 s789 南南南 西"), analyze(_state("m123 p456 s789 南南南 西")), client=client)
-        kw = client.captured
-        assert kw["model"] == DEFAULT_MODEL
-        assert kw["thinking"] == {"type": "disabled"}
-        # the rendered prompt is the user message content
-        assert "向听数" in kw["messages"][0]["content"]
+        with pytest.raises(ValueError,match="旧版.*已关闭"):
+            get_advice(_state("m123 p456 s789 南南南 西"), analyze(_state("m123 p456 s789 南南南 西")),client=client,model=model)
+        assert client.captured is None
 
-    def test_thinking_env_override(self, monkeypatch):
-        monkeypatch.setenv("MAHJONG_ADVISOR_THINKING", "adaptive")
-        client = _FakeClient()
-        get_advice(_state("m123 p456 s789 南南南 西"), analyze(_state("m123 p456 s789 南南南 西")), client=client)
-        assert client.captured["thinking"] == {"type": "adaptive"}
-
-    def test_model_override(self):
-        client = _FakeClient()
-        get_advice(_state("m123 p456 s789 南南南 西"), analyze(_state("m123 p456 s789 南南南 西")),
-                   client=client, model="claude-sonnet-5")
-        assert client.captured["model"] == "claude-sonnet-5"
-
-    def test_refusal_raises(self):
-        client = _FakeClient(stop_reason="refusal")
-        with pytest.raises(ValueError):
-            get_advice(_state("m123 p456 s789 南南南 西"), analyze(_state("m123 p456 s789 南南南 西")), client=client)
+    def test_disabled_before_sdk_construction_even_with_key_and_thinking(self,monkeypatch):
+        import anthropic
+        monkeypatch.setenv("ANTHROPIC_API_KEY","fake-offline-key")
+        monkeypatch.setenv("MAHJONG_ADVISOR_THINKING","adaptive")
+        def forbidden(*args,**kwargs):
+            raise AssertionError("must not construct an SDK client")
+        monkeypatch.setattr(anthropic,"Anthropic",forbidden)
+        with pytest.raises(ValueError,match="未产生API调用"):
+            get_advice(_state("m123 p456 s789 南南南 西"),analyze(_state("m123 p456 s789 南南南 西")))
 
 
 class TestAnalyzeWithMelds:
@@ -216,7 +202,8 @@ class TestRiskEstimates:
     def test_prompt_contains_percentages(self):
         state = _state("m123 p456 s789 南南南 西西 北")
         prompt = build_prompt(state, analyze(state))
-        assert "被吃" in prompt and "点炮" in prompt and "%" in prompt
+        assert "点炮" in prompt and "不是概率" in prompt
+        assert "被吃 " not in prompt
 
 
 class TestKongOpportunities:
@@ -229,7 +216,7 @@ class TestKongOpportunities:
 
     def test_peng_upgrade_detected(self):
         state = GameState(
-            my_hand=H("m123 p456 s789 南南 南"),
+            my_hand=H("m123 p456 s789 南"),
             my_melds=[Meld(type="peng", tiles=[create_tile("风", "南")] * 3)],
         )
         opps = analyze(state).kong_opportunities
@@ -285,6 +272,27 @@ class TestSeasonFlowerOpportunity:
         assert (create_tile("三元", "中"), 12) in kinds
         assert (create_tile("季节", "夏"), 1) in kinds
         assert "杠开" in build_prompt(state, a)
+
+
+@pytest.mark.parametrize("count", [1, 2, 3, 4])
+def test_single_flower_kong_exposes_zero_marginal_not_total(count):
+    from src.core.scoring import flower_hua
+    from src.web import analysis_json
+    from src.session import new_session
+    session = new_session("1万 2万 3万 1饼 2饼 3饼 1条 2条 3条 南风 南风 南风 西风",
+                          " ".join(["中"] * count + ["春", "夏"]))
+    state = session.state
+    before = flower_hua(state.flowers_in_hand)
+    item = next(op for op in analyze(state).kong_opportunities if op["kind"] == "花牌单杠")
+    assert item["hua"] == item["delta_hua"] == 0
+    assert item["hua_basis"] == "flower_score_delta"
+    assert item["flower_hua_before"] == item["flower_hua_after"] == before
+    encoded = next(op for op in analysis_json(state)["kong_opportunities"] if op["kind"] == "花牌单杠")
+    assert encoded["delta_hua"] == 0 and encoded["flower_hua_before"] == before
+    prompt = build_prompt(state, analyze(state))
+    assert "花牌单杠 中：本次花分增量 0花" in prompt
+    assert session.apply("kg 中")["ok"]
+    assert flower_hua(state.flowers_in_hand, state.konged_flowers, state.flower_kong_groups) == before
 
 
 class TestFirstWinSpeed:

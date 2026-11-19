@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>太湖麻将 · 大厅</title>
+<link rel="stylesheet" href="/lobby.css">
+<script src="/lobby.js" defer></script>
+</head>
+<body>
+<header class="bar"><span class="seal">麻</span>
+  <div><h1>太湖麻将 <small>大厅</small></h1><p id="whoami">正在建立访客身份…</p></div>
+</header>
+<main id="view">
+  <section class="card" id="lobby-card">
+    <h2>开始</h2>
+    <p class="hint">无需登录，使用临时访客身份。创建房间后可补齐机器人开始陪打。</p>
+    <label>昵称 <input id="nickname" maxlength="12" placeholder="留空自动生成"></label>
+    <button id="create-room" class="gold">创建房间</button>
+    <div id="resume" hidden><p>你有未结束的房间。</p><button id="resume-btn">回到房间</button></div>
+  </section>
+  <section class="card" id="room-card" hidden>
+    <h2>房间 <span id="room-id"></span></h2>
+    <p class="hint" id="room-state"></p>
+    <table class="seats"><tbody id="seats"></tbody></table>
+    <div class="actions">
+      <button id="fill-bots">补齐机器人</button>
+      <button id="ready">准备</button>
+      <button id="start" class="gold">开始对局</button>
+      <button id="open-table" hidden class="gold">进入牌桌 ↗</button>
+      <button id="leave" class="danger">离开房间</button>
+    </div>
+    <p class="hint" id="room-msg"></p>
+    <ol id="history"></ol>
+  </section>
+</main>
+<div id="notice" role="status"></div>
+</body>
+</html>

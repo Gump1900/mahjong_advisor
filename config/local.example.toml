@@ -1,0 +1,5 @@
+# Copy to config/local.toml, then fill the key locally. Never commit real keys.
+# A filled file key overrides env credentials. Explicitly enable LLM to call APIs.
+[deepseek]
+api_key = ""
+model = "deepseek-flash"

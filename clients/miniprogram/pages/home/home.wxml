@@ -1,0 +1,13 @@
+<view class="home">
+  <view class="home-brand">太湖 · 麻将</view>
+  <view class="home-eyebrow">TAIHU MAHJONG</view>
+  <view class="home-title">约一桌，
+慢慢打。</view>
+  <view class="home-copy">太湖玩法 · 好友同桌 · 机器人补位</view>
+  <view class="hero-tiles"><image src="/assets/tiles/Man1.png"/><image src="/assets/tiles/Pin8.png"/><image src="/assets/tiles/Sou2.png"/></view>
+  <view class="room-card friend-card"><view class="card-title">和朋友一起打</view><input class="room-input" value="{{nickname}}" bindinput="nickname" maxlength="12" placeholder="我的昵称" disabled="{{busy}}"/><button class="primary" bindtap="createRoom" disabled="{{busy}}">开好友桌</button><view class="join-row"><input class="room-input" value="{{code}}" type="number" bindinput="code" maxlength="6" placeholder="6位房间号" disabled="{{busy}}"/><button class="secondary" bindtap="joinRoom" disabled="{{busy||code.length!==6}}">加入房间</button></view><button wx:if="{{shared&&connected}}" class="secondary" bindtap="resume" disabled="{{busy}}">回到当前房间</button></view>
+  <view class="room-card"><view class="card-title">手机适配测试桌</view><view class="muted">真实洗牌、规则与结算，不展示军师。</view><picker mode="selector" range="{{scenarios}}" range-key="label" value="{{scenarioIndex}}" bindchange="scenario"><view class="scene-picker">测试场景：{{scenarios[scenarioIndex].label}} ▾</view></picker><view class="seat-line">我 ＋ 均衡 ＋ 稳健 ＋ 进攻</view><button class="primary" disabled="{{busy}}" bindtap="start">{{busy?'连接裁判中…':'准备并开始'}}</button><button wx:if="{{connected&&!shared}}" class="secondary" disabled="{{busy}}" bindtap="resume">继续上次测试桌</button></view>
+  <view wx:if="{{message}}" class="error-message">{{message}}</view>
+  <button class="connection-link" bindtap="settings" disabled="{{busy}}">连接设置</button>
+  <view class="home-foot">访客模式 · 支持网页与小程序同桌</view>
+</view>

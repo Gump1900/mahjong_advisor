@@ -1,6 +1,6 @@
 """Tile data structures and basic operations.
 
-Rule baseline (see docs/plans/2026-02-27-mahjong-advisor-design.md):
+Rule baseline (see docs/rules.md):
 - Playable tiles (form the 4-melds + 1-pair winning structure): 万/饼/条 1-9,
   plus the wind tiles 南/西/北 (honors: pairs/triplets only, no sequences).
 - Flower tiles (set aside, never part of the structure, may be held for 杠开):
@@ -78,6 +78,18 @@ _PLAYABLE_INDEX: Dict[Tile, int] = {t: i for i, t in enumerate(_PLAYABLE_LIST)}
 
 PLAYABLE_TILES: tuple = tuple(_PLAYABLE_LIST)
 
+_FLOWER_DISPLAY_ORDER = ("东风", "中", "发", "白", "春", "夏", "秋", "冬", "梅", "兰", "竹", "菊")
+
+
+def tile_sort_key(tile: Tile) -> int:
+    """Display order: 万1-9, 饼1-9, 条1-9, 南西北, then flowers.
+
+    This does not change physical hand order or stable legal-action IDs.
+    """
+    if tile in _PLAYABLE_INDEX:
+        return _PLAYABLE_INDEX[tile]
+    return 30 + _FLOWER_DISPLAY_ORDER.index(str(tile))
+
 
 def is_playable(tile: Tile) -> bool:
     """True if the tile can be part of the winning hand structure."""
@@ -129,3 +141,19 @@ class GameState:
     flowers_in_hand: List[Tile] = field(default_factory=list)
     konged_flowers: List[Tile] = field(default_factory=list)
     current_turn: Literal["me", "left", "right", "opposite"] = "me"
+    # Observed flowers only; an empty list does not prove an opponent has none.
+    opponent_flowers: Dict[str, List[Tile]] = field(default_factory=_three_player_dict)
+    opponent_konged_flowers: Dict[str, List[Tile]] = field(default_factory=_three_player_dict)
+    flower_kong_groups: List[List[Tile]] = field(default_factory=list)
+    opponent_flower_kong_groups: Dict[str, List[List[Tile]]] = field(default_factory=_three_player_dict)
+    opponent_flowers_complete: Dict[str, bool] = field(
+        default_factory=lambda: {p: False for p in ("left", "right", "opposite")})
+    # 吃/碰计口：取得成组者 -> 弃牌来源者 -> 累计口数（吃或碰都算，见规则 L104）。
+    chi_peng_source_counts: Dict[str, Dict[str, int]] = field(default_factory=dict)
+    # 我过胡未过圈（过胡只禁接炮，不禁自摸；通过吃/碰取得回合或轮到我摸牌即解除）。
+    my_passed_win_pending: bool = False
+    # 我过碰未过圈的牌种（过碰按牌种分别限制，见规则 L92-99）。
+    my_passed_peng_kinds: List[Tile] = field(default_factory=list)
+    public_events: List[dict] = field(default_factory=list)  # Ordered, redacted public prefix only.
+    opponent_hand_counts: Dict[str, int] = field(default_factory=dict)  # Total concealed slots, including held flowers.
+    opponent_unknown_kongs: Dict[str, int] = field(default_factory=dict)

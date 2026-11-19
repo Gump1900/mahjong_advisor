@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1,viewport-fit=cover"
+    />
+    <title>太湖麻将 · 微信小程序原型</title>
+    <link rel="stylesheet" href="../shared/miniprogram.css" />
+  </head>
+  <body>
+    <header class="review-top">
+      <a href="../index.html">太湖 · 原型设计</a
+      ><span>微信小程序 <i>交互评审稿</i></span
+      ><button id="present">纯净预览 ↗</button>
+    </header>
+    <div class="studio-layout">
+      <nav id="scene-nav" aria-label="原型场景"></nav>
+      <main class="preview-column">
+        <div class="canvas-caption">
+          <div>
+            <small>WECHAT MINI PROGRAM</small>
+            <h1 id="scene-title">朋友一起，打得自在。</h1>
+          </div>
+          <span id="canvas-size"></span>
+        </div>
+        <div id="device-stage">
+          <div id="device"><div id="screen"></div></div>
+        </div>
+        <div class="canvas-footer">
+          <span id="flow-position"></span
+          ><span>可点击原型 · 场景与分数为设计样例</span>
+        </div>
+        <div id="review-controls"></div>
+      </main>
+      <aside id="annotations" aria-label="交互设计说明"></aside>
+    </div>
+    <script src="../blocks/ui.js"></script>
+    <script src="../blocks/mobile.js"></script>
+    <script src="../flows/miniprogram.js"></script>
+    <script src="../app/miniprogram.js"></script>
+  </body>
+</html>

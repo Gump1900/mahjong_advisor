@@ -1,0 +1,300 @@
+{
+  "observation": {
+    "observation_id": "df3383dbd80f42b196b4ef5afc5abd7d:turn10:2",
+    "rules_version": "local-2026-10-22-desktop-v4",
+    "call_counts": [
+      [
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0
+      ]
+    ],
+    "locked_pairs": [],
+    "seat": 2,
+    "dealer": 0,
+    "stage": "turn",
+    "actor": 2,
+    "wall_count": 87,
+    "self": {
+      "hand": [
+        "2万",
+        "4万",
+        "7饼",
+        "8饼",
+        "9饼",
+        "1条",
+        "2条",
+        "4条",
+        "4条",
+        "北风",
+        "中",
+        "中",
+        "中",
+        "白"
+      ],
+      "waiting_tiles": [],
+      "discard_waits": {},
+      "waiting_note": "未见张数仅扣自己的牌与公开牌，不等于牌墙活张；未知暗杠可能耗尽进张。",
+      "ron_blocked": false,
+      "peng_blocked": [],
+      "locked_with": [],
+      "held_flower_count": 4,
+      "drawn_tile": "北风",
+      "draw_source": "normal",
+      "structural_shanten": 3,
+      "analysis_note": "结构向听未单独评估留花换牌的策略价值；合法动作由裁判另行校验。"
+    },
+    "players": [
+      {
+        "seat": 0,
+        "hand_count": 13,
+        "melds": [],
+        "locked_with": [],
+        "call_counts": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "known_qualifying_hua": {
+          "flowers": 1,
+          "wind_triplets": 0,
+          "kongs": 0,
+          "total": 1
+        },
+        "unknown_ankan_count": 0,
+        "value_note": "仅当前可知资格花，不含未公开手牌和牌型加分；不是听牌概率或已获收入。未知暗杠每组10或12，不能据此猜名。",
+        "flowers": [
+          "冬"
+        ],
+        "river": [
+          "1饼"
+        ]
+      },
+      {
+        "seat": 1,
+        "hand_count": 13,
+        "melds": [],
+        "locked_with": [],
+        "call_counts": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "known_qualifying_hua": {
+          "flowers": 1,
+          "wind_triplets": 0,
+          "kongs": 0,
+          "total": 1
+        },
+        "unknown_ankan_count": 0,
+        "value_note": "仅当前可知资格花，不含未公开手牌和牌型加分；不是听牌概率或已获收入。未知暗杠每组10或12，不能据此猜名。",
+        "flowers": [
+          "白"
+        ],
+        "river": [
+          "1万"
+        ]
+      },
+      {
+        "seat": 2,
+        "hand_count": 14,
+        "melds": [],
+        "locked_with": [],
+        "call_counts": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "known_qualifying_hua": {
+          "flowers": 0,
+          "wind_triplets": 0,
+          "kongs": 0,
+          "total": 0
+        },
+        "unknown_ankan_count": 0,
+        "value_note": "仅当前可知资格花，不含未公开手牌和牌型加分；不是听牌概率或已获收入。未知暗杠每组10或12，不能据此猜名。",
+        "flowers": [],
+        "river": []
+      },
+      {
+        "seat": 3,
+        "hand_count": 13,
+        "melds": [],
+        "locked_with": [],
+        "call_counts": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "known_qualifying_hua": {
+          "flowers": 0,
+          "wind_triplets": 0,
+          "kongs": 0,
+          "total": 0
+        },
+        "unknown_ankan_count": 0,
+        "value_note": "仅当前可知资格花，不含未公开手牌和牌型加分；不是听牌概率或已获收入。未知暗杠每组10或12，不能据此猜名。",
+        "flowers": [],
+        "river": []
+      }
+    ],
+    "events": [
+      {
+        "kind": "flower_kong",
+        "seat": 0,
+        "tile": "冬"
+      },
+      {
+        "kind": "draw",
+        "seat": 0,
+        "replacement": true,
+        "hidden": true
+      },
+      {
+        "kind": "discard",
+        "seat": 0,
+        "tile": "1饼"
+      },
+      {
+        "kind": "all_pass",
+        "source": 0
+      },
+      {
+        "kind": "draw",
+        "seat": 1,
+        "replacement": false,
+        "hidden": true
+      },
+      {
+        "kind": "flower_kong",
+        "seat": 1,
+        "tile": "白"
+      },
+      {
+        "kind": "draw",
+        "seat": 1,
+        "replacement": true,
+        "hidden": true
+      },
+      {
+        "kind": "discard",
+        "seat": 1,
+        "tile": "1万"
+      },
+      {
+        "kind": "all_pass",
+        "source": 1
+      },
+      {
+        "kind": "draw",
+        "seat": 2,
+        "tile": "北风",
+        "replacement": false
+      }
+    ],
+    "pending": null,
+    "legal_actions": [
+      {
+        "id": "df3383dbd80f42b196b4ef5afc5abd7d:turn10:2:0",
+        "kind": "discard",
+        "tiles": [
+          "1条"
+        ]
+      },
+      {
+        "id": "df3383dbd80f42b196b4ef5afc5abd7d:turn10:2:1",
+        "kind": "discard",
+        "tiles": [
+          "2万"
+        ]
+      },
+      {
+        "id": "df3383dbd80f42b196b4ef5afc5abd7d:turn10:2:2",
+        "kind": "discard",
+        "tiles": [
+          "2条"
+        ]
+      },
+      {
+        "id": "df3383dbd80f42b196b4ef5afc5abd7d:turn10:2:3",
+        "kind": "discard",
+        "tiles": [
+          "4万"
+        ]
+      },
+      {
+        "id": "df3383dbd80f42b196b4ef5afc5abd7d:turn10:2:4",
+        "kind": "discard",
+        "tiles": [
+          "4条"
+        ]
+      },
+      {
+        "id": "df3383dbd80f42b196b4ef5afc5abd7d:turn10:2:5",
+        "kind": "discard",
+        "tiles": [
+          "7饼"
+        ]
+      },
+      {
+        "id": "df3383dbd80f42b196b4ef5afc5abd7d:turn10:2:6",
+        "kind": "discard",
+        "tiles": [
+          "8饼"
+        ]
+      },
+      {
+        "id": "df3383dbd80f42b196b4ef5afc5abd7d:turn10:2:7",
+        "kind": "discard",
+        "tiles": [
+          "9饼"
+        ]
+      },
+      {
+        "id": "df3383dbd80f42b196b4ef5afc5abd7d:turn10:2:8",
+        "kind": "flower_kong",
+        "tiles": [
+          "中"
+        ]
+      },
+      {
+        "id": "df3383dbd80f42b196b4ef5afc5abd7d:turn10:2:9",
+        "kind": "discard",
+        "tiles": [
+          "北风"
+        ]
+      },
+      {
+        "id": "df3383dbd80f42b196b4ef5afc5abd7d:turn10:2:10",
+        "kind": "flower_kong",
+        "tiles": [
+          "白"
+        ]
+      }
+    ],
+    "result": null
+  }
+}

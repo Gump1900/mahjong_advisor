@@ -2,7 +2,7 @@
 
 TileCounter starts from the full 144-tile wall and lets us subtract every
 tile that is visible to us (our hand, our flowers, all discards, all melds)
-to estimate how many of each tile type are still live.
+to count unseen copies (opponents' concealed tiles PLUS the wall, not live outs).
 """
 from typing import Dict
 
@@ -35,7 +35,11 @@ class TileCounter:
         return self._counts.get(tile, 0)
 
     def remove(self, tile: Tile, count: int = 1) -> None:
-        self._counts[tile] = max(0, self._counts.get(tile, 0) - count)
+        if isinstance(count, bool) or not isinstance(count, int) or count < 0:
+            raise ValueError("扣除张数必须是非负整数")
+        if tile not in self._counts or count > self._counts[tile]:
+            raise ValueError(f"{tile} 的可见数量超过实体副本上限")
+        self._counts[tile] -= count
 
     def all_counts(self) -> Dict[Tile, int]:
         return dict(self._counts)
@@ -53,6 +57,13 @@ def count_remaining_tiles(state: GameState) -> Dict[Tile, int]:
         counter.remove(tile)
     for tile in state.konged_flowers:
         counter.remove(tile)
+
+    for flowers in state.opponent_flowers.values():
+        for tile in flowers:
+            counter.remove(tile)
+    for flowers in state.opponent_konged_flowers.values():
+        for tile in flowers:
+            counter.remove(tile)
 
     for player_discards in state.discards.values():
         for tile in player_discards:
@@ -75,37 +86,8 @@ _SAFE, _MEDIUM, _DANGER = "安全", "中", "危险"
 
 
 def discard_risk(tile: Tile, state: GameState) -> str:
-    """Heuristic ron-risk label ("安全" / "中" / "危险") for discarding `tile`.
-
-    This is intentionally crude — a "现物/中张" style rule of thumb, not an
-    exact probability. Signals, in order:
-
-    - flower tiles can never complete a structure -> 安全;
-    - all four copies already visible (remaining == 0) -> 安全 (no hidden copies);
-    - the tile was already discarded by an opponent (现物) -> 安全 (low ron risk);
-    - unseen, live middle tiles 4/5/6 are the most-wanted -> 危险;
-    - everything else (unseen honors, terminals, 2/3/7/8) -> 中.
-    """
-    if tile.is_flower:
-        return _SAFE
-
-    remaining = count_remaining_tiles(state)
-    if remaining.get(tile, 0) == 0:
-        return _SAFE
-
-    seen_in_discards = sum(
-        1 for pl in state.discards.values() for t in pl if t == tile
-    )
-    if seen_in_discards >= 1:
-        return _SAFE
-
-    if tile.suit == "风":  # 南西北 honors
-        return _MEDIUM
-
-    if tile.value in (4, 5, 6):
-        return _DANGER
-
-    return _MEDIUM
+    """Coarse structural heuristic, without any discarded-tile immunity."""
+    return estimate_discard_risks(tile, state)["label"]
 
 
 
@@ -124,44 +106,35 @@ def _sequence_shapes(tile: Tile) -> int:
 
 
 def estimate_discard_risks(tile: Tile, state: GameState) -> Dict[str, float]:
-    """Transparent heuristic estimates for discarding `tile`.
+    """Uncalibrated heuristic scores, not inferred opponent probabilities.
 
-    Returns {"chi": p, "peng": p, "ron": p, "label": 安全/中/危险} with p in
-    [0, 1]. NOT exact probabilities — a readable formula, not a solver:
-
-    chi  = 0                          if honor (only sequences can be chied)
-         = 0.12 * suit_bias + 0.08 * shapes/3
-           suit_bias: share of left's (the only player who can chi) discards
-                      in this suit — collecting that suit shows there
-           shapes:   how many runs the tile completes (centrality)
-    peng = 0.35 * hidden_copies/3 * attractiveness
-           hidden_copies: copies not visible anywhere (fewer -> less chance)
-           attractiveness: 1.0 middle (4/5/6), 0.8 for 3/7, 0.6 for 2/8,
-                           0.5 terminals, 0.7 honors
-    ron  = 0                          if flower, exhausted, or 现物 (seen in
-                                      an opponent's discards)
-         = 0.4 * shapes/3 * hidden_copies/3
-           (middle tiles with many hidden copies are the classic dangerous
-            discard; terminals/honors scale down via shapes/attractiveness)
+    There is no furiten rule: a past discard never proves ron impossible.
+    No unseen copies of the target also does not exclude sequence waits;
+    the opponents may hold its two neighbors. Chi concerns the downstream
+    player (right), not the upstream player whose discards *we* can chi.
     """
     if tile.is_flower:
         return {"chi": 0.0, "peng": 0.0, "ron": 0.0, "label": _SAFE}
 
     remaining = count_remaining_tiles(state)
     hidden = remaining.get(tile, 0)
-    seen = sum(1 for pl in state.discards.values() for t in pl if t == tile)
-
-    shapes = _sequence_shapes(tile)
+    shapes = 0
+    if tile.suit in ("万", "饼", "条"):
+        value = int(tile.value)
+        for start in range(max(1, value - 2), min(value, 7) + 1):
+            others = [create_tile(tile.suit, v) for v in range(start, start + 3) if v != value]
+            if all(remaining.get(t, 0) > 0 for t in others):
+                shapes += 1
     is_honor = tile.suit == "风"
 
-    # --- chi: only the left player can chi; lean on their suit tendency ---
-    if is_honor:
+    # --- chi: only the downstream player can chi my discard ---
+    if is_honor or not shapes:
         chi = 0.0
     else:
-        left_discards = state.discards.get("left", [])
+        downstream_discards = state.discards.get("right", [])
         suit_bias = (
-            sum(1 for t in left_discards if t.suit == tile.suit) / len(left_discards)
-            if left_discards else 0.25
+            sum(1 for t in downstream_discards if t.suit == tile.suit) / len(downstream_discards)
+            if downstream_discards else 0.25
         )
         chi = round(0.12 * suit_bias + 0.08 * shapes / 3, 4)
 
@@ -171,16 +144,16 @@ def estimate_discard_risks(tile: Tile, state: GameState) -> Dict[str, float]:
     else:
         attract = {5: 1.0, 4: 1.0, 6: 1.0, 3: 0.8, 7: 0.8,
                    2: 0.6, 8: 0.6, 1: 0.5, 9: 0.5}[tile.value]
-    peng = round(0.35 * (hidden / 3) * attract, 4)
+    peng = round(0.35 * min(1.0, hidden / 3) * attract, 4) if hidden >= 2 else 0.0
 
-    # --- ron: 现物 / exhausted tiles can't deal into a hidden pair-wait ---
-    if hidden == 0 or seen >= 1:
+    # A sequence wait needs no additional hidden copy of the discarded tile.
+    if shapes == 0 and hidden == 0:
         ron = 0.0
     else:
-        ron = round(0.4 * (shapes / 3 if not is_honor else 0.4) * (hidden / 3), 4)
+        ron = round(0.4 * max(shapes / 3, 0.4 if hidden else 0.0), 4)
 
     # --- label: same coarse buckets as discard_risk ---
-    if ron == 0.0 and seen >= 1 or hidden == 0 or tile.is_flower:
+    if ron == 0.0:
         label = _SAFE
     elif not is_honor and tile.value in (4, 5, 6) and ron > 0.2:
         label = _DANGER

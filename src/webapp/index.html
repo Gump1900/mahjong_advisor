@@ -1,356 +1,162 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>麻将策略助手</title>
 <style>
-  :root{
-    --felt:#1d4d3a; --felt2:#173f30; --panel:#fbf8ef; --ink:#33302a;
-    --line:#d8d2c0; --accent:#c8542f; --gold:#b98a2f; --safe:#4a7d52;
-    --warn:#c9a227; --danger:#b3402e; --muted:#8a8474;
-  }
-  *{box-sizing:border-box}
-  body{margin:0;background:linear-gradient(160deg,var(--felt),var(--felt2));
-       color:var(--ink);font:15px/1.5 -apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
-  header{display:flex;align-items:center;gap:12px;padding:12px 18px;color:#fff}
-  header h1{font-size:19px;margin:0;font-weight:600}
-  header .sub{opacity:.75;font-size:12.5px}
-  header .sp{flex:1}
-  button{font:inherit;border:1px solid var(--line);background:#fff;color:var(--ink);
-         border-radius:8px;padding:6px 14px;cursor:pointer}
-  button:hover{border-color:var(--accent);color:var(--accent)}
-  button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
-  button.primary:hover{opacity:.9;color:#fff}
-  button.ghost{background:transparent;color:#fff;border-color:rgba(255,255,255,.4)}
-  button.ghost:hover{border-color:#fff;color:#fff}
-  button:disabled{opacity:.5;cursor:default}
-  main{display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:14px;padding:0 18px 18px}
-  .card{background:var(--panel);border-radius:12px;padding:12px 14px;box-shadow:0 2px 10px rgba(0,0,0,.25)}
-  .card h3{margin:0 0 8px;font-size:13.5px;color:var(--muted);font-weight:600;letter-spacing:.5px}
-  .col{display:flex;flex-direction:column;gap:14px;min-width:0}
-  /* tiles */
-  .tile{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;
-        width:46px;height:60px;margin:2px;background:#fff;border:1px solid #cfc9b8;border-bottom-width:3px;
-        border-radius:6px;cursor:pointer;user-select:none;font-weight:700;line-height:1.15}
-  .tile .n{font-size:20px}
-  .tile .s{font-size:12px;color:#7a7462}
-  .tile.honor .n{font-size:17px}
-  .tile.flower{background:#fdf3dd;border-color:#d9c48a}
-  .tile.flower .n{color:#9a7418;font-size:16px}
-  .tile.small{width:32px;height:42px}
-  .tile.small .n{font-size:14px}.tile.small .s{font-size:10px}
-  .tile:hover{transform:translateY(-3px);border-color:var(--accent)}
-  .tile.flat{cursor:default}
-  .tile.flat:hover{transform:none;border-color:#cfc9b8}
-  .river{min-height:46px;padding:4px 6px;background:#efe9d8;border-radius:8px;line-height:0}
-  /* opponents */
-  .opps{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-  .opp h3{display:flex;justify-content:space-between}
-  .opp .cnt{color:var(--accent)}
-  .melds{margin-top:6px;font-size:12px;color:var(--muted)}
-  .melds .grp{display:inline-block;background:#efe9d8;border-radius:6px;padding:2px 6px;margin:2px 2px 0 0}
-  /* my area */
-  .row{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:8px}
-  .row .lbl{font-size:12.5px;color:var(--muted);min-width:64px}
-  .hand .tile{width:52px;height:68px}
-  /* action bar */
-  .actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-  .chip{padding:5px 12px;border-radius:999px;border:1px solid var(--line);background:#fff;cursor:pointer;font-size:13.5px}
-  .chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
-  .picker{margin-top:8px;display:none}
-  .picker.show{display:block}
-  .picker .grp{margin:4px 0}
-  .picker .glabel{font-size:12px;color:var(--muted);margin-right:6px}
-  .pending{margin-top:6px;font-size:13px;color:var(--accent);min-height:20px}
-  /* analysis */
-  .status{font-size:16px;font-weight:700;margin-bottom:6px}
-  .substat{font-size:12.5px;color:var(--muted);margin-bottom:8px}
-  table{width:100%;border-collapse:collapse;font-size:13px}
-  th{color:var(--muted);font-weight:600;text-align:left;padding:4px 6px;border-bottom:1px solid var(--line);font-size:12px}
-  td{padding:5px 6px;border-bottom:1px dashed #e7e1d0;vertical-align:middle}
-  tr.cand{cursor:pointer}
-  tr.cand:hover td{background:#f4efdf}
-  .risk{display:inline-block;padding:1px 8px;border-radius:999px;font-size:12px;color:#fff}
-  .risk.安全{background:var(--safe)} .risk.中{background:var(--warn)} .risk.危险{background:var(--danger)}
-  .bars{display:flex;gap:6px;margin-top:2px}
-  .bar{width:44px;height:4px;background:#e7e1d0;border-radius:2px;overflow:hidden}
-  .bar i{display:block;height:100%;background:var(--muted)}
-  .bar.r i{background:var(--danger)}
-  .kong{margin-top:10px;border-top:1px solid var(--line);padding-top:8px}
-  .kong li{margin:3px 0;font-size:13px}
-  .star{color:var(--accent);font-weight:700;font-size:13px;margin-top:4px}
-  .advice{white-space:pre-wrap;font-size:14px;max-height:420px;overflow:auto;background:#f4efdf;
-          border-radius:8px;padding:10px 12px}
-  .hint{color:var(--muted);font-size:13px}
-  .err{color:var(--danger)}
-  /* modal */
-  .mask{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center}
-  .mask.show{display:flex}
-  .modal{background:var(--panel);border-radius:14px;padding:20px;width:min(520px,92vw)}
-  .modal h2{margin:0 0 12px;font-size:17px}
-  .modal input{width:100%;font:inherit;padding:8px 10px;border:1px solid var(--line);border-radius:8px;margin-bottom:10px}
-  .modal .btns{display:flex;gap:10px;justify-content:flex-end}
-  @media (max-width:900px){main{grid-template-columns:1fr}}
+:root{--felt:#153d31;--felt2:#0e2d25;--paper:#fbf7ea;--paper2:#f0ead8;--ink:#292b28;--muted:#78766d;--line:#d7cfb9;--red:#b84a32;--gold:#c69435;--green:#3d7b54;--yellow:#bd9229;--shadow:0 14px 40px #061b1566}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(circle at 50% 0,#28644f 0,var(--felt) 42%,var(--felt2) 100%);font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC",sans-serif;color:var(--ink)}
+button{font:inherit;border:1px solid var(--line);border-radius:9px;padding:7px 12px;background:#fff;color:var(--ink);cursor:pointer}button:hover{border-color:var(--red);color:var(--red)}button:disabled{opacity:.38;cursor:not-allowed}button.primary{background:var(--red);border-color:var(--red);color:white}button.gold{background:var(--gold);border-color:var(--gold);color:#211b0e}.ghost{background:#ffffff12;border-color:#ffffff50;color:#fff}
+header{height:58px;display:flex;align-items:center;gap:12px;padding:0 22px;color:white}header h1{font-size:19px;margin:0}header small{opacity:.7}.spacer{flex:1}
+main{display:grid;grid-template-columns:minmax(620px,1fr) 390px;gap:14px;padding:0 18px 18px;max-width:1500px;margin:auto}.left,.right{display:flex;flex-direction:column;gap:12px;min-width:0}
+.panel{background:var(--paper);border:1px solid #ffffff70;border-radius:14px;box-shadow:var(--shadow);padding:12px}.section-title{font-size:11px;letter-spacing:.12em;color:var(--muted);font-weight:700;text-transform:uppercase;margin:0 0 7px}
+.opponents{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.opponent{background:#f6f1e3;border:1px solid var(--line);border-radius:11px;padding:9px;min-width:0}.opp-head{display:flex;align-items:center;gap:7px;font-weight:700;margin-bottom:6px}.opp-head .count{margin-left:auto;color:var(--muted);font-size:11px}.opp-actions{display:flex;gap:4px;flex-wrap:wrap;margin-top:7px}.opp-actions button{font-size:11px;padding:3px 7px}
+.river{min-height:45px;border-radius:8px;background:#eae3d1;padding:4px;display:flex;align-content:flex-start;flex-wrap:wrap;gap:2px}.melds{margin-top:5px;display:flex;flex-wrap:wrap;gap:4px}.meld{font-size:11px;background:#e6dec9;border-radius:5px;padding:3px 6px}.empty{color:var(--muted);font-size:12px;padding:8px}
+.claim{display:none;background:linear-gradient(90deg,#fff5d7,#f7e2b7);border:1px solid #d6ad5b;border-radius:11px;padding:9px 12px;align-items:center;gap:7px;box-shadow:0 5px 18px #0002}.claim.show{display:flex}.claim strong{margin-right:auto}.claim button{padding:5px 10px}
+.my-area{padding:14px}.zone{display:grid;grid-template-columns:78px 1fr;align-items:start;gap:8px;margin-bottom:11px}.zone-label{color:var(--muted);font-size:12px;padding-top:12px}.hand-line{display:flex;align-items:flex-end;gap:10px;min-height:90px}.hand{display:flex;flex-wrap:wrap;align-items:flex-end;gap:3px}.draw-slot{width:62px;min-width:62px;height:78px;border:2px dashed #bcb39d;border-radius:10px;display:flex;align-items:center;justify-content:center;color:var(--muted);background:#f6f1e3;cursor:pointer}.draw-slot.filled{border-style:solid;border-color:var(--gold);background:#fff6d9;box-shadow:0 0 0 3px #d7aa4740}.draw-slot.disabled{cursor:default;opacity:.65}.divider{width:1px;height:64px;background:var(--line)}
+.tile-wrap{position:relative;padding-top:22px}.tile-wrap.small{padding-top:0}.badge{position:absolute;top:1px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:9px;color:#fff;background:#5a5b56;border-radius:8px;padding:1px 5px;z-index:1}.badge.reco{background:var(--red)}.tile{width:49px;height:66px;border-radius:7px;background:linear-gradient(145deg,#fff,#eee9dc);border:1px solid #cec6b4;border-bottom:4px solid #b8ad97;display:flex;flex-direction:column;justify-content:center;align-items:center;font-weight:750;line-height:1.05;cursor:pointer;user-select:none;box-shadow:0 2px 2px #0002}.tile:hover{transform:translateY(-4px)}.tile .num{font-size:22px}.tile .suit{font-size:11px;color:#777167;margin-top:3px}.tile.honor .num{font-size:16px}.tile.flower{background:linear-gradient(145deg,#fff8dc,#eadcae);border-color:#cbb66d}.tile.safe{box-shadow:0 0 0 3px #4d9b6960}.tile.medium{box-shadow:0 0 0 3px #d0a12f70}.tile.danger{box-shadow:0 0 0 3px #c54b3970}.tile.recommended{outline:3px solid var(--red);outline-offset:1px}.tile.mini{width:30px;height:40px;border-bottom-width:2px;border-radius:5px;cursor:default}.tile.mini:hover{transform:none}.tile.mini .num{font-size:13px}.tile.mini .suit{font-size:8px}
+.flower-list{display:flex;flex-wrap:wrap;gap:7px}.flower-item{display:flex;align-items:center;gap:2px}.flower-item button{font-size:10px;padding:3px 5px}
+.status{font-size:20px;font-weight:800;margin:1px 0 3px}.phase{display:inline-block;font-size:11px;padding:2px 7px;border-radius:10px;background:#e8dfc9;color:#655f52;margin-right:7px;vertical-align:3px}.substatus{color:var(--muted);font-size:12px;margin-bottom:11px}table{width:100%;border-collapse:collapse;font-size:12px}th{text-align:left;color:var(--muted);font-size:10px;border-bottom:1px solid var(--line);padding:5px}td{padding:6px 5px;border-bottom:1px dashed #ddd5c1}.risk{font-size:10px;border-radius:8px;color:#fff;padding:2px 6px}.risk.安全{background:var(--green)}.risk.中{background:var(--yellow)}.risk.危险{background:var(--red)}.candidate{cursor:pointer}.candidate:first-of-type{background:#fff0df}.kong-list{border-top:1px solid var(--line);margin-top:9px;padding-top:8px;font-size:12px}.kong-list div{margin:4px 0}.advice{white-space:pre-wrap;background:var(--paper2);border-radius:9px;padding:10px;max-height:360px;overflow:auto;font-size:13px}.right-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#242723;color:white;border-radius:9px;padding:10px 16px;box-shadow:0 8px 30px #0006;opacity:0;pointer-events:none;transition:.2s;z-index:50}.toast.show{opacity:1}
+.overlay{position:fixed;inset:0;background:#071711c9;display:none;align-items:center;justify-content:center;z-index:20;padding:18px}.overlay.show{display:flex}.modal{width:min(880px,96vw);max-height:92vh;overflow:auto;background:var(--paper);border-radius:16px;padding:19px;box-shadow:0 20px 70px #0009}.modal.narrow{width:min(510px,94vw)}.modal h2{margin:0 0 5px}.modal-desc{color:var(--muted);margin-bottom:12px}.picker-groups{display:flex;flex-direction:column;gap:7px}.picker-row{display:flex;align-items:center;gap:4px;flex-wrap:wrap}.picker-label{width:38px;color:var(--muted);font-size:12px}.pick{position:relative}.pick .left-count{position:absolute;right:-2px;top:-5px;background:var(--red);color:#fff;border-radius:8px;min-width:15px;text-align:center;font-size:9px;z-index:2}.pick.disabled{opacity:.3;pointer-events:none}.pick .tile{width:40px;height:52px}.pick .tile .num{font-size:17px}.draft{margin:12px 0;background:#eee6d3;border-radius:9px;padding:9px;min-height:52px}.draft-head{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:5px}.draft-tiles{display:flex;gap:3px;flex-wrap:wrap}.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:13px}.tabs{display:flex;gap:5px;margin-bottom:9px}.tabs button.active{background:var(--ink);color:white;border-color:var(--ink)}
+@media(max-width:980px){main{grid-template-columns:1fr}.opponents{grid-template-columns:1fr 1fr 1fr}}@media(max-width:650px){header small{display:none}main{padding:0 8px 10px}.opponents{grid-template-columns:1fr}.zone{grid-template-columns:1fr}.zone-label{padding-top:0}.right{order:-1}.tile{width:43px;height:59px}}
 </style>
 </head>
 <body>
-<header>
-  <h1>🀄 麻将策略助手</h1>
-  <span class="sub">引擎算事实 · LLM 做读牌 · 一胡即终局，快胡优先</span>
-  <span class="sp"></span>
-  <button class="ghost" onclick="undo()">↩ 撤销</button>
-  <button class="ghost" onclick="showNew()">✚ 新对局</button>
-</header>
-
+<header><h1>🀄 麻将策略助手</h1><small>牌桌视角 · 引擎算事实 · LLM 做读牌</small><span class="spacer"></span><button class="ghost" onclick="undoEvent()">↩ 撤销</button><button class="ghost" onclick="openNewGame()">＋ 新对局</button></header>
 <main>
-  <div class="col">
-    <div class="card opps" id="opps"></div>
-
-    <div class="card">
-      <div class="row"><span class="lbl">未杠花牌</span><span id="flowers" class="river" style="line-height:1.6"><span class="hint">无</span></span></div>
-      <div class="row"><span class="lbl">我的明牌</span><span id="mymelds" class="melds" style="margin:0">无</span></div>
-      <div class="row"><span class="lbl">我的暗牌</span><span id="hand" class="hand" style="line-height:0"><span class="hint">点「新对局」开始</span></span>
-        <span style="font-size:12px;color:var(--muted)">（点一张 = 打出）</span></div>
-      <div class="row"><span class="lbl">我的弃牌</span><span id="myriver" class="river"><span class="hint">无</span></span></div>
+  <section class="left">
+    <div class="panel opponents" id="opponents"></div>
+    <div class="claim" id="claim"></div>
+    <div class="panel my-area">
+      <div class="zone"><div class="zone-label">花牌</div><div class="flower-list" id="flowers"><span class="empty">无</span></div></div>
+      <div class="zone"><div class="zone-label">我的明牌</div><div class="melds" id="myMelds"></div></div>
+      <div class="zone"><div class="zone-label">我的暗牌</div><div class="hand-line"><div class="hand" id="hand"></div><div class="divider"></div><div class="draw-slot" id="drawSlot" onclick="openDrawPicker()">摸牌</div></div></div>
+      <div class="zone"><div class="zone-label">我的弃牌</div><div class="river" id="myRiver"></div></div>
     </div>
-
-    <div class="card">
-      <h3>操作</h3>
-      <div class="actions" id="actions">
-        <span class="chip" data-mode="draw" onclick="setMode('draw','摸牌')">摸牌</span>
-        <span style="color:var(--line)">|</span>
-        <span class="chip" data-p="l" onclick="setPlayer('l')">上家</span>
-        <span class="chip" data-p="r" onclick="setPlayer('r')">下家</span>
-        <span class="chip" data-p="o" onclick="setPlayer('o')">对家</span>
-        <span class="chip" data-mode="od" onclick="setMode('od','打')">打</span>
-        <span class="chip" data-mode="op" onclick="setMode('op','碰')">碰</span>
-        <span class="chip" data-mode="oc" onclick="setMode('oc','吃')">吃</span>
-        <span class="chip" data-mode="og" onclick="setMode('og','杠')">杠</span>
-        <span style="color:var(--line)">|</span>
-        <span class="chip" data-mode="kg" onclick="setMode('kg','杠花')">杠花</span>
-        <span class="chip" data-mode="an" onclick="setMode('an','暗杠')">暗杠</span>
-        <span class="chip" data-mode="ka" onclick="setMode('ka','加杠')">加杠</span>
-      </div>
-      <div class="picker" id="picker"></div>
-      <div class="pending" id="pending"></div>
-    </div>
-  </div>
-
-  <div class="col">
-    <div class="card">
-      <h3>分析（引擎）</h3>
-      <div id="analysis" class="hint">开始对局后，摸牌自动更新</div>
-    </div>
-    <div class="card">
-      <h3>AI 建议
-        <button class="primary" id="adviceBtn" style="float:right;padding:3px 12px" onclick="advice()">问 LLM</button>
-      </h3>
-      <div id="advice" class="hint">需要 ANTHROPIC_API_KEY；引擎分析无需联网</div>
-    </div>
-  </div>
+  </section>
+  <aside class="right">
+    <div class="panel"><div class="section-title">局面分析</div><div id="riskReport" class="advice" hidden></div><div id="analysis"><span class="empty">开始对局后显示</span></div><div class="right-actions"><button class="primary" id="scoreBtn" onclick="score()" style="display:none">算花</button><button onclick="analyzeRisk()" id="riskBtn">逐家风险（试验）</button><button onclick="advice()" id="adviceBtn">问 LLM</button></div></div>
+    <div class="panel"><div class="section-title">AI 建议</div><div id="advice" class="advice">需要 API Key；确定性分析无需联网。</div></div>
+  </aside>
 </main>
 
-<div class="mask" id="mask">
-  <div class="modal">
-    <h2>新对局</h2>
-    <input id="inHand" placeholder="起手暗牌 13 张，如：2万 3万 4万 5万 6万 6万 6万 1饼 1饼 1饼 2条 2条 2条">
-    <input id="inFlowers" placeholder="起手花牌（可空），如：中 中">
-    <div class="btns">
-      <button onclick="fillSample()">填个示例</button>
-      <button onclick="hideNew()">取消</button>
-      <button class="primary" onclick="startGame()">开始</button>
-    </div>
-  </div>
-</div>
+<div class="overlay" id="pickerOverlay"><div class="modal"><h2 id="pickerTitle">选牌</h2><div class="modal-desc" id="pickerDesc"></div><div class="picker-groups" id="pickerGroups"></div><div class="draft" id="pickerDraft" style="display:none"></div><div class="modal-actions"><button onclick="closePicker()">取消</button><button class="primary" id="pickerConfirm" onclick="confirmPicker()" style="display:none">确认</button></div></div></div>
+<div class="overlay" id="newOverlay"><div class="modal"><h2>新对局</h2><div class="modal-desc">先选 13 张结构牌；花牌在“起手花”页单独加入。</div><div class="tabs"><button id="handTab" class="active" onclick="setNewTab('hand')">暗牌 <span id="handCount">0</span>/13</button><button id="flowerTab" onclick="setNewTab('flowers')">起手花 <span id="flowerCount">0</span></button></div><div class="picker-groups" id="newPicker"></div><div class="draft"><div class="draft-head"><span>已选</span><button onclick="clearDraft()">清空</button></div><div class="draft-tiles" id="newDraft"></div></div><p id="newGameError" role="alert" aria-live="polite" style="color:var(--red);white-space:pre-wrap" hidden></p><div class="modal-actions"><button onclick="closeNewGame()">取消</button><button class="primary" id="startGameBtn" onclick="startGame()">开始对局</button></div></div></div>
+<div class="overlay" id="scoreOverlay"><div class="modal narrow"><h2>本局花数</h2><div id="scoreResult"></div><div class="modal-actions"><button onclick="closeScore()">关闭</button><button class="primary" onclick="openNewGame()">下一局</button></div></div></div>
+<div class="toast" id="toast"></div>
 
 <script>
-const $ = id => document.getElementById(id);
-let mode = null, player = 'l', pending = [];
+const $=id=>document.getElementById(id);
+const NUMBER_TILES=['万','饼','条'].flatMap(s=>Array.from({length:9},(_,i)=>`${i+1}${s}`));
+const HONORS=['南风','西风','北风'];
+const MULTI_FLOWERS=['东风','中','发','白'];
+const SEASONS=['春','夏','秋','冬','梅','兰','竹','菊'];
+const ALL_TILES=[...NUMBER_TILES,...HONORS,...MULTI_FLOWERS,...SEASONS];
+const FLOWERS=new Set([...MULTI_FLOWERS,...SEASONS]);
+let current=null, legal=null, picker=null, newTab='hand', draftHand=[], draftFlowers=[];
 
-const SUITS = [
-  {label:'万', n:9, prefix:''}, {label:'饼', n:9}, {label:'条', n:9},
-];
-const HONORS = ['南风','西风','北风'];
-const FLOWERS = ['中','发','白','东风','春','夏','秋','冬','梅','兰','竹','菊'];
-const SEASON = new Set(['春','夏','秋','冬','梅','兰','竹','菊']);
-
-function tileHTML(name, cls='', click=''){
-  let n = name, s = '';
-  const m = name.match(/^([1-9])([万饼条])$/);
-  if (m){ n = m[1]; s = m[2]; }
-  else { s = ''; }
-  const flower = !m;
-  return `<span class="tile ${cls} ${flower?'flower':''} ${m?'':'honor'}" ${click?`onclick="${click}"`:''}>` +
-         `<span class="n">${n}</span>${s?`<span class="s">${s}</span>`:''}</span>`;
-}
-
-/* ---------- server calls ---------- */
-async function api(path, body){
-  const r = await fetch(path, body ? {method:'POST',headers:{'Content-Type':'application/json'},
-                                          body:JSON.stringify(body)} : undefined);
-  return r.json();
-}
-async function refresh(){
-  const d = await api('/api/state');
-  if (!d.ok){ return; }
-  render(d.state); renderAnalysis(d.analysis);
-}
-async function send(line){
-  const d = await api('/api/event', {line});
-  if (!d.ok){ flash(d.error || '操作失败'); return false; }
-  await refresh(); return true;
-}
-function flash(msg){
-  const p = $('pending'); p.textContent = '⚠ ' + msg;
-  setTimeout(()=>{ if(p.textContent.startsWith('⚠')) p.textContent=''; }, 2500);
-}
-
-/* ---------- render ---------- */
-function render(st){
-  // opponents
-  const names = {l:'上家', r:'下家', o:'对家'};
-  $('opps').innerHTML = ['l','r','o'].map(k=>{
-    const p = st.players[k==='l'?'left':k==='r'?'right':'opposite'];
-    const river = p.discards.length ? p.discards.map(t=>tileHTML(t,'small','flat')).join('') : '<span class="hint">无弃牌</span>';
-    const melds = p.melds.length ? p.melds.map(m=>`<span class="grp">${m.type} ${m.tiles.join(' ')}</span>`).join(' ') : '无明牌';
-    return `<div class="card opp"><h3>${names[k]} <span class="cnt">${p.discards.length}张弃牌</span></h3>
-            <div class="river">${river}</div><div class="melds">${melds}</div></div>`;
-  }).join('');
-
-  $('flowers').innerHTML = st.flowers.length
-    ? st.flowers.map(t=>tileHTML(t,'small',`send('kg ${t}')`)).join('') +
-      '<span class="hint" style="font-size:11px;margin-left:6px">点花=杠掉</span>'
-    : '<span class="hint">无</span>';
-  $('mymelds').innerHTML = st.my_melds.length
-    ? st.my_melds.map(m=>`<span class="grp">${m.type} ${m.tiles.join(' ')}</span>`).join(' ') : '无';
-  $('hand').innerHTML = st.hand.length
-    ? st.hand.map(t=>tileHTML(t,'',`send('打 ${t}')`)).join('')
-    : '<span class="hint">空</span>';
-  $('myriver').innerHTML = st.my_discards.length
-    ? st.my_discards.map(t=>tileHTML(t,'small','flat')).join('') : '<span class="hint">无</span>';
-}
-
-function renderAnalysis(a){
-  if (!a){ return; }
-  let head;
-  if (a.shanten === -1) head = '🎉 已经胡了！';
-  else if (a.is_tenpai) head = `📣 听牌！胡：${a.waiting.join(' ')}`;
-  else head = `向听数 ${a.shanten}｜进张：${a.ukeire.join(' ') || '无'}`;
-  let html = `<div class="status">${head}</div>
-              <div class="substat">全桌剩余 ${a.remaining_total} 张 · 一胡即终局，快胡优先</div>`;
-  if (a.candidates.length){
-    html += `<table><tr><th>打</th><th>向听</th><th>进张</th><th>风险</th><th>剩</th></tr>` +
-      a.candidates.map(c=>`
-        <tr class="cand" onclick="send('打 ${c.tile}')">
-          <td><b>${c.tile}</b></td>
-          <td>${c.shanten_after}</td>
-          <td>${c.speed_types}种/${c.speed_tiles}张</td>
-          <td><span class="risk ${c.risk}">${c.risk}</span>
-              <div class="bars">
-                <div class="bar" title="被吃 ${fmt(c.chi)}"><i style="width:${c.chi*100}%"></i></div>
-                <div class="bar" title="被碰 ${fmt(c.peng)}"><i style="width:${c.peng*100}%"></i></div>
-                <div class="bar r" title="点炮 ${fmt(c.ron)}"><i style="width:${c.ron*100}%"></i></div>
-              </div></td>
-          <td>${c.remaining}</td>
-        </tr>`).join('') + `</table>`;
-  }
-  if (a.kong_opportunities.length){
-    html += `<div class="kong"><b>杠牌/杠开机会</b><ul style="margin:4px 0 0 18px;padding:0">` +
-      a.kong_opportunities.map(o=>`<li>${o.kind} ${o.tile}：${o.hua}花；${o.note}</li>`).join('') +
-      `</ul>${a.is_tenpai ? '<div class="star">★ 已听牌：现在杠任意一组，补牌成胡 = 杠开（8花起，上不封顶）</div>' : ''}</div>`;
-  }
-  $('analysis').innerHTML = html;
-}
-const fmt = p => (p*100).toFixed(0) + '%';
-
-/* ---------- actions ---------- */
-function setPlayer(p){
-  player = p;
-  document.querySelectorAll('[data-p]').forEach(e=>e.classList.toggle('on', e.dataset.p===p));
-  if (!mode) setMode('od','打');
-  else renderPicker();
-}
-function setMode(m, label){
-  mode = m; pending = [];
-  document.querySelectorAll('[data-mode]').forEach(e=>e.classList.toggle('on', e.dataset.mode===m));
-  $('pending').textContent = m ? `待选牌（${label}）…` : '';
-  renderPicker();
-}
-const MODES = {
-  draw:{cnt:1, line:t=>`摸 ${t}`},
-  od:  {cnt:1, line:t=>`${player} ${t}`},
-  op:  {cnt:1, line:t=>`${player}碰 ${t}`},
-  oc:  {cnt:3, line:t=>`${player}吃 ${t.join(' ')}`},
-  og:  {cnt:1, line:t=>`${player}杠 ${t}`},
-  kg:  {cnt:1, line:t=>`kg ${t}`},
-  an:  {cnt:1, line:t=>`an ${t}`},
-  ka:  {cnt:1, line:t=>`ka ${t}`},
-};
-function renderPicker(){
-  const p = $('picker');
-  if (!mode){ p.className='picker'; p.innerHTML=''; return; }
-  p.className = 'picker show';
-  let html = '';
-  for (const s of SUITS){
-    html += `<div class="grp"><span class="glabel">${s.label}</span>` +
-      Array.from({length:9},(_,i)=>tileHTML(`${i+1}${s.label}`,'small',`pick('${i+1}${s.label}')`)).join('') + `</div>`;
-  }
-  html += `<div class="grp"><span class="glabel">字</span>` +
-    HONORS.map(t=>tileHTML(t,'small',`pick('${t}')`)).join('') + `</div>`;
-  if (['draw','kg'].includes(mode)){
-    html += `<div class="grp"><span class="glabel">花</span>` +
-      FLOWERS.map(t=>tileHTML(SEASON.has(t)?t:t,'small',`pick('${t}')`)).join('') + `</div>`;
-  }
-  p.innerHTML = html;
-}
-async function pick(t){
-  if (!mode) return;
-  const m = MODES[mode];
-  if (mode==='kg'){ send(`kg ${t}`); return; }        // 杠花直接执行
-  pending.push(t);
-  if (pending.length < m.cnt){
-    $('pending').textContent = `待选牌：${pending.join(' ')}${mode==='oc' ? '（吃还需 '+(m.cnt-pending.length)+' 张）' : ''}`;
-    return;
-  }
-  const line = m.line(m.cnt===1 ? pending[0] : pending);
-  pending = [];
-  $('pending').textContent = '';
-  await send(line);
-}
-async function undo(){ pending=[]; $('pending').textContent=''; await send('撤'); }
-
-async function advice(){
-  const btn = $('adviceBtn'), out = $('advice');
-  btn.disabled = true; btn.textContent = '思考中…';
-  out.className = 'advice'; out.textContent = 'LLM 正在读牌（可能需要十几秒）…';
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function tileParts(name){const m=name.match(/^([1-9])([万饼条])$/);return m?{n:m[1],s:m[2],flower:false}:{n:name,s:'',flower:FLOWERS.has(name)}}
+function tileHTML(name,{mini=false,risk='',recommended=false,badge='',click=''}={}){const p=tileParts(name);return `<div class="tile-wrap ${mini?'small':''}">${badge?`<span class="badge ${recommended?'reco':''}">${esc(badge)}</span>`:''}<div class="tile ${mini?'mini':''} ${p.flower?'flower':''} ${p.s?'':'honor'} ${risk} ${recommended?'recommended':''}" ${click?`onclick="${click}"`:''}><span class="num">${esc(p.n)}</span>${p.s?`<span class="suit">${p.s}</span>`:''}</div></div>`}
+function meldHTML(m){return `<span class="meld">${({chi:'吃',peng:'碰',ming_gang:'明杠',an_gang:'暗杠'})[m.type]||m.type} · ${m.tiles.map(esc).join(' ')}</span>`}
+async function api(path,body){
+  if(location.protocol==='file:')return {ok:false,error:'请通过 http://127.0.0.1:8765 打开本程序，不能直接双击 HTML 文件。'};
+  const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),30000);
   try{
-    const d = await api('/api/advice', {});
-    if (d.ok){ out.textContent = d.advice; }
-    else {
-      out.innerHTML = `<span class="err">获取失败：${d.error}</span>` +
-        (d.prompt ? `<details style="margin-top:8px"><summary>Prompt 预览（可复制给任意模型）</summary>
-                     <div style="white-space:pre-wrap;font-size:12.5px;margin-top:6px">${d.prompt}</div></details>` : '');
-    }
-  } finally { btn.disabled = false; btn.textContent = '问 LLM'; }
+    const options=body===undefined?{}:{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)};
+    const response=await fetch(path,{...options,cache:'no-store',signal:controller.signal});
+    let data;
+    try{data=await response.json()}catch{return {ok:false,error:`服务返回异常（HTTP ${response.status}），请刷新页面后重试。`}}
+    if(!response.ok)return {ok:false,error:data?.error||`请求失败（HTTP ${response.status}），请重试。`};
+    if(!data||typeof data.ok!=='boolean')return {ok:false,error:'服务返回的数据不完整，请刷新页面后重试。'};
+    return data;
+  }catch(error){return {ok:false,error:error.name==='AbortError'?'请求超过30秒，请检查本机服务后重试；已选牌仍然保留。':'无法连接本机服务，请确认服务仍在运行后重试；已选牌仍然保留。'}}
+  finally{clearTimeout(timeout)}
 }
+function notify(message){const t=$('toast');t.textContent=message;t.classList.add('show');clearTimeout(notify.timer);notify.timer=setTimeout(()=>t.classList.remove('show'),2600)}
 
-/* ---------- new game ---------- */
-function showNew(){ $('mask').className = 'mask show'; $('inHand').focus(); }
-function hideNew(){ $('mask').className = 'mask'; }
-function fillSample(){
-  $('inHand').value = '2万 3万 4万 5万 6万 6万 6万 1饼 1饼 1饼 2条 2条 2条';
-  $('inFlowers').value = '中';
-}
+async function refresh(){const d=await api('/api/state');if(!d.ok){if(!current)openNewGame();return false}current=d;const result=await api('/api/legal');legal=result.ok?result:null;render();return true}
+async function send(line,bindPending=false){const body={line};if(bindPending&&legal?.pending)body.expected_pending_id=legal.pending.id;const d=await api('/api/event',body);if(!d.ok){notify(d.error||'操作失败');return false}closePicker();await refresh();return true}
+
+function render(){renderOpponents();renderClaim();renderMyArea();renderAnalysis();renderRisk()}
+function renderOpponents(){const names={left:'上家',opposite:'对家',right:'下家'},prefix={left:'l',opposite:'o',right:'r'};$('opponents').innerHTML=['left','opposite','right'].map(key=>{const p=current.state.players[key];const river=p.discards.length?p.discards.map(t=>tileHTML(t,{mini:true})).join(''):'<span class="empty">暂无弃牌</span>';return `<div class="opponent"><div class="opp-head"><span>${names[key]}</span><span class="count">${p.discards.length} 张</span></div><div class="river">${river}</div><div class="melds">${p.melds.map(meldHTML).join('')}</div><div class="substatus">已知资格花 ${p.known_hua?.total??0} · ${p.flowers_complete?'花牌已核对（当前）':'花牌可能未录全'}<br>${[...(p.flowers||[]),...(p.konged_flowers||[])].map(esc).join(' ')||'未记录花牌'}</div><div class="opp-actions"><button onclick="openActionPicker('opp-discard','${prefix[key]} 打牌',1,'${prefix[key]}')">打</button><button onclick="opponentCall('${prefix[key]}','碰')">碰</button><button onclick="openActionPicker('opp-chi','${names[key]}吃牌',3,'${prefix[key]}')">吃</button><button onclick="opponentCall('${prefix[key]}','杠')">杠</button><button onclick="openActionPicker('opp-ankan','${names[key]}暗杠',1,'${prefix[key]}')">暗杠</button><button onclick="openActionPicker('opp-flower','${names[key]}增加花牌',1,'${prefix[key]}')">记花</button><button onclick="send('${prefix[key]}${p.flowers_complete?'花未知':'花完整'}')">${p.flowers_complete?'取消核对':'花牌录全'}</button></div></div>`}).join('')}
+function opponentCall(prefix,verb){const p=current.flow.pending;if(!p){notify('请先记录被打出的牌');return}send(`${prefix}${verb} ${p.tile}`,true)}
+function renderClaim(){const box=$('claim');if(!legal?.pending){box.className='claim';box.innerHTML='';return}const p=legal.pending;let buttons='';if(legal.peng)buttons+=`<button onclick="send('我碰 ${esc(p.tile)}',true)">碰</button>`;if(legal.gang)buttons+=`<button onclick="send('我杠 ${esc(p.tile)}',true)">明杠</button>`;for(const pair of legal.chi){const full=[...pair,p.tile].sort(tileSort);buttons+=`<button onclick="send('我吃 ${full.join(' ')}',true)">吃 ${pair.join(' ')}</button>`}if(legal.ron)buttons+=`<button class="primary" onclick="send('胡 放炮',true)">胡！</button>`;buttons+=`<button onclick="send('过',true)">过</button>`;box.className='claim show';box.innerHTML=`<strong>${({left:'上家',right:'下家',opposite:'对家'})[p.player]}打出 ${esc(p.tile)}</strong>${buttons}`}
+function tileSort(a,b){const order={'万':0,'饼':1,'条':2};const ma=a.match(/^([1-9])([万饼条])$/),mb=b.match(/^([1-9])([万饼条])$/);if(ma&&mb)return order[ma[2]]-order[mb[2]]||+ma[1]-+mb[1];if(ma)return-1;if(mb)return 1;return ALL_TILES.indexOf(a)-ALL_TILES.indexOf(b)}
+function renderMyArea(){const flow=current.flow,state=current.state,candidates=new Map(current.analysis.candidates.map((c,i)=>[c.tile,{...c,rank:i}]));let hand=[...state.hand];if(flow.drawn_tile&&!FLOWERS.has(flow.drawn_tile)){const i=hand.indexOf(flow.drawn_tile);if(i>=0)hand.splice(i,1)}hand.sort(tileSort);$('hand').innerHTML=hand.length?hand.map(t=>handTile(t,candidates)).join(''):'<span class="empty">无暗牌</span>';const slot=$('drawSlot');if(flow.drawn_tile){slot.className='draw-slot filled'+(flow.phase==='need_draw'?'':' disabled');slot.innerHTML=tileHTML(flow.drawn_tile,{click:flow.phase==='need_discard'?`send('打 ${flow.drawn_tile}')`:''})}else{slot.className='draw-slot'+(flow.phase!=='need_draw'?' disabled':'');slot.textContent=flow.phase==='need_draw'?'摸牌':'—'}$('myMelds').innerHTML=state.my_melds.length?state.my_melds.map(meldHTML).join(''):'<span class="empty">无</span>';$('myRiver').innerHTML=state.my_discards.length?state.my_discards.map(t=>tileHTML(t,{mini:true})).join(''):'<span class="empty">无</span>';const counts={};state.flowers.forEach(t=>counts[t]=(counts[t]||0)+1);$('flowers').innerHTML=state.flowers.length?[...new Set(state.flowers)].map(t=>{const can=flow.phase==='need_draw';return `<span class="flower-item">${tileHTML(t,{mini:true})}<span>×${counts[t]}</span>${can?`<button onclick="send('kg ${t}')">单张杠</button>${counts[t]===4&&!SEASONS.includes(t)?`<button onclick="send('kg ${t} 4')">暗杠4张</button>`:''}`:''}</span>`}).join(''):'<span class="empty">无</span>'}
+function handTile(t,candidates){const c=candidates.get(t),click=current.flow.phase==='need_discard'?`send('打 ${t}')`:'';if(!c)return tileHTML(t,{click});const risk={安全:'safe',中:'medium',危险:'danger'}[c.risk]||'';return tileHTML(t,{risk,recommended:c.rank===0,badge:c.rank===0?'推荐':`向${c.shanten_after} · ${c.speed_tiles}张`,click})}
+function openDrawPicker(){if(!current||current.flow.phase!=='need_draw')return;openActionPicker('draw','我摸到的牌',1,'')}
+function renderAnalysis(){const a=current.analysis,f=current.flow;const phase={need_draw:'等摸牌',need_discard:'须打一张',won:'已胡',drawn:'黄庄'}[f.phase];let title;if(f.phase==='drawn')title='黄庄 · 全部零结算';else if(f.phase==='won'&&!f.win)title='本局结束 · 对手胡牌';else if(f.win)title=`🎉 已胡 ${f.win.tile}`;else if(a.shanten===-1)title='牌型已完成，请确认胡牌';else if(a.is_tenpai)title=`听牌 · 胡 ${a.waiting.join(' ')}`;else title=`${a.shanten} 向听`;let html=`<div class="status"><span class="phase">${phase}</span>${title}</div><div class="substatus">未见牌 ${a.remaining_total} 张（含对手暗牌，非牌墙）${f.replacement_draw_pending?' · 下一张为补牌':''}</div>`;if(f.phase==='need_discard'&&a.shanten===-1&&!f.win)html+=`<button class="gold" onclick="send('胡 ${f.last_draw_was_replacement?'杠开':'自摸'}')">确认${f.last_draw_was_replacement?'杠开':'自摸'}胡</button>`;if(a.candidates.length){html+=`<table><tr><th>打</th><th>向听</th><th>进张</th><th>风险</th><th>剩</th></tr>${a.candidates.map(c=>`<tr class="candidate" onclick="${f.phase==='need_discard'?`send('打 ${c.tile}')`:''}"><td><b>${esc(c.tile)}</b></td><td>${c.shanten_after}</td><td>${c.speed_types}种/${c.speed_tiles}张</td><td><span class="risk ${c.risk}">${c.risk}</span><br><small>启发式指标，非概率</small></td><td>${c.remaining}</td></tr>`).join('')}</table>`}if(a.kong_opportunities.length)html+=`<div class="kong-list"><b>杠牌 / 杠开机会</b>${a.kong_opportunities.map(o=>`<div>${esc(o.kind)} ${esc(o.tile)} · ${o.hua_basis==='flower_score_delta'?'本次花分增量':'杠分'} ${o.hua}花<br><small>${esc(o.note)}</small>${kongButton(o)}</div>`).join('')}</div>`;$('analysis').innerHTML=html;$('scoreBtn').style.display=f.win?'inline-block':'none'}
+function kongButton(o){if(current.flow.phase==='need_discard'&&o.kind==='暗杠')return ` <button onclick="send('an ${o.tile}')">暗杠</button>`;if(current.flow.phase==='need_discard'&&o.kind==='加杠')return ` <button onclick="send('ka ${o.tile}')">加杠</button>`;return ''}
+const pct=n=>`${Math.round(n*100)}%`;
+
+function openActionPicker(mode,title,count,prefix){picker={mode,title,count,prefix,selected:[]};$('pickerTitle').textContent=title;$('pickerDesc').textContent=count===1?'请选择一张牌':`请选择 ${count} 张组成吃牌`;$('pickerOverlay').classList.add('show');renderPicker()}
+function renderPicker(){const tiles=picker.mode==='opp-flower'?[...MULTI_FLOWERS,...SEASONS]:picker.mode==='draw'?ALL_TILES:[...NUMBER_TILES,...HONORS];$('pickerGroups').innerHTML=pickerRows(tiles,(t)=>pickerPick(t),current?.flow.remaining_by_tile||null);const multi=picker.count>1;$('pickerDraft').style.display=multi?'block':'none';$('pickerConfirm').style.display=multi?'inline-block':'none';if(multi)$('pickerDraft').innerHTML=`<div class="draft-head"><span>已选 ${picker.selected.length}/${picker.count}</span><button onclick="picker.selected=[];renderPicker()">重选</button></div><div class="draft-tiles">${picker.selected.map(t=>tileHTML(t,{mini:true})).join('')}</div>`}
+function pickerRows(tiles,onPick,remaining){const groups=[['万',tiles.filter(t=>t.endsWith('万'))],['饼',tiles.filter(t=>t.endsWith('饼'))],['条',tiles.filter(t=>t.endsWith('条'))],['字',tiles.filter(t=>HONORS.includes(t))],['花',tiles.filter(t=>FLOWERS.has(t))]].filter(g=>g[1].length);return groups.map(([label,list])=>`<div class="picker-row"><span class="picker-label">${label}</span>${list.map(t=>{const left=remaining?remaining[t]:null;return `<div class="pick ${left===0?'disabled':''}" onclick="${left===0?'':`(${onPick.toString()})('${t}')`}">${left!==null?`<span class="left-count">${left}</span>`:''}${tileHTML(t)}</div>`}).join('')}</div>`).join('')}
+function pickerPick(t){if(picker.count===1){executePicker([t]);return}if(picker.selected.length<picker.count)picker.selected.push(t);renderPicker()}
+function confirmPicker(){if(picker.selected.length!==picker.count){notify(`还需选择 ${picker.count-picker.selected.length} 张`);return}executePicker(picker.selected)}
+function executePicker(ts){const {mode,prefix}=picker;if(mode==='draw')send(`摸 ${ts[0]}`);else if(mode==='opp-discard')send(`${prefix} ${ts[0]}`);else if(mode==='opp-chi')send(`${prefix}吃 ${ts.join(' ')}`,true);else if(mode==='opp-ankan')send(`${prefix}暗杠 ${ts[0]}`);else if(mode==='opp-flower')send(`${prefix}花 ${ts[0]}`)}
+function closePicker(){$('pickerOverlay').classList.remove('show');picker=null}
+
+function openNewGame(){$('scoreOverlay').classList.remove('show');$('newOverlay').classList.add('show');setNewTab('hand')}
+function closeNewGame(){if(current)$('newOverlay').classList.remove('show');else notify('请先开始一局')}
+function setNewTab(tab){newTab=tab;$('handTab').classList.toggle('active',tab==='hand');$('flowerTab').classList.toggle('active',tab==='flowers');renderNewPicker()}
+function renderNewPicker(){const tiles=newTab==='hand'?[...NUMBER_TILES,...HONORS]:[...MULTI_FLOWERS,...SEASONS];const counts={};[...draftHand,...draftFlowers].forEach(t=>counts[t]=(counts[t]||0)+1);const remaining={};tiles.forEach(t=>remaining[t]=(SEASONS.includes(t)?1:4)-(counts[t]||0));$('newPicker').innerHTML=pickerRows(tiles,(t)=>addDraft(t),remaining);$('newDraft').innerHTML=[...draftHand,...draftFlowers].sort(tileSort).map(t=>`<span onclick="removeDraft('${t}')">${tileHTML(t,{mini:true})}</span>`).join('')||'<span class="empty">点击上方牌面加入</span>';$('handCount').textContent=draftHand.length;$('flowerCount').textContent=draftFlowers.length}
+function addDraft(t){if(newTab==='hand'){if(draftHand.length>=13){notify('暗牌已经选满 13 张');return}draftHand.push(t)}else draftFlowers.push(t);renderNewPicker()}
+function removeDraft(t){let list=FLOWERS.has(t)?draftFlowers:draftHand;const i=list.indexOf(t);if(i>=0)list.splice(i,1);renderNewPicker()}
+function clearDraft(){draftHand=[];draftFlowers=[];renderNewPicker()}
 async function startGame(){
-  const d = await api('/api/new', {hand:$('inHand').value.trim(), flowers:$('inFlowers').value.trim()});
-  if (!d.ok){ alert(d.error); return; }
-  hideNew(); setMode(null,''); await refresh();
+  const button=$('startGameBtn'),errorBox=$('newGameError');
+  if(button.disabled)return;
+  errorBox.hidden=true;errorBox.textContent='';
+  const fail=message=>{errorBox.textContent=message;errorBox.hidden=false};
+  if(draftHand.length!==13){fail('请先选满 13 张暗牌');return}
+  button.disabled=true;button.textContent='正在开始…';
+  try{
+    const result=await api('/api/new',{hand:draftHand.join(' '),flowers:draftFlowers.join(' ')});
+    if(!result.ok){fail(result.error||'创建对局失败，请重试。');return}
+    if(!await refresh()){fail('对局已创建，但局面加载失败。请重试或刷新页面。');return}
+    $('newOverlay').classList.remove('show');
+  }catch(error){fail('局面显示失败，请刷新页面后重试。');console.error('开始对局失败',error)}
+  finally{button.disabled=false;button.textContent='开始对局'}
+}
+async function undoEvent(){const d=await api('/api/event',{line:'撤'});if(!d.ok){notify(d.error);return}await refresh()}
+async function advice(){const btn=$('adviceBtn'),out=$('advice');btn.disabled=true;btn.textContent='思考中…';out.textContent='LLM 正在读牌…';const d=await api('/api/advice',{});btn.disabled=false;btn.textContent='问 LLM';if(d.ok){out.textContent=d.advice}else{out.textContent=`获取失败：${d.error}${d.prompt?'\n\nPrompt 预览：\n'+d.prompt:''}`}}
+
+let riskResult=null,riskBusy=false;
+function sameDecisionVersion(a,b){return !!a&&!!b&&a.game_id===b.game_id&&a.revision===b.revision}
+function renderRisk(){
+  const button=$('riskBtn'),box=$('riskReport');
+  button.disabled=riskBusy||!current||current.flow.phase!=='need_discard';
+  button.textContent=riskBusy?'抽样计算中…':'逐家风险（试验）';
+  if(!sameDecisionVersion(riskResult,current?.flow)){box.hidden=true;return}
+  box.hidden=false;
+  const names={left:'上家',opposite:'对家',right:'下家'};
+  const rows=riskResult.candidates.map(c=>{
+    const opponents=Object.entries(c.opponents).map(([p,s])=>
+      `${names[p]}：接炮 ${pct(s.ron_rate)}（${s.ron_hits}/${riskResult.samples} 次）；胡时平均付 ${s.mean_payment_if_ron===null?'未知':s.mean_payment_if_ron.toFixed(1)} 点`).join('<br>');
+    return `<tr><td>${esc(c.tile)}</td><td>${c.expected_immediate_loss.toFixed(2)} 点</td><td>${opponents}<br><small>至少一家接炮的抽样区间：${c.any_ron_interval_95.map(pct).join('～')}</small></td></tr>`;
+  }).join('');
+  box.innerHTML=`<b>逐家立即赔付评估 · 试验模型</b><p>${riskResult.samples} 次联合抽样 · ${riskResult.elapsed_ms}ms${riskResult.budget_exhausted?' · 已达计算预算':''}</p><p>仅比较本次放炮损失，不是整局收益；零次命中不代表安全。牌效推荐保持不变。</p><table><tr><th>打</th><th>平均立即损失</th><th>逐家样本结果</th></tr>${rows}</table><details><summary>模型假设与局限</summary>${riskResult.warnings.map(w=>`<p>${esc(w)}</p>`).join('')}</details>`;
+}
+async function analyzeRisk(){
+  if(riskBusy||!current||current.flow.phase!=='need_discard')return;
+  const version={game_id:current.flow.game_id,revision:current.flow.revision};
+  riskBusy=true;renderRisk();
+  try{
+    const result=await api('/api/decision',{...version,samples:256,seed:0});
+    if(!sameDecisionVersion(version,current?.flow))return;
+    if(result.ok&&sameDecisionVersion(result.decision,current.flow))riskResult=result.decision;
+    else notify(result.error||'分析失败，请重试');
+  }catch(error){notify('分析失败，请重试')}
+  finally{riskBusy=false;renderRisk()}
 }
 
-/* boot */
-setPlayer('l'); setMode(null,'');
-$('mask').className = 'mask show';
+async function score(){const d=await api('/api/score',{});if(!d.ok){notify(d.error);return}$('scoreResult').innerHTML=`<div class="status">${d.hua} 花</div><div class="substatus">其中花牌 ${d.flowers} 花</div>${d.breakdown.map(x=>`<div class="meld" style="margin:5px 0;padding:7px">${esc(x)}</div>`).join('')}`;$('scoreOverlay').classList.add('show')}
+function closeScore(){$('scoreOverlay').classList.remove('show')}
+
 refresh();
 </script>
 </body>

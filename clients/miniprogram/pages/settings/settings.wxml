@@ -1,0 +1,12 @@
+<view class="connection-page">
+  <button class="connection-back" bindtap="back">‹ 返回</button>
+  <view class="home-brand">连接测试服务</view>
+  <view class="connection-help">开发者工具使用本机地址；手机试打请填写电脑在同一 Wi-Fi 下的地址。</view>
+  <view class="connection-help">牌桌上的“声音开／关”控制出牌与动作播报，跟随系统音量和静音模式。</view>
+  <label>服务地址</label><input class="connection-input" value="{{baseURL}}" bindinput="url" placeholder="http://192.168.1.8:8771" disabled="{{busy}}"/>
+  <label>开发配对码</label><input class="connection-input" value="{{devKey}}" bindinput="key" password="true" placeholder="本机连接可以留空" disabled="{{busy}}"/>
+  <view wx:if="{{message}}" class="connection-message {{success?'success':''}}">{{message}}</view>
+  <button class="secondary" bindtap="probe" disabled="{{busy}}">{{busy?'检查中…':'检查连接'}}</button>
+  <button class="primary" bindtap="save" disabled="{{busy}}">保存并返回</button>
+  <view class="connection-help">更换地址或配对码后，会清除手机上旧桌的连接记录；旧桌不会被删除。正式微信环境仍需合法开发域名与 HTTPS。</view>
+</view>

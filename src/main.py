@@ -1,12 +1,13 @@
 """Interactive CLI for the mahjong advisor.
 
 Run with:  python -m src.main
-Set ANTHROPIC_API_KEY (or run `ant auth login`) for live AI advice; without it
-the tool prints the engine analysis and a prompt preview instead of crashing.
+Legacy paid prose is disabled. Engine analysis and offline prompt exports remain;
+the desktop adviser uses the independently guarded strategy-v2 protocol.
 """
 from .core.tiles import GameState, Meld, parse_tile
-from .llm.advisor import analyze, build_prompt, get_advice
-from .session import print_analysis, run_session
+from .decision.service import analyze
+from .llm.advisor import build_prompt, get_advice
+from .session import new_session, print_analysis, run_session
 
 # meld keywords -> (MeldType, tile copies)
 _MELD_TYPES = {
@@ -72,8 +73,7 @@ def _input_tiles(prompt: str):
 def _session_mode() -> None:
     hand = _input_tiles("请输入起手暗牌（13张；已有明牌则输剩余暗牌）:\n> ")
     flowers = _input_tiles("请输入起手花牌（未杠，直接回车跳过）:\n> ")
-    state = GameState(my_hand=hand, flowers_in_hand=flowers)
-    run_session(state)
+    run_session(new_session(_join(hand), _join(flowers)))
 
 
 def main() -> None:
@@ -115,8 +115,7 @@ def main() -> None:
         print(f"\n【AI建议】\n{advice}")
     except Exception as e:  # noqa: BLE001 - surface any failure, then fall back
         print(f"\n获取 AI 建议失败：{e}")
-        print("（设置 ANTHROPIC_API_KEY 或 `ant auth login` 后可获取 AI 建议；")
-        print(" 下面是给模型的 Prompt 预览，可自行复制使用。）\n")
+        print("（旧版付费自由讲解已关闭；下面仅为离线资料，不是受约束军师建议。）\n")
         print("【Prompt 预览】")
         print(build_prompt(state, analysis))
 

@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>太湖麻将 · Block组件库</title>
+    <link rel="stylesheet" href="../shared/tokens.css" />
+    <link rel="stylesheet" href="../shared/review.css" />
+    <link rel="stylesheet" href="../shared/workbench.css" />
+  </head>
+  <body class="block-library">
+    <header class="library-header">
+      <a href="../index.html">太湖 · 原型设计</a>
+      <nav>
+        <strong>Block</strong><a href="../flows/index.html">Flow</a
+        ><a href="../app/index.html">App</a>
+      </nav>
+    </header>
+    <main class="library-main">
+      <span class="eyebrow">BLOCK / 可复用基础单元</span>
+      <h1>一次打磨，处处一致。</h1>
+      <p class="library-intro">
+        这里的牌、手牌、副露、座位、操作组和弹窗，与 Flow 和 App
+        调用相同的渲染函数、设计变量和样式。组件只表达状态，不决定流程。
+      </p>
+      <div id="block-tabs"></div>
+      <div class="library-grid">
+        <section>
+          <div id="block-states"></div>
+          <div class="gallery-scroll">
+            <div class="gallery-stage game" id="block-preview"></div>
+          </div>
+        </section>
+        <aside class="library-notes" id="block-notes"></aside>
+      </div>
+    </main>
+    <script src="ui.js"></script>
+    <script src="../shared/call-fixtures.js"></script>
+    <script src="catalog.js"></script>
+  </body>
+</html>

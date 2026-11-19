@@ -6,7 +6,7 @@ Model: 总分 = 底分(自摸4/放炮2，杠开8替代) + Σ番型(杠开按自�
 import pytest
 
 from src.core.tiles import create_tile, Meld
-from src.core.scoring import score_hand, ScoringResult, PATTERN_VALUES
+from src.core.scoring import score_hand, ScoringResult, PATTERN_VALUES, flower_hua
 
 _SUIT = {"m": "万", "p": "饼", "s": "条"}
 
@@ -37,11 +37,29 @@ def _chi(a, b, c):
 
 # --- base -------------------------------------------------------------------
 class TestBase:
+    def test_zero_flower_compensation_is_better_than_one_flower(self):
+        hand = H("m123 m456 p789 s123 s99")
+        assert score_hand(hand).hua == 6
+        assert score_hand(hand, flowers=["春"]).hua == 5
+        assert score_hand(hand, flowers=["春", "夏"]).hua == 6
+
+    def test_patterns_do_not_grant_ron_but_wind_triplets_do(self):
+        with pytest.raises(ValueError, match="无花不能接炮"):
+            score_hand(H("m111 m222 m333 m444 m99"), win_method="dianpao")
+        result = score_hand(H("m123 p456 s789 南南南 西西"), win_method="dianpao")
+        assert result.qualifying_hua == 1 and result.hua == 3
+
+    def test_no_flower_self_draw_still_adds_pattern_points(self):
+        result = score_hand(H("m111 m222 m333 m444 m99"))
+        assert result.base_hua == 6 and result.pattern_hua == 20
+        assert result.qualifying_hua == 0 and result.hua == 26
+
     def test_plain_zimo(self):
-        assert score_hand(H("m123 m456 p789 s123 s99"), win_method="zimo").hua == 4
+        assert score_hand(H("m123 m456 p789 s123 s99"), win_method="zimo").hua == 6
 
     def test_plain_dianpao(self):
-        assert score_hand(H("m123 m456 p789 s123 s99"), win_method="dianpao").hua == 2
+        with pytest.raises(ValueError, match="无花不能接炮"):
+            score_hand(H("m123 m456 p789 s123 s99"), win_method="dianpao")
 
     def test_gangkai_replaces_base(self):
         # 杠开已有8花，不额外加自摸4
@@ -69,7 +87,7 @@ class TestPengPeng:
         hand = H("m111 p222 南南")   # 2 concealed triplets + pair, 2 pengs called
         melds = [_peng(create_tile("饼", 5)), _peng(create_tile("条", 9))]
         r = score_hand(hand, my_melds=melds, win_method="zimo")
-        assert r.hua == 4 + 10
+        assert r.hua == 6 + 10
 
     def test_chi_meld_breaks_it(self):
         # 2 concealed triplets + pair, but one meld is a chi -> no 碰碰胡
@@ -78,49 +96,49 @@ class TestPengPeng:
                  _chi(create_tile("条", 3), create_tile("条", 4), create_tile("条", 5))]
         r = score_hand(hand, my_melds=melds, win_method="zimo")
         assert "碰碰胡" not in r.breakdown
-        assert r.hua == 4   # base only
+        assert r.hua == 6   # no-flower self-draw compensation
 
 
 class TestDiaoChe:
     def test_da_diao_che_standalone(self):
-        # 1 hand tile + 4 pengs: 大吊车 only (独立算，不叠碰碰胡)
-        hand = [create_tile("风", "西")]
+        # One-tile wait has become a pair on winning; no 碰碰胡 stacking.
+        hand = [create_tile("风", "西")] * 2
         melds = [_peng(create_tile("万", 3)), _peng(create_tile("万", 7)),
                  _peng(create_tile("饼", 5)), _peng(create_tile("条", 9))]
         r = score_hand(hand, my_melds=melds, win_method="zimo")
         assert "大吊车 20花" in r.breakdown
         assert "碰碰胡" not in r.breakdown
-        assert r.hua == 4 + 20
+        assert r.hua == 6 + 20
 
     def test_da_diao_che_dianpao(self):
-        hand = [create_tile("风", "西")]
+        hand = [create_tile("风", "西")] * 2
         melds = [_peng(create_tile("万", 3)), _peng(create_tile("万", 7)),
                  _peng(create_tile("饼", 5)), _peng(create_tile("条", 9))]
-        assert score_hand(hand, my_melds=melds, win_method="dianpao").hua == 2 + 10
+        assert score_hand(hand, my_melds=melds, flowers=["春"], win_method="dianpao").hua == 2 + 10 + 1
 
     def test_xiao_diao_che(self):
-        # 1 hand tile + melds containing chi -> 小吊车
-        hand = [create_tile("风", "西")]
+        # Completed one-tile wait plus a chi meld -> 小吊车.
+        hand = [create_tile("风", "西")] * 2
         melds = [_peng(create_tile("万", 3)), _peng(create_tile("万", 7)),
                  _chi(create_tile("饼", 5), create_tile("饼", 6), create_tile("饼", 7)),
                  _chi(create_tile("条", 1), create_tile("条", 2), create_tile("条", 3))]
         r = score_hand(hand, my_melds=melds, win_method="zimo")
         assert "小吊车 10花" in r.breakdown
-        assert r.hua == 4 + 10
+        assert r.hua == 6 + 10
 
 
 class TestQingYiSe:
     def test_flush_with_runs(self):
         r = score_hand(H("m111 m222 m345 m678 m99"), win_method="zimo")
         assert "清一色 10花" in r.breakdown
-        assert r.hua == 4 + 10
+        assert r.hua == 6 + 10
 
     def test_flush_dianpao(self):
-        assert score_hand(H("m111 m222 m345 m678 m99"), win_method="dianpao").hua == 2 + 5
+        assert score_hand(H("m111 m222 m345 m678 m99"), flowers=["春"], win_method="dianpao").hua == 2 + 5 + 1
 
     def test_flush_plus_pengpeng_stacks(self):
         r = score_hand(H("m111 m222 m333 m444 m99"), win_method="zimo")
-        assert r.hua == 4 + 10 + 10   # 清一色 + 碰碰胡 叠加
+        assert r.hua == 6 + 10 + 10   # 无花自摸 + 清一色 + 碰碰胡
 
     def test_honors_break_flush(self):
         r = score_hand(H("m111 m222 m333 m444 南南"), win_method="zimo")
@@ -128,22 +146,41 @@ class TestQingYiSe:
 
 
 class TestSevenPairs:
+    @pytest.mark.parametrize("method,pattern,total", [("zimo", 60, 65),
+                                                      ("gangkai", 60, 69),
+                                                      ("dianpao", 30, 33)])
+    def test_triple_luxury(self, method, pattern, total):
+        hand = H("m1111 p2222 s3333 北北")
+        r = score_hand(hand, konged_flowers=["春"], flower_kong_groups=[["春"]], win_method=method)
+        assert r.hua == total and r.pattern_hua == pattern
+        assert f"三豪华 {pattern}花" in r.breakdown
+        assert not any(b.startswith(("七对 ", "豪华七对 ", "双豪华 ", "暗杠", "明杠")) for b in r.breakdown)
+
+    def test_triple_luxury_without_flower_is_self_draw_only(self):
+        hand = H("m1111 p2222 s3333 北北")
+        assert score_hand(hand, win_method="zimo").hua == 66
+        with pytest.raises(ValueError, match="无花不能接炮"):
+            score_hand(hand, win_method="dianpao")
+
+    def test_triple_luxury_can_stack_with_flush(self):
+        assert score_hand(H("m11112222333344"), win_method="zimo").hua == 6+60+10
+
     def test_plain(self):
         r = score_hand(H("m11 m22 p33 p44 s55 s66 南南"), win_method="zimo")
-        assert r.hua == 4 + 10
+        assert r.hua == 6 + 10
         assert "七对 10花" in r.breakdown
 
     def test_luxury(self):
         # one quad (4张一样的) as two pairs + five pairs
-        r = score_hand(H("m1111 m22 p33 p44 s55 s66"), win_method="dianpao")
+        r = score_hand(H("m1111 m22 p33 p44 s55 s66"), flowers=["春"], win_method="dianpao")
         assert "豪华七对 10花" in r.breakdown
         assert "七对" not in [b.split()[0] for b in r.breakdown]   # 互斥
-        assert r.hua == 2 + 10
+        assert r.hua == 2 + 10 + 1
 
     def test_double_luxury(self):
         r = score_hand(H("m1111 p2222 s33 s55 南南"), win_method="zimo")
         assert "双豪华 40花" in r.breakdown
-        assert r.hua == 4 + 40
+        assert r.hua == 6 + 40
 
     def test_melds_block_seven_pairs(self):
         hand = H("m11 m22 p33 p44 s55 s66")
@@ -161,7 +198,7 @@ class TestCombinations:
 
     def test_qingyise_seven_pairs_stacks(self):
         r = score_hand(H("m11 m22 m33 m44 m55 m66 m77"), win_method="zimo")
-        assert r.hua == 4 + 10 + 10   # 清一色 + 七对
+        assert r.hua == 6 + 10 + 10   # 无花自摸 + 清一色 + 七对
 
     def test_flowers_add(self):
         r = score_hand(H("m123 m456 p789 s123 s99"),
@@ -210,7 +247,7 @@ class TestKongHua:
         assert r.hua == 4 + 10 + 12
 
     def test_multiple_kongs_stack(self):
-        hand = [create_tile("风", "西")]
+        hand = [create_tile("风", "西")] * 2
         melds = [Meld("ming_gang", [create_tile("条", 9)] * 4),
                  Meld("an_gang", [create_tile("万", 3)] * 4),
                  _peng(create_tile("饼", 5)), _peng(create_tile("条", 1))]
@@ -240,6 +277,25 @@ class TestHeldFlowerTiers:
 
 
 class TestKongedFlowers:
+    def test_four_single_kongs_differ_from_one_concealed_kong(self):
+        tiles = ["中"] * 4
+        assert flower_hua([], tiles, [["中"]] * 4) == 6
+        assert flower_hua([], tiles, [tiles]) == 12
+
+    def test_held_and_individually_konged_flowers_share_one_tier(self):
+        assert flower_hua(["中", "中"], ["中"], [["中"]]) == 4
+        assert flower_hua(["中", "中", "中"], ["中"], [["中"]]) == 6
+
+    def test_flower_replacement_win_uses_eight_base(self):
+        result = score_hand(H("m123 m456 p789 s123 s99"),
+                            konged_flowers=["中"], flower_kong_groups=[["中"]],
+                            win_method="gangkai")
+        assert result.base_hua == 8 and result.hua == 9
+
+    def test_group_mismatch_rejected(self):
+        with pytest.raises(ValueError, match="不一致"):
+            flower_hua([], ["中"], [["中"] * 4])
+
     def test_konged_flower_replaces_tier(self):
         # 4个中杠掉 = 12花（不再叠手持4张档的6花）
         r = score_hand(H("m123 m456 p789 s123 s99"),
@@ -307,7 +363,7 @@ class TestWindTripletHua:
     def test_pair_alone_is_zero(self):
         r = score_hand(H("m123 m456 p789 s123 s99"), win_method="zimo")
         assert all("风刻" not in b for b in r.breakdown)
-        assert r.hua == 4
+        assert r.hua == 6
 
     def test_konged_wind_no_extra(self):
         # 明杠南=6、暗杠南=12 已含；不再+1

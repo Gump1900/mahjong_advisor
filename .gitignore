@@ -27,6 +27,7 @@ wheels/
 
 # Testing
 .pytest_cache/
+runs/
 .coverage
 htmlcov/
 
@@ -35,3 +36,20 @@ htmlcov/
 .vscode/
 *.swp
 *.swo
+
+# Local credentials (never commit real keys)
+/config/local.toml
+
+# Generated documentation, runtime context, models and experiment outputs
+/artifacts/
+# macOS metadata
+.DS_Store
+
+# WeChat developer tool local machine settings
+/clients/miniprogram/project.private.config.json
+
+# Local secrets and downloaded research video
+.env
+.env.*
+!.env.example
+/data/sources/video/

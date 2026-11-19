@@ -1,0 +1,1496 @@
+{
+  "scope": "Frozen own-seat observations and raw replies for offline regression; not oracle labels or new API successes",
+  "source": "runs/live-batch/20261027-185632-tricks-860348eb/game-01/hand-001",
+  "source_sha256": {
+    "decisions.jsonl": "4a2f3c14a7be03bc690f99f04a413ad3b9f1188ccd27268ad12ebf9b0f87b16f",
+    "rejected-seat-2.json": "c809924ed5b31c711589f91c2a3c0e02aad5da5072db092c7de1f28ace23e5dc"
+  },
+  "accepted_rows": [
+    {
+      "observation": {
+        "observation_id": "07d0acbbf138476cba8aa901b2f45eb7:turn0:0",
+        "rules_version": "local-2026-10-22-desktop-v4",
+        "call_counts": [
+          [
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "locked_pairs": [],
+        "seat": 0,
+        "dealer": 0,
+        "stage": "turn",
+        "actor": 0,
+        "wall_count": 91,
+        "self": {
+          "hand": [
+            "1万",
+            "1万",
+            "1饼",
+            "3饼",
+            "9饼",
+            "4条",
+            "5条",
+            "东风",
+            "东风",
+            "中",
+            "白",
+            "春",
+            "冬",
+            "菊"
+          ],
+          "waiting_tiles": [],
+          "discard_waits": {},
+          "waiting_note": "未见张数仅扣自己的牌与公开牌，不等于牌墙活张；未知暗杠可能耗尽进张。",
+          "ron_blocked": false,
+          "peng_blocked": [],
+          "locked_with": [],
+          "held_flower_count": 7,
+          "drawn_tile": null,
+          "draw_source": "initial",
+          "structural_shanten": 5,
+          "analysis_note": "结构向听未单独评估留花换牌的策略价值；合法动作由裁判另行校验。"
+        },
+        "players": [
+          {
+            "seat": 0,
+            "hand_count": 14,
+            "melds": [],
+            "locked_with": [],
+            "call_counts": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "known_qualifying_hua": {
+              "flowers": 0,
+              "wind_triplets": 0,
+              "kongs": 0,
+              "total": 0
+            },
+            "unknown_ankan_count": 0,
+            "value_note": "仅当前可知资格花，不含未公开手牌和牌型加分；不是听牌概率或已获收入。未知暗杠每组10或12，不能据此猜名。",
+            "flowers": [],
+            "river": []
+          },
+          {
+            "seat": 1,
+            "hand_count": 13,
+            "melds": [],
+            "locked_with": [],
+            "call_counts": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "known_qualifying_hua": {
+              "flowers": 0,
+              "wind_triplets": 0,
+              "kongs": 0,
+              "total": 0
+            },
+            "unknown_ankan_count": 0,
+            "value_note": "仅当前可知资格花，不含未公开手牌和牌型加分；不是听牌概率或已获收入。未知暗杠每组10或12，不能据此猜名。",
+            "flowers": [],
+            "river": []
+          },
+          {
+            "seat": 2,
+            "hand_count": 13,
+            "melds": [],
+            "locked_with": [],
+            "call_counts": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "known_qualifying_hua": {
+              "flowers": 0,
+              "wind_triplets": 0,
+              "kongs": 0,
+              "total": 0
+            },
+            "unknown_ankan_count": 0,
+            "value_note": "仅当前可知资格花，不含未公开手牌和牌型加分；不是听牌概率或已获收入。未知暗杠每组10或12，不能据此猜名。",
+            "flowers": [],
+            "river": []
+          },
+          {
+            "seat": 3,
+            "hand_count": 13,
+            "melds": [],
+            "locked_with": [],
+            "call_counts": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "known_qualifying_hua": {
+              "flowers": 0,
+              "wind_triplets": 0,
+              "kongs": 0,
+              "total": 0
+            },
+            "unknown_ankan_count": 0,
+            "value_note": "仅当前可知资格花，不含未公开手牌和牌型加分；不是听牌概率或已获收入。未知暗杠每组10或12，不能据此猜名。",
+            "flowers": [],
+            "river": []
+          }
+        ],
+        "events": [],
+        "pending": null,
+        "legal_actions": [
+          {
+            "id": "07d0acbbf138476cba8aa901b2f45eb7:turn0:0:0",
+            "kind": "discard",
+            "tiles": [
+              "1万"
+            ]
+          },
+          {
+            "id": "07d0acbbf138476cba8aa901b2f45eb7:turn0:0:1",
+            "kind": "discard",
+            "tiles": [
+              "1饼"
+            ]
+          },
+          {
+            "id": "07d0acbbf138476cba8aa901b2f45eb7:turn0:0:2",
+            "kind": "discard",
+            "tiles": [
+              "3饼"
+            ]
+          },
+          {
+            "id": "07d0acbbf138476cba8aa901b2f45eb7:turn0:0:3",
+            "kind": "discard",
+            "tiles": [
+              "4条"
+            ]
+          },
+          {
+            "id": "07d0acbbf138476cba8aa901b2f45eb7:turn0:0:4",
+            "kind": "discard",
+            "tiles": [
+              "5条"
+            ]
+          },
+          {
+            "id": "07d0acbbf138476cba8aa901b2f45eb7:turn0:0:5",
+            "kind": "discard",
+            "tiles": [
+              "9饼"
+            ]
+          },
+          {
+            "id": "07d0acbbf138476cba8aa901b2f45eb7:turn0:0:6",
+            "kind": "flower_kong",
+            "tiles": [
+              "东风"
+            ]
+          },
+          {
+            "id": "07d0acbbf138476cba8aa901b2f45eb7:turn0:0:7",
+            "kind": "flower_kong",
+            "tiles": [
+              "中"
+            ]
+          },
+          {
+            "id": "07d0acbbf138476cba8aa901b2f45eb7:turn0:0:8",
+            "kind": "flower_kong",
+            "tiles": [
+              "冬"
+            ]
+          },
+          {
+            "id": "07d0acbbf138476cba8aa901b2f45eb7:turn0:0:9",
+            "kind": "flower_kong",
+            "tiles": [
+              "春"
+            ]
+          },
+          {
+            "id": "07d0acbbf138476cba8aa901b2f45eb7:turn0:0:10",
+            "kind": "flower_kong",
+            "tiles": [
+              "白"
+            ]
+          },
+          {
+            "id": "07d0acbbf138476cba8aa901b2f45eb7:turn0:0:11",
+            "kind": "flower_kong",
+            "tiles": [
+              "菊"
+            ]
+          }
+        ],
+        "result": null
+      },
+      "choice": {
+        "action_id": "07d0acbbf138476cba8aa901b2f45eb7:turn0:0:5",
+        "controller": "llm",
+        "reason": "打 9饼。结构5向听，尚未合法听牌。手里仍有留花，须处理后才能胡牌。公开未见改善张26，不等于墙内活张。 策略说明：模型选择：打 9饼。结构5向听，尚未合法听牌。手里仍有留花，须处理后才能胡牌。公开未见改善张26，不等于墙内活张。\n\n模型取舍（未经最优性证明）：起手14张结构很散（结构向听5），手上有7张花占位严重，但唯一有点价值的组牌形态是1万对子加1/3饼和4/5条两个搭子，9饼是孤张且与1饼等无直接联系。先打9饼保留相对完整的进张结构（未见改进26），比直接打掉搭子或对子更少损失成牌潜力。花暂不全换：目前没有直接的杠开条件，逐张单换只是换成一张未知牌、各花分值同为1，先保留花可以多观察一轮摸牌再决定换哪张、换几张更划算。相较B3打3饼，我会更快失去饼门的1/3饼嵌2饼结构；相较逐张换花，我放弃了一点结构整洁度，换取稍后选择换花时机的权利。\n\n不确定性：未见改进张数不是牌墙活张，别家可能有暗杠或持有相关牌；9饼是唯一一张，打出去是否安全只能靠经验，当前没有任何公开弃牌可参考；花分的最终结算口径由代码决定，我按同款合并阶梯理解，单花约1分。\n\n改判条件：如果下一巡摸到有用的组牌张（如2饼、3/6条、1万或东风对子补强），且手上仍有多张花，我会进一步倾向一次性换出部分花以收回占位；若某家明显推进速度很快（连续吃碰、明杠），我会考虑提前打掉孤张9饼之外的危险中张、并更快清花以求自摸。\n\n合法对照：打 3饼。结构5向听，尚未合法听牌。手里仍有留花，须处理后才能胡牌。公开未见改善张12，不等于墙内活张。\n\n代码核对的代价：接受留花占位、当前不能胡牌\n\n分析提醒：模型未逐家分析全部对手；空项不是安全证明"
+      },
+      "decision_validation": {
+        "decision_frame": {
+          "protocol": "table-v1",
+          "selected": "B6",
+          "alternative": "B3",
+          "plan": "起手14张结构很散（结构向听5），手上有7张花占位严重，但唯一有点价值的组牌形态是1万对子加1/3饼和4/5条两个搭子，9饼是孤张且与1饼等无直接联系。先打9饼保留相对完整的进张结构（未见改进26），比直接打掉搭子或对子更少损失成牌潜力。花暂不全换：目前没有直接的杠开条件，逐张单换只是换成一张未知牌、各花分值同为1，先保留花可以多观察一轮摸牌再决定换哪张、换几张更划算。相较B3打3饼，我会更快失去饼门的1/3饼嵌2饼结构；相较逐张换花，我放弃了一点结构整洁度，换取稍后选择换花时机的权利。",
+          "uncertainty": "未见改进张数不是牌墙活张，别家可能有暗杠或持有相关牌；9饼是唯一一张，打出去是否安全只能靠经验，当前没有任何公开弃牌可参考；花分的最终结算口径由代码决定，我按同款合并阶梯理解，单花约1分。",
+          "reconsider": "如果下一巡摸到有用的组牌张（如2饼、3/6条、1万或东风对子补强），且手上仍有多张花，我会进一步倾向一次性换出部分花以收回占位；若某家明显推进速度很快（连续吃碰、明杠），我会考虑提前打掉孤张9饼之外的危险中张、并更快清花以求自摸。",
+          "opponents": []
+        }
+      }
+    },
+    {
+      "observation": {
+        "observation_id": "07d0acbbf138476cba8aa901b2f45eb7:turn4:1",
+        "rules_version": "local-2026-10-22-desktop-v4",
+        "call_counts": [
+          [
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "locked_pairs": [],
+        "seat": 1,
+        "dealer": 0,
+        "stage": "turn",
+        "actor": 1,
+        "wall_count": 90,
+        "self": {
+          "hand": [
+            "3万",
+            "4万",
+            "6万",
+            "7万",
+            "8万",
+            "2饼",
+            "3饼",
+            "5饼",
+            "5饼",
+            "9饼",
+            "南风",
+            "中",
+            "夏",
+            "秋"
+          ],
+          "waiting_tiles": [],
+          "discard_waits": {},
+          "waiting_note": "未见张数仅扣自己的牌与公开牌，不等于牌墙活张；未知暗杠可能耗尽进张。",
+          "ron_blocked": false,
+          "peng_blocked": [],
+          "locked_with": [],
+          "held_flower_count": 3,
+          "drawn_tile": "8万",
+          "draw_source": "normal",
+          "structural_shanten": 3,
+          "analysis_note": "结构向听未单独评估留花换牌的策略价值；合法动作由裁判另行校验。"
+        },
+        "players": [
+          {
+            "seat": 0,
+            "hand_count": 13,
+            "melds": [],
+            "locked_with": [],
+            "call_counts": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "known_qualifying_hua": {
+              "flowers": 0,
+              "wind_triplets": 0,
+              "kongs": 0,
+              "total": 0
+            },
+            "unknown_ankan_count": 0,
+            "value_note": "仅当前可知资格花，不含未公开手牌和牌型加分；不是听牌概率或已获收入。未知暗杠每组10或12，不能据此猜名。",
+            "flowers": [],
+            "river": [
+              "9饼"
+            ]
+          },
+          {
+            "seat": 1,
+            "hand_count": 14,
+            "melds": [],
+            "locked_with": [],
+            "call_counts": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "known_qualifying_hua": {
+              "flowers": 0,
+              "wind_triplets": 0,
+              "kongs": 0,
+              "total": 0
+            },
+            "unknown_ankan_count": 0,
+            "value_note": "仅当前可知资格花，不含未公开手牌和牌型加分；不是听牌概率或已获收入。未知暗杠每组10或12，不能据此猜名。",
+            "flowers": [],
+            "river": []
+          },
+          {
+            "seat": 2,
+            "hand_count": 13,
+            "melds": [],
+            "locked_with": [],
+            "call_counts": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "known_qualifying_hua": {
+              "flowers": 0,
+              "wind_triplets": 0,
+              "kongs": 0,
+              "total": 0
+            },
+            "unknown_ankan_count": 0,
+            "value_note": "仅当前可知资格花，不含未公开手牌和牌型加分；不是听牌概率或已获收入。未知暗杠每组10或12，不能据此猜名。",
+            "flowers": [],
+            "river": []
+          },
+          {
+            "seat": 3,
+            "hand_count": 13,
+            "melds": [],
+            "locked_with": [],
+            "call_counts": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "known_qualifying_hua": {
+              "flowers": 0,
+              "wind_triplets": 0,
+              "kongs": 0,
+              "total": 0
+            },
+            "unknown_ankan_count": 0,
+            "value_note": "仅当前可知资格花，不含未公开手牌和牌型加分；不是听牌概率或已获收入。未知暗杠每组10或12，不能据此猜名。",
+            "flowers": [],
+            "river": []
+          }
+        ],
+        "events": [
+          {
+            "kind": "discard",
+            "seat": 0,
+            "tile": "9饼"
+          },
+          {
+            "kind": "all_pass",
+            "source": 0
+          },
+          {
+            "kind": "draw",
+            "seat": 1,
+            "tile": "8万",
+            "replacement": false
+          }
+        ],
+        "pending": null,
+        "legal_actions": [
+          {
+            "id": "07d0acbbf138476cba8aa901b2f45eb7:turn4:1:0",
+            "kind": "discard",
+            "tiles": [
+              "2饼"
+            ]
+          },
+          {
+            "id": "07d0acbbf138476cba8aa901b2f45eb7:turn4:1:1",
+            "kind": "discard",
+            "tiles": [
+              "3万"
+            ]
+          },
+          {
+            "id": "07d0acbbf138476cba8aa901b2f45eb7:turn4:1:2",
+            "kind": "discard",
+            "tiles": [
+              "3饼"
+            ]
+          },
+          {
+            "id": "07d0acbbf138476cba8aa901b2f45eb7:turn4:1:3",
+            "kind": "discard",
+            "tiles": [
+              "4万"
+            ]
+          },
+          {
+            "id": "07d0acbbf138476cba8aa901b2f45eb7:turn4:1:4",
+            "kind": "discard",
+            "tiles": [
+              "5饼"
+            ]
+          },
+          {
+            "id": "07d0acbbf138476cba8aa901b2f45eb7:turn4:1:5",
+            "kind": "discard",
+            "tiles": [
+              "6万"
+            ]
+          },
+          {
+            "id": "07d0acbbf138476cba8aa901b2f45eb7:turn4:1:6",
+            "kind": "discard",
+            "tiles": [
+              "7万"
+            ]
+          },
+          {
+            "id": "07d0acbbf138476cba8aa901b2f45eb7:turn4:1:7",
+            "kind": "discard",
+            "tiles": [
+              "8万"
+            ]
+          },
+          {
+            "id": "07d0acbbf138476cba8aa901b2f45eb7:turn4:1:8",
+            "kind": "discard",
+            "tiles": [
+              "9饼"
+            ]
+          },
+          {
+            "id": "07d0acbbf138476cba8aa901b2f45eb7:turn4:1:9",
+            "kind": "flower_kong",
+            "tiles": [
+              "中"
+            ]
+          },
+          {
+            "id": "07d0acbbf138476cba8aa901b2f45eb7:turn4:1:10",
+            "kind": "discard",
+            "tiles": [
+              "南风"
+            ]
+          },
+          {
+            "id": "07d0acbbf138476cba8aa901b2f45eb7:turn4:1:11",
+            "kind": "flower_kong",
+            "tiles": [
+              "夏"
+            ]
+          },
+          {
+            "id": "07d0acbbf138476cba8aa901b2f45eb7:turn4:1:12",
+            "kind": "flower_kong",
+            "tiles": [
+              "秋"
+            ]
+          }
+        ],
+        "result": null
+      },
+      "choice": {
+        "action_id": "07d0acbbf138476cba8aa901b2f45eb7:turn4:1:9",
+        "controller": "llm",
+        "reason": "单张杠花换牌 中。当前可核对资格花0；补牌未知，不预报补牌后的听口。 策略说明：模型选择：单张杠花换牌 中。当前可核对资格花0；补牌未知，不预报补牌后的听口。\n\n模型取舍（未经最优性证明）：先换掉一张花（中），把手牌缩回13张并争取资格花与更好的进张；目前3张花一直占位，结构向听3、离成牌还远，先把花处理掉更划算。换中而非夏秋，是因为中属中发白东一类，可与其他同款花合并阶梯计分，且保留夏秋稍后再换的灵活性。若只换一张后仍不进牌，再考虑继续清花。\n\n不确定性：补到的牌未知，无法确定换花后是否真的改善结构或形成杠开；不知道其他三家暗牌与暗杠，无法判断进张是否被暗杠吃掉；三张花是否该一次全换（分批换）也需看下一张补牌质量。\n\n改判条件：如果换中后补到关键进张（如改善万/饼搭子），可继续按普通路线推进并保留剩余花择时换；若补到废张或下家明显推进，则加快清掉夏秋；若出现同款花第四张的迹象，再评估是否转为四张暗杠路线。\n\n合法对照：单张杠花换牌 秋。当前可核对资格花0；补牌未知，不预报补牌后的听口。\n\n分析提醒：模型未逐家分析全部对手；空项不是安全证明"
+      },
+      "decision_validation": {
+        "decision_frame": {
+          "protocol": "table-v1",
+          "selected": "B10",
+          "alternative": "B13",
+          "plan": "先换掉一张花（中），把手牌缩回13张并争取资格花与更好的进张；目前3张花一直占位，结构向听3、离成牌还远，先把花处理掉更划算。换中而非夏秋，是因为中属中发白东一类，可与其他同款花合并阶梯计分，且保留夏秋稍后再换的灵活性。若只换一张后仍不进牌，再考虑继续清花。",
+          "uncertainty": "补到的牌未知，无法确定换花后是否真的改善结构或形成杠开；不知道其他三家暗牌与暗杠，无法判断进张是否被暗杠吃掉；三张花是否该一次全换（分批换）也需看下一张补牌质量。",
+          "reconsider": "如果换中后补到关键进张（如改善万/饼搭子），可继续按普通路线推进并保留剩余花择时换；若补到废张或下家明显推进，则加快清掉夏秋；若出现同款花第四张的迹象，再评估是否转为四张暗杠路线。",
+          "opponents": []
+        }
+      }
+    },
+    {
+      "observation": {
+        "observation_id": "07d0acbbf138476cba8aa901b2f45eb7:turn5:1",
+        "rules_version": "local-2026-10-22-desktop-v4",
+        "call_counts": [
+          [
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "locked_pairs": [],
+        "seat": 1,
+        "dealer": 0,
+        "stage": "turn",
+        "actor": 1,
+        "wall_count": 89,
+        "self": {
+          "hand": [
+            "3万",
+            "4万",
+            "6万",
+            "6万",
+            "7万",
+            "8万",
+            "2饼",
+            "3饼",
+            "5饼",
+            "5饼",
+            "9饼",
+            "南风",
+            "夏",
+            "秋"
+          ],
+          "waiting_tiles": [],
+          "discard_waits": {},
+          "waiting_note": "未见张数仅扣自己的牌与公开牌，不等于牌墙活张；未知暗杠可能耗尽进张。",
+          "ron_blocked": false,
+          "peng_blocked": [],
+          "locked_with": [],
+          "held_flower_count": 2,
+          "drawn_tile": "6万",
+          "draw_source": "replacement",
+          "structural_shanten": 3,
+          "analysis_note": "结构向听未单独评估留花换牌的策略价值；合法动作由裁判另行校验。"
+        },
+        "players": [
+          {
+            "seat": 0,
+            "hand_count": 13,
+            "melds": [],
+            "locked_with": [],
+            "call_counts": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "known_qualifying_hua": {
+              "flowers": 0,
+              "wind_triplets": 0,
+              "kongs": 0,
+              "total": 0
+            },
+            "unknown_ankan_count": 0,
+            "value_note": "仅当前可知资格花，不含未公开手牌和牌型加分；不是听牌概率或已获收入。未知暗杠每组10或12，不能据此猜名。",
+            "flowers": [],
+            "river": [
+              "9饼"
+            ]
+          },
+          {
+            "seat": 1,
+            "hand_count": 14,
+            "melds": [],
+            "locked_with": [],
+            "call_counts": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "known_qualifying_hua": {
+              "flowers": 1,
+              "wind_triplets": 0,
+              "kongs": 0,
+              "total": 1
+            },
+            "unknown_ankan_count": 0,
+            "value_note": "仅当前可知资格花，不含未公开手牌和牌型加分；不是听牌概率或已获收入。未知暗杠每组10或12，不能据此猜名。",
+            "flowers": [
+              "中"
+            ],
+            "river": []
+          },
+          {
+            "seat": 2,
+            "hand_count": 13,
+            "melds": [],
+            "locked_with": [],
+            "call_counts": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "known_qualifying_hua": {
+              "flowers": 0,
+              "wind_triplets": 0,
+              "kongs": 0,
+              "total": 0
+            },
+            "unknown_ankan_count": 0,
+            "value_note": "仅当前可知资格花，不含未公开手牌和牌型加分；不是听牌概率或已获收入。未知暗杠每组10或12，不能据此猜名。",
+            "flowers": [],
+            "river": []
+          },
+          {
+            "seat": 3,
+            "hand_count": 13,
+            "melds": [],
+            "locked_with": [],
+            "call_counts": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "known_qualifying_hua": {
+              "flowers": 0,
+              "wind_triplets": 0,
+              "kongs": 0,
+              "total": 0
+            },
+            "unknown_ankan_count": 0,
+            "value_note": "仅当前可知资格花，不含未公开手牌和牌型加分；不是听牌概率或已获收入。未知暗杠每组10或12，不能据此猜名。",
+            "flowers": [],
+            "river": []
+          }
+        ],
+        "events": [
+          {
+            "kind": "discard",
+            "seat": 0,
+            "tile": "9饼"
+          },
+          {
+            "kind": "all_pass",
+            "source": 0
+          },
+          {
+            "kind": "draw",
+            "seat": 1,
+            "tile": "8万",
+            "replacement": false
+          },
+          {
+            "kind": "flower_kong",
+            "seat": 1,
+            "tile": "中"
+          },
+          {
+            "kind": "draw",
+            "seat": 1,
+            "tile": "6万",
+            "replacement": true
+          }
+        ],
+        "pending": null,
+        "legal_actions": [
+          {
+            "id": "07d0acbbf138476cba8aa901b2f45eb7:turn5:1:0",
+            "kind": "discard",
+            "tiles": [
+              "2饼"
+            ]
+          },
+          {
+            "id": "07d0acbbf138476cba8aa901b2f45eb7:turn5:1:1",
+            "kind": "discard",
+            "tiles": [
+              "3万"
+            ]
+          },
+          {
+            "id": "07d0acbbf138476cba8aa901b2f45eb7:turn5:1:2",
+            "kind": "discard",
+            "tiles": [
+              "3饼"
+            ]
+          },
+          {
+            "id": "07d0acbbf138476cba8aa901b2f45eb7:turn5:1:3",
+            "kind": "discard",
+            "tiles": [
+              "4万"
+            ]
+          },
+          {
+            "id": "07d0acbbf138476cba8aa901b2f45eb7:turn5:1:4",
+            "kind": "discard",
+            "tiles": [
+              "5饼"
+            ]
+          },
+          {
+            "id": "07d0acbbf138476cba8aa901b2f45eb7:turn5:1:5",
+            "kind": "discard",
+            "tiles": [
+              "6万"
+            ]
+          },
+          {
+            "id": "07d0acbbf138476cba8aa901b2f45eb7:turn5:1:6",
+            "kind": "discard",
+            "tiles": [
+              "7万"
+            ]
+          },
+          {
+            "id": "07d0acbbf138476cba8aa901b2f45eb7:turn5:1:7",
+            "kind": "discard",
+            "tiles": [
+              "8万"
+            ]
+          },
+          {
+            "id": "07d0acbbf138476cba8aa901b2f45eb7:turn5:1:8",
+            "kind": "discard",
+            "tiles": [
+              "9饼"
+            ]
+          },
+          {
+            "id": "07d0acbbf138476cba8aa901b2f45eb7:turn5:1:9",
+            "kind": "discard",
+            "tiles": [
+              "南风"
+            ]
+          },
+          {
+            "id": "07d0acbbf138476cba8aa901b2f45eb7:turn5:1:10",
+            "kind": "flower_kong",
+            "tiles": [
+              "夏"
+            ]
+          },
+          {
+            "id": "07d0acbbf138476cba8aa901b2f45eb7:turn5:1:11",
+            "kind": "flower_kong",
+            "tiles": [
+              "秋"
+            ]
+          }
+        ],
+        "result": null
+      },
+      "choice": {
+        "action_id": "07d0acbbf138476cba8aa901b2f45eb7:turn5:1:10",
+        "controller": "llm",
+        "reason": "单张杠花换牌 夏。当前可核对资格花1；补牌未知，不预报补牌后的听口。 策略说明：模型选择：单张杠花换牌 夏。当前可核对资格花1；补牌未知，不预报补牌后的听口。\n\n模型取舍（未经最优性证明）：先换出夏，清掉一张占位花并保留能随时再接一张换花的余地。当前结构还远（3向听），两张花持续占位，早换出可多保留摸牌与成组机会；单张夏、秋价值相同，先换夏即可。相较立刻打南风或万饼散张，我不愿提前固定舍牌方向，也不急着拆可能有用的68万、34万或饼子搭子。\n\n不确定性：补牌未知，换出夏后摸到什么无法预计；夏与秋只是先换顺序不同，本身无价值差别；对手均无公开花和成组，暂不可判断谁更快。\n\n改判条件：若换出夏后摸到明显可用牌或结构显著向听改善，可能继续留秋择机再换；若另家开始吃碰推进或公开花增多，则提高对秋的换出优先级。\n\n合法对照：单张杠花换牌 秋。当前可核对资格花1；补牌未知，不预报补牌后的听口。\n\n分析提醒：模型未逐家分析全部对手；空项不是安全证明"
+      },
+      "decision_validation": {
+        "decision_frame": {
+          "protocol": "table-v1",
+          "selected": "B11",
+          "alternative": "B12",
+          "plan": "先换出夏，清掉一张占位花并保留能随时再接一张换花的余地。当前结构还远（3向听），两张花持续占位，早换出可多保留摸牌与成组机会；单张夏、秋价值相同，先换夏即可。相较立刻打南风或万饼散张，我不愿提前固定舍牌方向，也不急着拆可能有用的68万、34万或饼子搭子。",
+          "uncertainty": "补牌未知，换出夏后摸到什么无法预计；夏与秋只是先换顺序不同，本身无价值差别；对手均无公开花和成组，暂不可判断谁更快。",
+          "reconsider": "若换出夏后摸到明显可用牌或结构显著向听改善，可能继续留秋择机再换；若另家开始吃碰推进或公开花增多，则提高对秋的换出优先级。",
+          "opponents": []
+        }
+      }
+    },
+    {
+      "observation": {
+        "observation_id": "07d0acbbf138476cba8aa901b2f45eb7:turn6:1",
+        "rules_version": "local-2026-10-22-desktop-v4",
+        "call_counts": [
+          [
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "locked_pairs": [],
+        "seat": 1,
+        "dealer": 0,
+        "stage": "turn",
+        "actor": 1,
+        "wall_count": 88,
+        "self": {
+          "hand": [
+            "2万",
+            "3万",
+            "4万",
+            "6万",
+            "6万",
+            "7万",
+            "8万",
+            "2饼",
+            "3饼",
+            "5饼",
+            "5饼",
+            "9饼",
+            "南风",
+            "秋"
+          ],
+          "waiting_tiles": [],
+          "discard_waits": {},
+          "waiting_note": "未见张数仅扣自己的牌与公开牌，不等于牌墙活张；未知暗杠可能耗尽进张。",
+          "ron_blocked": false,
+          "peng_blocked": [],
+          "locked_with": [],
+          "held_flower_count": 1,
+          "drawn_tile": "2万",
+          "draw_source": "replacement",
+          "structural_shanten": 2,
+          "analysis_note": "结构向听未单独评估留花换牌的策略价值；合法动作由裁判另行校验。"
+        },
+        "players": [
+          {
+            "seat": 0,
+            "hand_count": 13,
+            "melds": [],
+            "locked_with": [],
+            "call_counts": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "known_qualifying_hua": {
+              "flowers": 0,
+              "wind_triplets": 0,
+              "kongs": 0,
+              "total": 0
+            },
+            "unknown_ankan_count": 0,
+            "value_note": "仅当前可知资格花，不含未公开手牌和牌型加分；不是听牌概率或已获收入。未知暗杠每组10或12，不能据此猜名。",
+            "flowers": [],
+            "river": [
+              "9饼"
+            ]
+          },
+          {
+            "seat": 1,
+            "hand_count": 14,
+            "melds": [],
+            "locked_with": [],
+            "call_counts": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "known_qualifying_hua": {
+              "flowers": 2,
+              "wind_triplets": 0,
+              "kongs": 0,
+              "total": 2
+            },
+            "unknown_ankan_count": 0,
+            "value_note": "仅当前可知资格花，不含未公开手牌和牌型加分；不是听牌概率或已获收入。未知暗杠每组10或12，不能据此猜名。",
+            "flowers": [
+              "中",
+              "夏"
+            ],
+            "river": []
+          },
+          {
+            "seat": 2,
+            "hand_count": 13,
+            "melds": [],
+            "locked_with": [],
+            "call_counts": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "known_qualifying_hua": {
+              "flowers": 0,
+              "wind_triplets": 0,
+              "kongs": 0,
+              "total": 0
+            },
+            "unknown_ankan_count": 0,
+            "value_note": "仅当前可知资格花，不含未公开手牌和牌型加分；不是听牌概率或已获收入。未知暗杠每组10或12，不能据此猜名。",
+            "flowers": [],
+            "river": []
+          },
+          {
+            "seat": 3,
+            "hand_count": 13,
+            "melds": [],
+            "locked_with": [],
+            "call_counts": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "known_qualifying_hua": {
+              "flowers": 0,
+              "wind_triplets": 0,
+              "kongs": 0,
+              "total": 0
+            },
+            "unknown_ankan_count": 0,
+            "value_note": "仅当前可知资格花，不含未公开手牌和牌型加分；不是听牌概率或已获收入。未知暗杠每组10或12，不能据此猜名。",
+            "flowers": [],
+            "river": []
+          }
+        ],
+        "events": [
+          {
+            "kind": "discard",
+            "seat": 0,
+            "tile": "9饼"
+          },
+          {
+            "kind": "all_pass",
+            "source": 0
+          },
+          {
+            "kind": "draw",
+            "seat": 1,
+            "tile": "8万",
+            "replacement": false
+          },
+          {
+            "kind": "flower_kong",
+            "seat": 1,
+            "tile": "中"
+          },
+          {
+            "kind": "draw",
+            "seat": 1,
+            "tile": "6万",
+            "replacement": true
+          },
+          {
+            "kind": "flower_kong",
+            "seat": 1,
+            "tile": "夏"
+          },
+          {
+            "kind": "draw",
+            "seat": 1,
+            "tile": "2万",
+            "replacement": true
+          }
+        ],
+        "pending": null,
+        "legal_actions": [
+          {
+            "id": "07d0acbbf138476cba8aa901b2f45eb7:turn6:1:0",
+            "kind": "discard",
+            "tiles": [
+              "2万"
+            ]
+          },
+          {
+            "id": "07d0acbbf138476cba8aa901b2f45eb7:turn6:1:1",
+            "kind": "discard",
+            "tiles": [
+              "2饼"
+            ]
+          },
+          {
+            "id": "07d0acbbf138476cba8aa901b2f45eb7:turn6:1:2",
+            "kind": "discard",
+            "tiles": [
+              "3万"
+            ]
+          },
+          {
+            "id": "07d0acbbf138476cba8aa901b2f45eb7:turn6:1:3",
+            "kind": "discard",
+            "tiles": [
+              "3饼"
+            ]
+          },
+          {
+            "id": "07d0acbbf138476cba8aa901b2f45eb7:turn6:1:4",
+            "kind": "discard",
+            "tiles": [
+              "4万"
+            ]
+          },
+          {
+            "id": "07d0acbbf138476cba8aa901b2f45eb7:turn6:1:5",
+            "kind": "discard",
+            "tiles": [
+              "5饼"
+            ]
+          },
+          {
+            "id": "07d0acbbf138476cba8aa901b2f45eb7:turn6:1:6",
+            "kind": "discard",
+            "tiles": [
+              "6万"
+            ]
+          },
+          {
+            "id": "07d0acbbf138476cba8aa901b2f45eb7:turn6:1:7",
+            "kind": "discard",
+            "tiles": [
+              "7万"
+            ]
+          },
+          {
+            "id": "07d0acbbf138476cba8aa901b2f45eb7:turn6:1:8",
+            "kind": "discard",
+            "tiles": [
+              "8万"
+            ]
+          },
+          {
+            "id": "07d0acbbf138476cba8aa901b2f45eb7:turn6:1:9",
+            "kind": "discard",
+            "tiles": [
+              "9饼"
+            ]
+          },
+          {
+            "id": "07d0acbbf138476cba8aa901b2f45eb7:turn6:1:10",
+            "kind": "discard",
+            "tiles": [
+              "南风"
+            ]
+          },
+          {
+            "id": "07d0acbbf138476cba8aa901b2f45eb7:turn6:1:11",
+            "kind": "flower_kong",
+            "tiles": [
+              "秋"
+            ]
+          }
+        ],
+        "result": null
+      },
+      "choice": {
+        "action_id": "07d0acbbf138476cba8aa901b2f45eb7:turn6:1:10",
+        "controller": "llm",
+        "reason": "打 南风。结构2向听，尚未合法听牌。手里仍有留花，须处理后才能胡牌。公开未见改善张43，不等于墙内活张。 策略说明：模型选择：打 南风。结构2向听，尚未合法听牌。手里仍有留花，须处理后才能胡牌。公开未见改善张43，不等于墙内活张。\n\n模型取舍（未经最优性证明）：先打南风，把手牌收成两组万子搭子加两饼搭子、五饼对子的两向听结构，保留秋这一张资格花继续占位，等下一摸看到更明确信息再决定换不换。相比立刻换秋（B12），我放弃一次马上补牌和可能的杠开机会，换取南风不占搭子、结构更干净；南风本身刻子分已计入资格花，但单张留着要占一个组牌位置，先舍出更利于速度。\n\n不确定性：秋换出后的补牌未知，B12可能直接补到有用牌甚至杠开，这无法事先计算；南风是否会被别人碰、外面是否还有南风刻子潜力也不确定。\n\n改判条件：如果下一摸后手牌更接近成牌、或秋带来的占位开始明显阻碍结构，我会立即换秋；如果别家连续吃碰推进、我速度明显落后，也会更倾向尽快用花杠补牌换速度。\n\n合法对照：单张杠花换牌 秋。当前可核对资格花2；补牌未知，不预报补牌后的听口。\n\n代码核对的代价：接受留花占位、当前不能胡牌\n\n分析提醒：模型未逐家分析全部对手；空项不是安全证明"
+      },
+      "decision_validation": {
+        "decision_frame": {
+          "protocol": "table-v1",
+          "selected": "B11",
+          "alternative": "B12",
+          "plan": "先打南风，把手牌收成两组万子搭子加两饼搭子、五饼对子的两向听结构，保留秋这一张资格花继续占位，等下一摸看到更明确信息再决定换不换。相比立刻换秋（B12），我放弃一次马上补牌和可能的杠开机会，换取南风不占搭子、结构更干净；南风本身刻子分已计入资格花，但单张留着要占一个组牌位置，先舍出更利于速度。",
+          "uncertainty": "秋换出后的补牌未知，B12可能直接补到有用牌甚至杠开，这无法事先计算；南风是否会被别人碰、外面是否还有南风刻子潜力也不确定。",
+          "reconsider": "如果下一摸后手牌更接近成牌、或秋带来的占位开始明显阻碍结构，我会立即换秋；如果别家连续吃碰推进、我速度明显落后，也会更倾向尽快用花杠补牌换速度。",
+          "opponents": []
+        }
+      }
+    }
+  ],
+  "rejection": {
+    "observation": {
+      "observation_id": "07d0acbbf138476cba8aa901b2f45eb7:turn10:2",
+      "rules_version": "local-2026-10-22-desktop-v4",
+      "call_counts": [
+        [
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0
+        ]
+      ],
+      "locked_pairs": [],
+      "seat": 2,
+      "dealer": 0,
+      "stage": "turn",
+      "actor": 2,
+      "wall_count": 87,
+      "self": {
+        "hand": [
+          "6万",
+          "8万",
+          "8万",
+          "2饼",
+          "5饼",
+          "1条",
+          "6条",
+          "8条",
+          "9条",
+          "9条",
+          "南风",
+          "东风",
+          "发",
+          "白"
+        ],
+        "waiting_tiles": [],
+        "discard_waits": {},
+        "waiting_note": "未见张数仅扣自己的牌与公开牌，不等于牌墙活张；未知暗杠可能耗尽进张。",
+        "ron_blocked": false,
+        "peng_blocked": [],
+        "locked_with": [],
+        "held_flower_count": 3,
+        "drawn_tile": "9条",
+        "draw_source": "normal",
+        "structural_shanten": 4,
+        "analysis_note": "结构向听未单独评估留花换牌的策略价值；合法动作由裁判另行校验。"
+      },
+      "players": [
+        {
+          "seat": 0,
+          "hand_count": 13,
+          "melds": [],
+          "locked_with": [],
+          "call_counts": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "known_qualifying_hua": {
+            "flowers": 0,
+            "wind_triplets": 0,
+            "kongs": 0,
+            "total": 0
+          },
+          "unknown_ankan_count": 0,
+          "value_note": "仅当前可知资格花，不含未公开手牌和牌型加分；不是听牌概率或已获收入。未知暗杠每组10或12，不能据此猜名。",
+          "flowers": [],
+          "river": [
+            "9饼"
+          ]
+        },
+        {
+          "seat": 1,
+          "hand_count": 13,
+          "melds": [],
+          "locked_with": [],
+          "call_counts": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "known_qualifying_hua": {
+            "flowers": 2,
+            "wind_triplets": 0,
+            "kongs": 0,
+            "total": 2
+          },
+          "unknown_ankan_count": 0,
+          "value_note": "仅当前可知资格花，不含未公开手牌和牌型加分；不是听牌概率或已获收入。未知暗杠每组10或12，不能据此猜名。",
+          "flowers": [
+            "中",
+            "夏"
+          ],
+          "river": [
+            "南风"
+          ]
+        },
+        {
+          "seat": 2,
+          "hand_count": 14,
+          "melds": [],
+          "locked_with": [],
+          "call_counts": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "known_qualifying_hua": {
+            "flowers": 0,
+            "wind_triplets": 0,
+            "kongs": 0,
+            "total": 0
+          },
+          "unknown_ankan_count": 0,
+          "value_note": "仅当前可知资格花，不含未公开手牌和牌型加分；不是听牌概率或已获收入。未知暗杠每组10或12，不能据此猜名。",
+          "flowers": [],
+          "river": []
+        },
+        {
+          "seat": 3,
+          "hand_count": 13,
+          "melds": [],
+          "locked_with": [],
+          "call_counts": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "known_qualifying_hua": {
+            "flowers": 0,
+            "wind_triplets": 0,
+            "kongs": 0,
+            "total": 0
+          },
+          "unknown_ankan_count": 0,
+          "value_note": "仅当前可知资格花，不含未公开手牌和牌型加分；不是听牌概率或已获收入。未知暗杠每组10或12，不能据此猜名。",
+          "flowers": [],
+          "river": []
+        }
+      ],
+      "events": [
+        {
+          "kind": "discard",
+          "seat": 0,
+          "tile": "9饼"
+        },
+        {
+          "kind": "all_pass",
+          "source": 0
+        },
+        {
+          "kind": "draw",
+          "seat": 1,
+          "replacement": false,
+          "hidden": true
+        },
+        {
+          "kind": "flower_kong",
+          "seat": 1,
+          "tile": "中"
+        },
+        {
+          "kind": "draw",
+          "seat": 1,
+          "replacement": true,
+          "hidden": true
+        },
+        {
+          "kind": "flower_kong",
+          "seat": 1,
+          "tile": "夏"
+        },
+        {
+          "kind": "draw",
+          "seat": 1,
+          "replacement": true,
+          "hidden": true
+        },
+        {
+          "kind": "discard",
+          "seat": 1,
+          "tile": "南风"
+        },
+        {
+          "kind": "all_pass",
+          "source": 1
+        },
+        {
+          "kind": "draw",
+          "seat": 2,
+          "tile": "9条",
+          "replacement": false
+        }
+      ],
+      "pending": null,
+      "legal_actions": [
+        {
+          "id": "07d0acbbf138476cba8aa901b2f45eb7:turn10:2:0",
+          "kind": "discard",
+          "tiles": [
+            "1条"
+          ]
+        },
+        {
+          "id": "07d0acbbf138476cba8aa901b2f45eb7:turn10:2:1",
+          "kind": "discard",
+          "tiles": [
+            "2饼"
+          ]
+        },
+        {
+          "id": "07d0acbbf138476cba8aa901b2f45eb7:turn10:2:2",
+          "kind": "discard",
+          "tiles": [
+            "5饼"
+          ]
+        },
+        {
+          "id": "07d0acbbf138476cba8aa901b2f45eb7:turn10:2:3",
+          "kind": "discard",
+          "tiles": [
+            "6万"
+          ]
+        },
+        {
+          "id": "07d0acbbf138476cba8aa901b2f45eb7:turn10:2:4",
+          "kind": "discard",
+          "tiles": [
+            "6条"
+          ]
+        },
+        {
+          "id": "07d0acbbf138476cba8aa901b2f45eb7:turn10:2:5",
+          "kind": "discard",
+          "tiles": [
+            "8万"
+          ]
+        },
+        {
+          "id": "07d0acbbf138476cba8aa901b2f45eb7:turn10:2:6",
+          "kind": "discard",
+          "tiles": [
+            "8条"
+          ]
+        },
+        {
+          "id": "07d0acbbf138476cba8aa901b2f45eb7:turn10:2:7",
+          "kind": "discard",
+          "tiles": [
+            "9条"
+          ]
+        },
+        {
+          "id": "07d0acbbf138476cba8aa901b2f45eb7:turn10:2:8",
+          "kind": "flower_kong",
+          "tiles": [
+            "东风"
+          ]
+        },
+        {
+          "id": "07d0acbbf138476cba8aa901b2f45eb7:turn10:2:9",
+          "kind": "discard",
+          "tiles": [
+            "南风"
+          ]
+        },
+        {
+          "id": "07d0acbbf138476cba8aa901b2f45eb7:turn10:2:10",
+          "kind": "flower_kong",
+          "tiles": [
+            "发"
+          ]
+        },
+        {
+          "id": "07d0acbbf138476cba8aa901b2f45eb7:turn10:2:11",
+          "kind": "flower_kong",
+          "tiles": [
+            "白"
+          ]
+        }
+      ],
+      "result": null
+    },
+    "answer": {
+      "protocol": "table-v1",
+      "selected": "B3",
+      "alternative": "B9",
+      "plan": "现在手牌是东、发、白三张花牌加南风，组牌骨架很散，距成牌还远。三张花要各占一个位置，若继续留着，必须靠后续摸牌同时补结构再等换花时机，风险是别家先胡而自己始终没兑现。先切5饼，保留东发白这三张花作为潜在资格花来源，暂不换花，是因为当前换出只有单张、离凑同款更远，且换出后立刻杠开机会也没有；先把最孤立的数牌处理掉，观察下一摸或别家推进再决定是否批量换花。相较B9单换东风，我放弃提前取得一张补牌并降一张花占位的机会，换取保留三张花未来阶梯或成组可能，但这是弱倾向，不是算出的优势。",
+      "uncertainty": "下一张补牌未知，B3留下的三张花能否变成实际收益不确定；别家是否已经接近听牌、暗杠是否耗尽我的进张也无法知道。5饼相对2饼是否真更该弃只是根据搭子结构的初步判断，没有做完整进张核算。",
+      "reconsider": "若下一摸仍无有效结构进展、别家明显加速或出现公开成组推进，我会改判为批量换花（先东风、发、白）换取补牌时间；若摸到与东发白相关的第四张同款或结构突然接近成牌，则继续留花。",
+      "opponents": [
+        {
+          "seat": 1,
+          "patterns": [
+            "清一色",
+            "碰碰胡"
+          ],
+          "watch_tiles": [
+            "南风"
+          ],
+          "evidence_ids": [
+            "event.3",
+            "event.5",
+            "event.7",
+            "seat.1.flowers"
+          ],
+          "note": "已公开换出中、夏两张花并有2资格花，说明他有花分基础；但不确定是否已听牌，也不代表南风对他是安全牌。"
+        }
+      ]
+    },
+    "model_output": {
+      "stop_reason": "end_turn",
+      "text": "{\"protocol\":\"table-v1\",\"selected\":\"B3\",\"alternative\":\"B9\",\"plan\":\"现在手牌是东、发、白三张花牌加南风，组牌骨架很散，距成牌还远。三张花要各占一个位置，若继续留着，必须靠后续摸牌同时补结构再等换花时机，风险是别家先胡而自己始终没兑现。先切5饼，保留东发白这三张花作为潜在资格花来源，暂不换花，是因为当前换出只有单张、离凑同款更远，且换出后立刻杠开机会也没有；先把最孤立的数牌处理掉，观察下一摸或别家推进再决定是否批量换花。相较B9单换东风，我放弃提前取得一张补牌并降一张花占位的机会，换取保留三张花未来阶梯或成组可能，但这是弱倾向，不是算出的优势。\",\"uncertainty\":\"下一张补牌未知，B3留下的三张花能否变成实际收益不确定；别家是否已经接近听牌、暗杠是否耗尽我的进张也无法知道。5饼相对2饼是否真更该弃只是根据搭子结构的初步判断，没有做完整进张核算。\",\"reconsider\":\"若下一摸仍无有效结构进展、别家明显加速或出现公开成组推进，我会改判为批量换花（先东风、发、白）换取补牌时间；若摸到与东发白相关的第四张同款或结构突然接近成牌，则继续留花。\",\"opponents\":[{\"seat\":1,\"patterns\":[\"清一色\",\"碰碰胡\"],\"watch_tiles\":[\"南风\"],\"evidence_ids\":[\"event.3\",\"event.5\",\"event.7\",\"seat.1.flowers\"],\"note\":\"已公开换出中、夏两张花并有2资格花，说明他有花分基础；但不确定是否已听牌，也不代表南风对他是安全牌。\"}]}"
+    },
+    "error": "对手假设字段不合法，不接受未核对的暗牌描述",
+    "executed": false
+  }
+}

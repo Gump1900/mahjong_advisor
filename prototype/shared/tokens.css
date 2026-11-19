@@ -1,0 +1,14 @@
+/* 牌身与画板尺寸的唯一来源；组件、流程、App共用。 */
+:root {
+  --hand-w: 38px;
+  --hand-h: 54px;
+  --river-w: 25px;
+  --river-h: 35px;
+  --river-cols: 9;
+  --board-w: 1100px;
+  --board-h: 820px;
+  --ink: #243c35;
+  --gold: #e4be77;
+  --cream: #f5f2e9;
+  --muted: #7f9186;
+}

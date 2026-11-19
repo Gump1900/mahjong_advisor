@@ -3,7 +3,9 @@
 Total = 底分 + Σ番型分 + 花牌数.
 
 底分 (exactly one):
-  自摸 +4 / 放炮 +2; 杠开 +8 — the 杠开 value REPLACES the 2/4 base
+  有花自摸 +4 / 放炮 +2；无花普通自摸固定6点，再加牌型分。
+  无花不能接炮，清一色等牌型加分不提供接炮资格。
+  杠开 +8 — the 杠开 value REPLACES the 2/4 base
   (杠开已有8，不额外加底分). 杠开是自摸胡，番型按自摸档计.
 
 番型 (stack on top of the base; (自摸, 放炮)):
@@ -14,14 +16,15 @@ Total = 底分 + Σ番型分 + 花牌数.
   七对      10 / 5   — 7个对子（门清）
   豪华七对  20 / 10  — 七对里有一组4张一样的当两对
   双豪华    40 / 20  — 七对里有两组4张一样的
-  七对/豪华/双豪华互斥，按最高档计；清一色等其余番型照常叠加.
+  三豪华    60 / 30  — 七对里有三组4张一样的
+  七对/豪华/双豪华/三豪华互斥，按最高档计；清一色等其余番型照常叠加.
 
 杠分 (each kong adds its own 花):
   明杠 万饼条 +5 / 南西北 +6;  暗杠 万饼条 +10 / 中发白东南西北 +12.
-  花牌（中发白东）没人打得出来，只能自杠 -> 按暗杠 +12.
+  中发白东可逐张杠；只有四张同款一起暗杠才 +12。
 
 花牌分:
-  中发白东（未杠，拿手里，按同款张数）: 1张=1花, 2张=2花, 3张=4花, 4张=6花
+  中发白东（持有与逐张杠合并，按同款张数）: 1张=1花, 2张=2花, 3张=4花, 4张=6花
   （暗杠后牌面朝下没翻出来，不算花，只拿暗杠 12花——"留花还是杠花"的博弈）
   春夏秋冬梅兰竹菊: 每张 1 花.
 
@@ -45,6 +48,7 @@ PATTERN_VALUES: Dict[str, tuple] = {
     "七对": (10, 5),
     "豪华七对": (20, 10),
     "双豪华": (40, 20),
+    "三豪华": (60, 30),
 }
 
 # held 中发白东 by identical-copies count -> 花
@@ -61,6 +65,9 @@ class ScoringResult:
     hua: int                                   # total 花
     flowers: int = 0                           # 花 contribution from flower tiles
     breakdown: List[str] = field(default_factory=list)   # human-readable parts
+    qualifying_hua: int = 0   # flowers/wind triplets/kongs; excludes base and patterns
+    pattern_hua: int = 0
+    base_hua: int = 0
 
 
 def _counts(hand: List[Tile]) -> Dict[Tile, int]:
@@ -72,8 +79,8 @@ def _counts(hand: List[Tile]) -> Dict[Tile, int]:
 
 
 def _diao_che(hand: List[Tile], melds: List[Meld]):
-    """大吊车 (all 4 melds are peng/gang) / 小吊车 (melds include chi)."""
-    if len(hand) != 1 or len(melds) != 4:
+    """Score the completed pair after a one-tile wait and four exposed melds."""
+    if len(hand) != 2 or hand[0] != hand[1] or len(melds) != 4:
         return None
     if all(m.type in _TRIPLET_MELDS for m in melds):
         return "大吊车"
@@ -95,7 +102,7 @@ def _is_pengpeng(hand: List[Tile], melds: List[Meld]) -> bool:
 
 
 def _seven_pairs_level(hand: List[Tile], melds: List[Meld]):
-    """七对 / 豪华七对 / 双豪华 — mutually exclusive levels (None if not 七对)."""
+    """七对 / 豪华七对 / 双豪华 / 三豪华: take exactly the highest level."""
     if melds or len(hand) != 14:
         return None
     c = _counts(hand)
@@ -106,7 +113,9 @@ def _seven_pairs_level(hand: List[Tile], melds: List[Meld]):
         return "七对"
     if quads == 1:
         return "豪华七对"
-    return "双豪华"
+    if quads == 2:
+        return "双豪华"
+    return "三豪华"
 
 
 def _is_qing_yi_se(hand: List[Tile], melds: List[Meld]) -> bool:
@@ -142,19 +151,46 @@ def _held_flower_hua(flowers: list) -> int:
 
 
 def _konged_flower_hua(konged_flowers: list) -> int:
-    """花 from konged flowers: each 中发白东 type konged = 12花 (replaces the
-    held tier); season flowers count 1花 each even when set aside."""
-    counts: Dict[str, int] = {}
-    for f in konged_flowers or []:
-        name = _flower_name(f)
-        counts[name] = counts.get(name, 0) + 1
-    hua = 0
-    for name, n in counts.items():
-        if name in _MULTI_FLOWERS:
-            hua += FLOWER_KONG_HUA
+    """Compatibility helper; explicit grouping should use flower_hua."""
+    return flower_hua([], konged_flowers)
+
+
+def flower_hua(flowers: list = None, konged_flowers: list = None,
+               flower_kong_groups: list = None) -> int:
+    """Count held and individually konged flowers together by identical type.
+
+    Explicit groups distinguish four single kongs from a four-tile concealed
+    kong. For older snapshots without groups, four identical konged tiles are
+    interpreted as one concealed kong, as before.
+    """
+    held = list(flowers or [])
+    konged = list(konged_flowers or [])
+    if flower_kong_groups is None:
+        counts = {}
+        for tile in konged:
+            name = _flower_name(tile)
+            counts.setdefault(name, []).append(tile)
+        groups = []
+        for name, tiles in counts.items():
+            if name in _MULTI_FLOWERS and len(tiles) == 4:
+                groups.append(tiles)
+            else:
+                groups.extend([[tile] for tile in tiles])
+    else:
+        groups = flower_kong_groups
+        from collections import Counter
+        if Counter(_flower_name(t) for group in groups for t in group) != Counter(_flower_name(t) for t in konged):
+            raise ValueError("花杠分组与已杠花牌记录不一致")
+    concealed_hua = 0
+    for group in groups:
+        if len(group) == 1:
+            held.extend(group)
+        elif (len(group) == 4 and len({_flower_name(tile) for tile in group}) == 1
+              and _flower_name(group[0]) in _MULTI_FLOWERS):
+            concealed_hua += FLOWER_KONG_HUA
         else:
-            hua += n
-    return hua
+            raise ValueError("花牌只能单张杠或四张同款中发白东暗杠")
+    return _held_flower_hua(held) + concealed_hua
 
 
 def _wind_triplet_hua(hand: List[Tile], melds: List[Meld]) -> Tuple[int, List[str]]:
@@ -181,7 +217,9 @@ def _wind_triplet_hua(hand: List[Tile], melds: List[Meld]) -> Tuple[int, List[st
 def kong_value(kong_type: str, tile: Tile) -> int:
     """花 of one kong: 明杠 万饼条 5 / 南西北 6; 暗杠 万饼条 10 / 中发白东南西北 12.
 
-    Flowers (中发白东) can only be self-konged -> the 暗杠 12.
+    Confirmed by the user on 2026-10-21: added kongs use ming_gang too;
+    the wind's original triplet point is replaced, not added. A concealed flower
+    kong uses 12; individual flower kongs use flower_hua(), not this function.
     """
     if kong_type == "ming_gang":
         return 6 if tile.suit == "风" else 5
@@ -203,12 +241,28 @@ def _kong_hua(melds: List[Meld]) -> Tuple[int, List[str]]:
     return total, parts
 
 
+def known_hua(melds=None, flowers=None, konged_flowers=None,
+              flower_kong_groups=None) -> dict:
+    """Known non-pattern value conditional on winning; not earned income.
+
+    Missing opponent observations do not prove that the player has no flowers.
+    """
+    melds = melds or []
+    flowers = flower_hua(flowers, konged_flowers, flower_kong_groups)
+    winds, _ = _wind_triplet_hua([], melds)
+    kongs, _ = _kong_hua(melds)
+    return {"flowers": flowers, "wind_triplets": winds, "kongs": kongs,
+            "total": flowers + winds + kongs}
+
+
 def score_hand(
     hand: List[Tile],
     my_melds: List[Meld] = None,
     flowers: list = None,
     konged_flowers: list = None,
     win_method: str = "zimo",
+    *,
+    flower_kong_groups: list = None,
 ) -> ScoringResult:
     """Score a winning hand in 花.
 
@@ -253,9 +307,18 @@ def score_hand(
         hua += wind_hua
         breakdown.extend(wind_parts)
 
-    flower_hua = _held_flower_hua(flowers) + _konged_flower_hua(konged_flowers)
-    if flower_hua:
-        hua += flower_hua
-        breakdown.append(f"花牌 {flower_hua}花")
-
-    return ScoringResult(hua=hua, flowers=flower_hua, breakdown=breakdown)
+    flower_points = flower_hua(flowers, konged_flowers, flower_kong_groups)
+    if flower_points:
+        hua += flower_points
+        breakdown.append(f"花牌 {flower_points}花")
+    qualifying = flower_points + wind_hua + kong_hua
+    if win_method == "dianpao" and qualifying == 0:
+        raise ValueError("无花不能接炮；清一色、碰碰胡等牌型加分不提供接炮资格")
+    if win_method == "zimo" and qualifying == 0:
+        hua += 2
+        base = 6
+        breakdown[0] = "无花自摸固定 6点"
+    return ScoringResult(hua=hua, flowers=flower_points, breakdown=breakdown,
+                         qualifying_hua=qualifying,
+                         pattern_hua=sum(PATTERN_VALUES[name][0 if is_zimo_level else 1]
+                                         for name in patterns), base_hua=base)

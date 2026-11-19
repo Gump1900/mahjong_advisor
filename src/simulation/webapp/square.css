@@ -1,0 +1,95 @@
+/* One physical tile size, with layout slots matching real 90-degree rotation. */
+:root { --card-w:64px; --card-h:90px; --back-step:10px; --board-size:min(1100px,calc(100dvh - 78px),calc(100vw - 480px)); }
+main {
+  display:grid; min-width:1100px; max-width:2100px; margin:auto; padding:8px 12px;
+  grid-template-columns:minmax(200px,1fr) var(--board-size) minmax(240px,1fr);
+  grid-template-rows:var(--board-size);
+  grid-template-areas:"info board history"; gap:8px 18px;
+}
+main > aside { display:block; min-width:0; height:calc(var(--board-size) - 198px); overflow:auto; margin:0; }
+main > .info-sidebar { grid-area:info; }
+main > .history-sidebar { grid-area:history; }
+main > aside .panel { padding:14px; }
+main > aside .log-panel { min-height:0; max-height:none; height:100%; overflow:auto; margin:0; }
+body.panels-hidden main > aside { visibility:hidden; }
+.table {
+  grid-area:board; width:var(--board-size); height:var(--board-size); min-height:0; aspect-ratio:1;
+  grid-template-columns:104px minmax(0,1fr) 104px;
+  grid-template-rows:142px minmax(0,1fr) 116px;
+  grid-template-areas:"left top right" "left arena right" "left bottom right";
+  padding:8px 8px 174px; gap:5px; border-width:6px; overflow:hidden;
+}
+.table .table-tile {
+  display:inline-block; position:relative; width:var(--card-w); height:var(--card-h);
+  flex:0 0 auto; vertical-align:middle;
+}
+.table .table-tile > img {
+  position:absolute; display:block; width:var(--card-w); height:var(--card-h);
+  max-width:none; max-height:none; margin:0; left:0; top:0; object-fit:fill;
+}
+.table .concealed.revealed .table-tile > img { width:var(--card-w); height:var(--card-h); }
+.top { grid-template-columns:minmax(0,1fr) minmax(0,1fr); grid-template-rows:28px minmax(0,1fr); }
+.top .concealed { padding-left:calc(var(--card-w) - var(--back-step)); gap:0; overflow:auto; justify-content:flex-start; }
+.top .concealed > .table-tile { margin-left:calc(var(--back-step) - var(--card-w)); }
+.top .concealed > .opponent-drawn { margin-left:8px; }
+.top .concealed.revealed { padding-left:0; gap:4px; }
+.top .concealed.revealed > .table-tile { margin:0; }
+.top .exposed { grid-template-columns:1fr 1fr; gap:3px; overflow:visible; }
+.top .exposed .zone-cards { min-height:90px; max-height:90px; }
+.top .zone { padding:2px 4px; }
+.top .zone-title { font-size:10px; line-height:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.table > .left,.table > .right { grid-row:1/4; overflow:auto; }
+.left .avatar,.right .avatar { display:none; }
+.left .player-heading,.right .player-heading { min-height:28px; }
+.left .meta,.right .meta { font-size:10px; }
+.left .concealed,.right .concealed {
+  padding:calc(var(--card-w) - var(--back-step)) 0 0; gap:0;
+  flex-direction:column; width:100%; overflow:visible;
+}
+.left .concealed > .table-tile,.right .concealed > .table-tile { margin-top:calc(var(--back-step) - var(--card-w)); }
+.left .concealed > .opponent-drawn,.right .concealed > .opponent-drawn { margin-top:8px; }
+.left .table-tile,.right .table-tile { width:var(--card-h); height:var(--card-w); }
+.left .table-tile > img,.right .table-tile > img { left:50%; top:50%; }
+.left .table-tile > img { transform:translate(-50%,-50%) rotate(90deg); }
+.right .table-tile > img { transform:translate(-50%,-50%) rotate(-90deg); }
+.left .concealed.revealed,.right .concealed.revealed { display:flex; max-height:180px; overflow:auto; gap:4px; padding:0; }
+.left .concealed.revealed > .table-tile,.right .concealed.revealed > .table-tile { margin:0; }
+.left .exposed,.right .exposed { flex-shrink:1; overflow:auto; }
+.left .zone-cards,.right .zone-cards { flex-direction:column; align-items:center; }
+.left .meld,.right .meld { flex-direction:column; }
+.bottom { display:block; }
+.bottom .player-heading { display:none; }
+.bottom .zone-cards { max-height:90px; }
+.bottom .exposed { grid-template-columns:1fr 1fr; gap:5px; }
+.arena { min-height:0; grid-template-columns:1fr; grid-template-rows:1fr; display:block; }
+.arena .center { display:none; }
+.arena .river { position:absolute; width:auto; max-width:100%; max-height:48%; overflow:auto; padding:2px; }
+.arena .river-top { left:50%; top:0; transform:translateX(-50%); }
+.arena .river-bottom { left:50%; bottom:0; transform:translateX(-50%); }
+.arena .river-left { left:0; top:35%; max-width:95px; }
+.arena .river-right { right:0; top:35%; max-width:95px; }
+.river-cards { grid-template-columns:repeat(3,var(--card-w)); gap:3px; }
+.river-left .river-cards,.river-right .river-cards { grid-template-columns:var(--card-w); }
+.arena .river .table-tile > img { width:var(--card-w); height:var(--card-h); }
+.river-left .table-tile,.river-right .table-tile { width:var(--card-h); height:var(--card-w); }
+.river-left .table-tile > img { left:50%; top:50%; transform:translate(-50%,-50%) rotate(90deg); }
+.river-right .table-tile > img { left:50%; top:50%; transform:translate(-50%,-50%) rotate(-90deg); }
+.river-left .river-cards,.river-right .river-cards { grid-template-columns:var(--card-h); }
+.my-hand.hand-dock {
+  grid-area:auto; grid-column:1/-1; grid-row:1; align-self:end; justify-self:center;
+  position:relative; left:auto; right:auto; bottom:auto; width:min(1040px,100%); min-width:0; height:auto;
+  margin:0; padding:4px 12px 6px; border:1px solid #bba56a42; border-radius:12px;
+  background:linear-gradient(#123f32,#0c2c24); box-shadow:0 5px 18px #0004;
+}
+.dock-tools { display:flex; min-height:30px; gap:8px; align-items:center; }
+.dock-tools .wait-strip { flex:1; min-width:0; max-height:30px; }
+.dock-tools .actions { position:static; max-width:65%; min-width:0; min-height:0; margin:0; overflow:auto; flex-wrap:nowrap; }
+.hand-dock .actions button { min-height:30px; padding:3px 8px; }
+.hand-dock .hand-heading { margin:2px 0 0; height:16px; }
+.hand-dock .hand { height:106px; min-height:0; padding-top:16px; }
+.hand-dock .tile-button { width:var(--card-w); height:var(--card-h); flex-basis:var(--card-w); }
+.felt-mark { font-size:20px; top:45%; }
+@media(max-height:800px) {
+  .table { grid-template-rows:142px minmax(0,1fr) 116px; }
+  .left .hand-zone,.right .hand-zone { max-height:none; overflow:visible; flex-shrink:0; }
+}

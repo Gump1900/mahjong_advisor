@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>太湖麻将 · 产品完整流程</title>
+    <link rel="stylesheet" href="../shared/tokens.css" />
+    <link rel="stylesheet" href="../shared/review.css" />
+    <link rel="stylesheet" href="../shared/workbench.css" />
+    <link rel="stylesheet" href="../shared/product-flow.css" />
+  </head>
+  <body>
+    <header class="library-header">
+      <a href="../index.html">太湖 · 原型设计</a>
+      <nav>
+        <a href="../blocks/index.html">Block</a><strong>产品Flow</strong
+        ><a href="index.html">牌桌Flow</a><a href="../app/index.html">App</a>
+      </nav>
+    </header>
+    <main class="product-flow-overview">
+      <span class="eyebrow">PRODUCT FLOW / 从入口到下一局</span>
+      <h1>每一步有入口，也有返回路径。</h1>
+      <p class="flow-overview-intro">
+        先以访客身份跑通产品流程。下面每条流程都使用同一套App和产品状态模型，点击可从对应分支开始检查。多人、结果和网络异常均为本地设计模拟，未接真实服务。
+      </p>
+      <div id="journeys"></div>
+      <p class="flow-overview-intro">
+        右侧设计面板中的“模拟事件”供评审使用，不是正式产品按钮。牌桌内吃碰杠胡等细节继续复用已确认的Block和Flow。
+      </p>
+      <a href="../design.md">查看流程范围、状态与验收清单</a>
+    </main>
+    <script src="product-flow.js"></script>
+    <script>
+      document.getElementById("journeys").innerHTML = ProductFlow.journeys
+        .map(
+          (j) =>
+            '<section class="journey-card"><h2>' +
+            j.name +
+            '</h2><div class="journey-nodes">' +
+            j.steps.map((s) => "<span>" + s + "</span>").join("<i>→</i>") +
+            '</div><a href="../app/index.html?case=' +
+            j.case +
+            '">进入这条流程 →</a></section>',
+        )
+        .join("");
+    </script>
+  </body>
+</html>

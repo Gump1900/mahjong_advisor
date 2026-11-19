@@ -1,0 +1,193 @@
+/* One local player coordinate system: melds LEFT, flowers RIGHT, hand BELOW.
+   Rotate the WHOLE local surface, never individual faces or card grids. */
+:root { --card-w:22px; --card-h:30px; --river-w:20px; --river-h:28px; --own-w:42px; --own-h:59px; color-scheme:dark; }
+body { min-width:1180px; background:#071b16; }
+header { height:60px; padding:8px 18px; background:#081e19; gap:10px; }
+.brand h1 { font:26px serif; color:#edcf8a; }
+.brand p,.brand small { display:none; }
+.seal { width:32px; height:36px; font-size:25px; }
+.toolbar { gap:6px; }
+.toolbar button,.toolbar select { font-size:12px; padding:6px 8px; }
+.toolbar select { color:#eeddb2; background:#153d2e; border:1px solid #c6ab6844; border-radius:5px; }
+#connection { max-width:145px; font-size:11px; }
+main { display:grid; grid-template-columns:minmax(880px,1fr) 270px; gap:12px; max-width:1920px; min-width:1180px; padding:10px 14px; margin:auto; }
+.table { container-type:size; position:relative; display:block; width:100%; height:max(640px,calc(100dvh - 80px)); min-height:0;
+  --side-depth:160px; --top-depth:128px; --bottom-depth:216px;
+  --front-span:min(760px,calc(100cqw - 360px)); --side-span:min(540px,calc(100cqh - 200px));
+  padding:0; border:7px solid #59422b; border-radius:24px; overflow:visible;
+  background:radial-gradient(ellipse at 50% 45%,#21664b,#124b38 75%,#0d372b);
+  box-shadow:inset 0 0 0 2px #c3a56355,inset 0 0 70px #001c1455,0 12px 25px #0004; }
+.table::before { inset:5px; border-color:#d7c48333; pointer-events:none; }
+.felt-mark { display:none; }
+.table > .seat { position:absolute; display:block; min-width:0; min-height:0; margin:0; padding:0; width:auto; height:auto; overflow:visible; z-index:3; }
+.table > .top { left:50%; top:10px; width:var(--front-span); height:var(--top-depth); transform:translateX(-50%); }
+.table > .bottom { left:50%; bottom:10px; right:auto; width:calc(100cqw - 40px); height:var(--bottom-depth); transform:translateX(-50%); }
+.table > .left { left:12px; right:auto; top:50%; width:var(--side-depth); height:var(--side-span); transform:translateY(-50%); }
+.table > .right { right:12px; left:auto; top:50%; width:var(--side-depth); height:var(--side-span); transform:translateY(-50%); }
+.table .seat-surface { position:relative; width:100%; height:100%; display:flex; flex-direction:column; justify-content:flex-end; align-items:stretch; gap:6px; }
+.table .top .seat-surface { transform:rotate(180deg); }
+.table .left .seat-surface,.table .right .seat-surface { position:absolute; left:50%; top:50%; width:var(--side-span); height:var(--side-depth); transform-origin:center; }
+.table .left .seat-surface { transform:translate(-50%,-50%) rotate(90deg); }
+.table .right .seat-surface { transform:translate(-50%,-50%) rotate(-90deg); }
+.table .player-heading { position:absolute; display:flex; flex-direction:row; justify-content:center; align-items:center; gap:5px; top:-26px; left:50%; width:max-content; max-width:100%; transform:translateX(-50%); text-align:center; }
+.table .top > .player-heading { top:-7px; left:0; transform:none; width:100px; z-index:4; }
+.table .bottom > .player-heading { display:none; } /* Identity is in the hand heading's normal flow. */
+.table .avatar { width:25px; height:25px; font-size:13px; }
+.table .seat-name { font-size:11px; white-space:normal; }
+.table .meta,.table .warning { font-size:9px; line-height:12px; }
+.table .exposed { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:12px; width:100%; max-width:none; margin:0; flex:0 0 auto; }
+.table .bottom .exposed { max-width:var(--front-span); align-self:center; }
+.table .zone { min-width:0; padding:2px 0; border-top:1px solid #dbbc6c44; }
+.table .zone-title { color:#e2cb8e; font-size:10px; line-height:12px; margin-bottom:3px; }
+.table .zone-cards { display:flex; flex-wrap:wrap; flex-direction:row; gap:2px 5px; justify-content:center; align-items:flex-start; }
+.table .zone-empty { color:#90b49b; font-size:10px; }
+.table .table-tile { position:relative; display:inline-block; flex:0 0 auto; width:var(--card-w); height:var(--card-h); margin:0; vertical-align:top; }
+.table .table-tile > img { display:block; position:absolute; left:0; top:0; width:var(--card-w); height:var(--card-h); max-width:none; max-height:none; margin:0; transform:none; object-fit:fill; border:0; border-radius:2px; background:#fffdf0; }
+.table .table-tile > img[alt="牌背"] { filter:hue-rotate(135deg) saturate(.65) brightness(.75); outline:1px solid #052c2066; outline-offset:-1px; }
+.table .meld { display:inline-flex; flex-direction:column; gap:1px; flex-wrap:nowrap; flex:0 0 auto; margin:0; align-items:center; }
+.table .meld-faces { display:flex; flex-direction:row; gap:0; }
+.table .meld-source { font-size:9px; line-height:11px; color:#f6d992; white-space:nowrap; background:#123224; padding:0 2px; border-radius:2px; }
+.table .hand-zone { width:100%; flex:0 0 auto; border:0; padding:0; }
+.table .hand-zone .zone-title { text-align:center; }
+.table .seat-surface .concealed,.table .seat-surface .concealed.revealed {
+  position:static; display:flex; flex-direction:row; flex-wrap:nowrap; justify-content:center; align-items:center;
+  width:100%; height:auto; max-width:none; max-height:none; padding:0; margin:0; gap:1px; overflow:visible; opacity:1;
+}
+.table .seat-surface .concealed .table-tile { margin:0; }
+.table .seat-surface .concealed .opponent-drawn { margin-left:7px; }
+.arena { position:absolute; inset:0; min-height:0; pointer-events:none; z-index:1; }
+.arena .river { position:absolute; display:block; width:calc(var(--river-w) * 6 + 11px); max-width:none; max-height:none; padding:2px; border:1px solid #e0c47822; border-radius:5px; background:#103b2b44; gap:0; overflow:visible; }
+.arena .river .zone-title { position:absolute; bottom:100%; left:0; right:0; height:13px; line-height:12px; margin:0; text-align:center; white-space:nowrap; }
+.river-cards { display:grid; grid-template-columns:repeat(6,var(--river-w)); gap:1px; line-height:0; }
+.table .river .table-tile,.table .river .table-tile > img { width:var(--river-w); height:var(--river-h); }
+.arena .river-top { top:calc(var(--top-depth) + 18px); left:50%; bottom:auto; right:auto; transform:translateX(-50%) rotate(180deg); }
+.arena .river-bottom { bottom:calc(var(--bottom-depth) + 18px); left:50%; top:auto; right:auto; transform:translateX(-50%); }
+.arena .river-left { left:calc(var(--side-depth) + 24px); top:50%; bottom:auto; right:auto; transform:translateY(-50%) rotate(90deg); }
+.arena .river-right { right:calc(var(--side-depth) + 24px); top:50%; bottom:auto; left:auto; transform:translateY(-50%) rotate(-90deg); }
+.arena .center { position:absolute; left:50%; top:calc(50% - 25px); transform:translate(-50%,-50%); width:76px; min-height:0; padding:3px; border-radius:50%; background:#0c3025d9; }
+.arena:has(.river-bottom .table-tile:nth-child(n+19)) .center { left:calc(50% + 110px); }
+.wall-label { font-size:9px; letter-spacing:0; }
+.arena #wall { font-size:23px; }
+.arena #turn { font-size:9px; line-height:11px; margin:0; }
+.arena #pending { display:none; }
+.arena .motion { top:48%; }
+.my-hand.hand-dock { position:relative; left:auto; right:auto; bottom:auto; width:100%; height:112px; min-height:0; margin:0; padding:0; flex:0 0 auto; z-index:5; }
+main > .my-hand { display:none; }
+.dock-tools { display:flex; height:29px; align-items:center; gap:6px; }
+.wait-strip { display:flex; align-items:center; gap:5px; flex:1; min-width:0; max-height:29px; overflow:auto; font-size:10px; }
+.wait-item { display:flex; align-items:center; gap:2px; flex:0 0 auto; }
+.wait-item img { width:17px; height:24px; }
+.wait-item small,.wait-title,.wait-note,.wait-explanation { font-size:10px; }
+.dock-tools .actions { position:static; display:flex; gap:4px; flex-wrap:nowrap; max-width:62%; min-height:0; margin:0; overflow:auto; }
+.dock-tools .actions button { min-height:26px; padding:2px 6px; font-size:11px; }
+.dock-tools .actions img { width:17px; height:24px; }
+.hand-heading { display:flex; align-items:center; justify-content:space-between; gap:12px; height:14px; line-height:14px; margin:0; font-size:10px; }
+#hand-title { flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+#phase { flex:0 1 auto; max-width:42%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.hand-dock .hand { display:flex; flex-wrap:nowrap; justify-content:center; align-items:flex-end; gap:3px; height:68px; min-height:0; padding-top:6px; }
+.hand-dock .tile-button { width:var(--own-w); height:var(--own-h); flex:0 0 var(--own-w); }
+.hand-dock .hand > .claimed-win { width:var(--own-w); height:var(--own-h); }
+.tile-button.drawn { margin-left:10px; }
+.tile-button.selected { transform:translateY(-11px); }
+.tile-button.batch-new:not(.selected) { outline:2px solid #a3d7c8; }
+.tile-button.tenpai-choice:not(.selected) { box-shadow:0 -3px 0 #96d5a3; }
+main > .history-sidebar { display:flex; flex-direction:column; height:max(640px,calc(100dvh - 80px)); min-width:0; gap:10px; overflow:auto; }
+.history-sidebar .panel { margin:0; padding:14px; border-color:#bfaa6940; background:#0c2a21; }
+.history-sidebar .coach-panel { flex:0 0 auto; max-height:64%; overflow:auto; }
+.history-sidebar .log-panel { flex:1; min-height:160px; max-height:none; overflow:auto; }
+.coach-panel h2 { margin:4px 0 8px; }
+.coach-panel p { font-size:12px; color:#d3dfcd; margin:7px 0; }
+.coach-panel .coach-muted { color:#9eb8a5; font-size:11px; }
+.coach-panel details { border-top:1px solid #d6ba7333; margin-top:8px; padding-top:5px; font-size:11px; }
+.coach-panel summary { cursor:pointer; color:#e9d49c; }
+.coach-panel button { font-size:11px; margin:4px 0; padding:6px; }
+.coach-panel .coach-controls { display:flex; align-items:center; flex-wrap:wrap; gap:4px; font-size:11px; color:#e9d49c; }
+#coach-explanation { font-size:13px; line-height:1.75; color:#dfd2b0; white-space:pre-wrap; }
+.coach-headline { color:#f3d98b; font-size:15px; }
+.coach-stale { padding:5px; border-left:2px solid #b8a16b; color:#9eb8a5; }
+main > .info-sidebar { display:none; }
+body.details-open main > .info-sidebar { display:block; position:fixed; top:65px; right:20px; bottom:20px; width:360px; z-index:40; overflow:auto; padding:12px; background:#102d24fa; border:1px solid #d3b97566; border-radius:12px; }
+#notice { top:62px; }
+#sound-settings:not([hidden]) { position:fixed; top:62px; right:20px; z-index:50; display:flex; flex-direction:column; gap:10px; width:280px; padding:18px; background:#102d24fa; border:1px solid #c3ab6b; border-radius:10px; }
+#sound-settings label { display:flex; justify-content:space-between; gap:10px; }
+.batch-row .motion-tile { width:var(--card-w); height:var(--card-h); }
+@media(min-width:1600px) and (min-height:850px) {
+  :root { --card-w:32px; --card-h:44px; --river-w:30px; --river-h:42px; --own-w:56px; --own-h:78px; }
+  .table { --side-depth:214px; --top-depth:180px; --bottom-depth:266px;
+    --front-span:min(900px,calc(100cqw - 470px)); --side-span:min(640px,calc(100cqh - 260px)); }
+  .my-hand.hand-dock { height:132px; }
+  .hand-dock .hand { height:88px; }
+}
+/* 实际模拟器：副露＋暗手牌同排。只调整显示结构，不改变裁判和决策。 */
+.table .tile-rail,.table .hand-row{display:flex;flex-flow:row nowrap;align-items:flex-end;justify-content:center;gap:14px;width:max-content;max-width:none;min-height:var(--card-h);flex:0 0 auto;margin-inline:auto}
+.table .tile-rail>.meld-zone,.table .hand-row>.meld-zone{width:max-content;flex:0 0 auto;padding:0;border:0;min-width:0}
+.table .tile-rail>.hand-zone{width:max-content;flex:0 0 auto}
+.table .tile-rail>.hand-zone>.zone-title,.table .tile-rail>.meld-zone>.zone-title,.table .hand-row>.meld-zone>.zone-title{display:none}
+.table .tile-rail .zone-cards,.table .hand-row .zone-cards{display:flex;flex-flow:row nowrap;gap:8px;align-items:flex-end;justify-content:flex-start;min-height:0}
+.table .tile-rail .concealed,.table .tile-rail .concealed.revealed{width:max-content;flex:0 0 auto;justify-content:flex-start}
+.table .tile-rail .meld,.table .hand-row .meld{position:relative;display:block;height:var(--card-h);margin:0;flex:0 0 auto}
+.table .tile-rail .meld-faces,.table .hand-row .meld-faces{display:flex;align-items:flex-end;gap:1px;height:var(--card-h)}
+.table .tile-rail .meld-source,.table .hand-row .meld-source{position:absolute;top:calc(100% + 3px);left:0;white-space:nowrap;z-index:1;font-size:8px;background:transparent;padding:0;pointer-events:none}
+.table .table-tile.claimed-tile{width:var(--card-h);height:var(--card-w);transform:none;margin:0}
+.table .table-tile.claimed-tile>img{left:50%;top:50%;transform:translate(-50%,-50%) rotate(90deg);width:var(--card-w);height:var(--card-h)}
+.table .exposed{display:block;width:100%;flex:0 0 auto}
+.table .flower-zone{border:0;padding:0}
+.table .flower-zone .zone-cards{display:grid;grid-template-columns:repeat(12,var(--card-w));gap:2px;justify-content:center;min-height:0}
+.table .zone[hidden]{display:none!important}
+.table .seat-surface{gap:16px;padding-bottom:18px}
+.table>.left,.table>.right{--side-span:min(740px,calc(100cqh - 140px))}
+.table>.seat.left>.player-heading,.table>.seat.right>.player-heading{position:absolute;top:0;left:0;transform:none;width:150px;max-width:150px;min-height:32px;padding:0;background:transparent;box-shadow:none;z-index:1;justify-content:flex-start;text-align:left}
+.table>.seat.right>.player-heading{left:auto;right:0}
+.table>.top>.player-heading{top:0;left:0;max-width:150px;width:150px;z-index:1}
+.table .bottom .seat-surface{padding-bottom:10px;gap:12px}
+.table .hand-dock{height:calc(var(--own-h) + 90px);width:100%;overflow:visible}
+.table .hand-row{min-height:var(--own-h);padding-bottom:13px;gap:14px}
+.table .hand-row #hand{width:max-content;flex:0 0 auto;min-height:var(--own-h);height:var(--own-h);padding-top:0;justify-content:flex-start}
+.table .hand-dock .dock-tools{height:46px;min-height:46px;position:relative;align-items:flex-start}
+.table .hand-dock .dock-tools .actions{position:absolute;left:50%;top:0;bottom:auto;transform:translateX(-50%);z-index:8;display:flex;justify-content:center;align-items:center;gap:8px;max-width:100%;width:max-content;min-height:0;flex-wrap:wrap;overflow:visible;background:transparent;border:0;box-shadow:none;border-radius:0;padding:0;margin:0}
+.table .hand-dock .dock-tools .actions button{min-width:52px;min-height:36px;padding:6px 10px;font-size:14px;white-space:nowrap}
+.table .hand-dock .dock-tools .actions img{width:20px;height:28px}
+.table #actions[hidden],.table #actions:empty{display:none!important}
+.table #motion:empty,.table #motion.event-pass,.table #motion.event-all_pass{display:none!important}
+.table .bottom .exposed .flower-zone .zone-cards{grid-template-columns:repeat(24,var(--card-w))}
+@media(min-width:1600px) and (min-height:850px){.table{--bottom-depth:290px}}
+/* 名牌在最长牌列上方留出独立空间，不靠提高z-index遮住副露来源字。 */
+.table>.seat.left>.player-heading,.table>.seat.right>.player-heading{top:-48px}
+
+/* 我的待牌属于本人手牌区域，绝不相对视口顶边定位。与动作条分行避免互挡。 */
+.table .hand-dock{height:auto;flex:0 0 auto;min-height:calc(var(--own-h) + 90px)}
+.table .hand-dock .dock-tools{height:auto;min-height:46px;display:flex;flex-direction:column;align-items:stretch;gap:8px}
+.table .hand-dock #waits{position:static;transform:none;display:flex;align-items:center;flex-wrap:wrap;gap:6px;max-width:100%;width:100%;max-height:100px;overflow:auto;margin:0;padding:4px 8px;background:#102e25e8;border:1px solid #d7b86855;border-radius:8px}
+.table .hand-dock #waits:empty{display:none}
+.table .hand-dock #waits .wait-title{color:#efd18a;white-space:nowrap;font-size:12px}
+.table .hand-dock #waits .wait-item{flex-direction:row;gap:3px;padding:2px 4px}
+.table .hand-dock #waits .wait-item img{width:23px;height:32px}
+.table .hand-dock #waits .wait-explanation{flex-basis:100%;color:#b6cabc;line-height:1.4}
+.table .hand-dock .dock-tools .actions{position:static;transform:none;align-self:center;max-width:100%;flex:0 0 auto}
+
+.table{--bottom-depth:260px}
+.table>.bottom{height:auto;min-height:var(--bottom-depth)}
+.table .bottom .seat-surface{height:auto;min-height:var(--bottom-depth)}
+.table .hand-dock #waits{display:grid;grid-template-columns:auto minmax(0,1fr);max-height:none;overflow:visible}
+.table .hand-dock #waits .wait-items{display:flex;flex-wrap:nowrap;gap:4px;min-width:0;overflow-x:auto;overscroll-behavior:contain}
+.table .hand-dock #waits .wait-item{white-space:nowrap}
+.table .hand-dock #waits .wait-explanation{grid-column:1/-1}
+.table .hand-dock #waits .wait-item img{background:#fffdf0;border-radius:3px;object-fit:contain}
+
+/* 军师首屏：一个动作、一句理由、三家判断。计算和候选默认折叠。 */
+.coach-panel #coach-explanation .coach-headline{font-size:24px;line-height:1.3;color:#f3d99b;margin:12px 0 8px}
+.coach-panel .coach-reason{font-size:14px;line-height:1.5;margin:0 0 12px}
+.coach-opponents{display:grid;gap:0;margin:12px 0;border-top:1px solid #c7d7c522}
+.coach-opponent{display:grid;grid-template-columns:34px minmax(0,1fr);gap:8px;align-items:start;padding:9px 0;border-bottom:1px solid #c7d7c522;font-size:12px;line-height:1.5}
+.coach-opponent>span{color:#9bb7a6}.coach-opponent strong{font-weight:500;color:#e8d7b0}.coach-opponent strong.unknown{color:#a4b9ad}
+.coach-panel details{margin-top:10px;font-size:12px;line-height:1.6}.coach-panel details>summary{cursor:pointer;color:#adbfaf}
+.coach-full-text{white-space:pre-line;padding-top:10px}
+
+/* 待牌常驻本人区域最左侧；动作条居中。位置不随按钮出现与动作播放改变。 */
+.table .hand-dock .dock-tools{position:relative;display:block;height:72px;min-height:72px}
+.table .hand-dock #waits{position:absolute;left:0;right:auto;top:0;bottom:auto;transform:none;width:240px;max-width:27%;margin:0;animation:none;transition:none;z-index:1}
+.table .hand-dock #waits .wait-title{max-width:54px;white-space:normal;font-size:11px}
+.table .hand-dock #waits .wait-item{display:grid;grid-template-columns:23px auto;column-gap:3px;row-gap:0;flex:0 0 auto}
+.table .hand-dock #waits .wait-item img{grid-row:1/3}
+.table .hand-dock #waits .wait-explanation{font-size:9px;line-height:12px}
+.table .hand-dock .dock-tools .actions{position:absolute;left:50%;top:8px;transform:translateX(-50%);max-width:45%}

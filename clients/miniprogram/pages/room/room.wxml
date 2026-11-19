@@ -1,0 +1,18 @@
+<view class="shared-room-page">
+  <view class="home-brand">太湖 · 好友房</view>
+  <view wx:if="{{room}}">
+    <view class="room-code-label">房间号</view><view class="room-code">{{room.code}}</view>
+    <view class="muted">网页与微信输入相同房间号，即可同桌</view>
+    <view class="shared-seats"><view wx:for="{{room.seats}}" wx:key="index" class="shared-seat {{item.me?'mine':''}}"><view class="seat-symbol">{{item.kind==='empty'?'+':item.kind==='bot'?'机':item.me?'我':'友'}}</view><view class="seat-person">{{item.nickname||'等待加入'}}{{item.host?' · 房主':''}}</view><view class="seat-presence">{{item.kind==='empty'?'空座':item.ready?'已准备':'未准备'}}{{item.kind==='human'&&!item.online?' · 暂时离线':''}}</view></view></view>
+    <view wx:if="{{room.notice}}" class="room-notice">{{room.notice}}</view>
+    <view wx:if="{{message}}" class="error-message">{{message}}</view>
+    <button wx:if="{{room.phase==='waiting'}}" class="primary" bindtap="ready" disabled="{{busy}}">{{myReady?'取消准备':'准备'}}</button>
+    <button wx:if="{{room.phase==='waiting'&&room.host}}" class="secondary" bindtap="bots" disabled="{{busy}}">机器人补齐空位</button>
+    <button wx:if="{{room.phase==='waiting'&&room.host}}" class="primary" bindtap="start" disabled="{{busy||!room.canStart}}">开始对局</button>
+    <view wx:if="{{room.phase==='waiting'&&!room.host}}" class="connection-help">准备后，等待房主开始。</view>
+    <button wx:if="{{room.phase==='playing'}}" class="primary" bindtap="enter" disabled="{{busy}}">回到牌桌</button>
+    <button class="secondary" bindtap="leave" disabled="{{busy}}">离开房间</button>
+    <view class="connection-help">关闭页面或切后台不会离桌；再次进入可继续。主动离桌会中止正在进行的这一局。</view>
+  </view>
+  <view wx:else=""><view class="error-message">{{message||'正在恢复房间…'}}</view><button bindtap="reconnect">重连</button><button bindtap="home">返回入口</button></view>
+</view>

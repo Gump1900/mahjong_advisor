@@ -1,0 +1,26 @@
+{
+  "version": "taihu-history-v1",
+  "split": "practice_only",
+  "cases": [
+    {"id":"E01","category":"equal_options","source":"runs/self-play/20261024-141308-41388351/completed-decisions.jsonl","token":"turn67:1"},
+    {"id":"E02","category":"equal_options","source":"runs/self-play/20261023-125956-18a7ca13/completed-decisions.jsonl","token":"turn3:0"},
+    {"id":"E03","category":"equal_options","source":"runs/live-batch/20261024-200135-14a080ac/game-03/completed-decisions.jsonl","token":"turn37:1"},
+    {"id":"E04","category":"equal_options","source":"runs/live-batch/20261025-085913-d6bfc749/game-02/completed-decisions.jsonl","token":"turn28:2"},
+    {"id":"E05","category":"equal_options","source":"runs/live-batch/20261025-124429-86cf3bdf/game-01/completed-decisions.jsonl","token":"turn20:0"},
+    {"id":"F01","category":"flower_timing","source":"runs/live-batch/20261024-200135-14a080ac/game-02/completed-decisions.jsonl","token":"turn178:3"},
+    {"id":"F02","category":"flower_timing","source":"runs/live-batch/20261025-085913-d6bfc749/game-05/completed-decisions.jsonl","token":"turn162:3"},
+    {"id":"F03","category":"flower_timing","source":"runs/live-batch/20261025-085913-d6bfc749/game-05/completed-decisions.jsonl","token":"turn201:0"},
+    {"id":"F04","category":"flower_timing","source":"runs/live-batch/20261025-124429-86cf3bdf/game-01/completed-decisions.jsonl","token":"turn161:1"},
+    {"id":"F05","category":"flower_timing","source":"runs/live-batch/20261025-085913-d6bfc749/game-03/completed-decisions.jsonl","token":"turn109:1"},
+    {"id":"M01","category":"revise_opponent","source":"runs/live-batch/20261024-200135-14a080ac/game-02/completed-decisions.jsonl","token":"turn99:2","prior_token":"response96:2","target":0},
+    {"id":"M02","category":"revise_opponent","source":"runs/live-batch/20261024-200135-14a080ac/game-09/completed-decisions.jsonl","token":"turn89:3","prior_token":"turn81:3","target":0},
+    {"id":"M03","category":"revise_opponent","source":"runs/live-batch/20261024-200135-14a080ac/game-10/completed-decisions.jsonl","token":"turn105:1","prior_token":"response94:1","target":2},
+    {"id":"M04","category":"revise_opponent","source":"runs/live-batch/20261025-085913-d6bfc749/game-04/completed-decisions.jsonl","token":"turn196:0","prior_token":"turn195:0","target":1},
+    {"id":"M05","category":"revise_opponent","source":"runs/live-batch/20261025-085913-d6bfc749/game-04/completed-decisions.jsonl","token":"turn139:3","prior_token":"response136:3","target":1},
+    {"id":"R01","category":"risk_value","source":"runs/live-batch/20261025-085913-d6bfc749/game-03/completed-decisions.jsonl","token":"turn164:0"},
+    {"id":"R02","category":"risk_value","source":"runs/live-batch/20261024-200135-14a080ac/game-09/completed-decisions.jsonl","token":"turn69:0"},
+    {"id":"R03","category":"risk_value","source":"runs/live-batch/20261024-200135-14a080ac/game-01/completed-decisions.jsonl","token":"turn113:0"},
+    {"id":"R04","category":"risk_value","source":"runs/live-batch/20261024-200135-14a080ac/game-02/completed-decisions.jsonl","token":"turn157:2"},
+    {"id":"R05","category":"risk_value","source":"runs/live-batch/20261025-085913-d6bfc749/game-05/completed-decisions.jsonl","token":"turn170:1"}
+  ]
+}

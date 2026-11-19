@@ -1,0 +1,15 @@
+{
+  "pages": [
+    "pages/home/home",
+    "pages/table/table",
+    "pages/settings/settings",
+    "pages/room/room"
+  ],
+  "window": {
+    "navigationStyle": "custom",
+    "backgroundColor": "#f3f2e9",
+    "pageOrientation": "portrait"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

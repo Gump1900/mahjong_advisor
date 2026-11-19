@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>太湖麻将 · 四人试打</title><link rel="stylesheet" href="/style.css"><link rel="stylesheet" href="/compact.css"><link rel="stylesheet" href="/table.css"><link rel="stylesheet" href="/board-layout.css"><script src="/audio.js" defer></script><script src="/table.js" defer></script></head>
+<body>
+<header><div class="brand"><span class="seal">麻</span><div><h1>太湖麻将 <small>四人试打</small></h1><p>小胡即重开，每一步都有分量。</p></div></div><div class="toolbar"><span id="connection">正在连接裁判…</span><label class="speed-label">节奏 <select id="speed" aria-label="陪练速度"><option value="slow">慢速</option><option value="normal">正常</option><option value="fast">快速</option><option value="step">逐步</option></select></label><button id="pause">暂停</button><button id="step">下一步</button><button id="save">保存续局</button><button id="new" class="gold">新的一局</button></div></header>
+<main>
+<aside class="info-sidebar"><div class="panel"><span class="eyebrow">TABLE NOTES</span><h2>桌面信息</h2><div id="status"></div><p class="hint">点一下牌冒头，再点同一张直接打出；也可点“打出”按钮。点空白取消。留花不可直接弃出。</p><p class="hint">四家同类牌统一尺寸。副露与剩余手牌同排，前方只显示花牌与弃牌。声音在首次点击页面后启用。</p></div><div class="fineprint">普通摸牌取墙前、补牌取墙后，无死墙，为测试桌约定。<a href="/THIRD_PARTY.md" target="_blank" rel="noopener">牌图来源与许可</a></div></aside>
+<section class="table" aria-label="四人麻将牌桌">
+ <div class="felt-mark">太 湖 麻 将 <small>本地规则 · 144 张 · 一胡即结</small></div>
+ <section id="top" class="seat top" aria-label="对家"></section>
+ <section id="left" class="seat left" aria-label="上家"></section>
+ <section id="right" class="seat right" aria-label="下家"></section>
+ <section id="bottom" class="seat bottom" aria-label="我的公开牌"></section>
+ <div class="arena" aria-label="四家独立牌河与行动区">
+ <div id="river-top" class="river river-top" aria-label="对家牌河"></div>
+ <div id="river-left" class="river river-left" aria-label="上家牌河"></div>
+ <div id="river-right" class="river river-right" aria-label="下家牌河"></div>
+ <div id="river-bottom" class="river river-bottom" aria-label="我的牌河"></div>
+ <div class="center"><div class="wall-label">剩余牌墙</div><strong id="wall">—</strong><div id="turn">等待发牌</div><div id="pending"></div></div>
+ <div id="motion" class="motion" aria-live="polite" aria-label="当前桌面动作"></div>
+ </div>
+</section>
+<aside class="history-sidebar"><section class="panel coach-panel"><span class="eyebrow">YOUR ADVISER</span><h2>牌桌军师</h2><div id="coach-explanation" aria-live="polite"></div><div id="coach-content" aria-live="polite">轮到你时，军师会自动研判局势。</div><details class="coach-settings"><summary>军师设置</summary><div class="coach-controls"><label><input id="coach-auto" type="checkbox"> 常驻军师（自动计费）</label><select id="coach-budget" aria-label="军师每局调用上限"><option value="10">每局最多10次</option><option value="20" selected>每局最多20次</option><option value="40">每局最多40次</option></select></div><button id="local-strategy" type="button">比较多步方案（本地免费）</button><button id="ask-coach" type="button">现在问军师</button></details></section><div class="panel log-panel"><span class="eyebrow">ROUND HISTORY</span><h2>本局动态</h2><ol id="log"></ol></div></aside>
+<div class="my-hand hand-dock"><div class="dock-tools"><div id="waits" class="wait-strip" aria-live="polite" aria-label="我的胡牌提示"></div><div id="actions" class="actions" aria-label="合法动作"></div></div><div class="hand-heading"><span id="hand-title">我的手牌</span><span id="phase"></span></div><div id="hand" class="hand"></div></div>
+</main>
+<div id="notice" role="status" aria-live="polite"></div>
+<dialog id="new-dialog"><form id="new-form"><span class="eyebrow">A NEW HAND</span><h2>开一桌，慢慢打。</h2><p>你与三位基础机器人对局。当前局会先保存。</p><label>随机种子 <input id="seed" type="number" min="0" max="9007199254740991" placeholder="留空每次随机；42 可复现测试"></label><label>庄家 <select id="dealer"><option value="0">座位 0</option><option value="1">座位 1</option><option value="2">座位 2</option><option value="3">座位 3</option></select></label><div class="dialog-actions"><button type="button" id="cancel-new">取消</button><button type="submit" class="gold">发牌</button></div></form></dialog>
+<dialog id="result-dialog"><span class="eyebrow">HAND COMPLETE</span><h2 id="result-title">本局结束</h2><div id="result-body"></div><div class="dialog-actions"><button id="inspect">回看牌桌</button><button id="next" class="gold">再来一局</button></div></dialog>
+</body></html>

@@ -8,6 +8,9 @@ import pytest
 
 from src.core.tiles import create_tile
 from src.core.hand_analyzer import (
+    can_chi,
+    can_peng,
+    can_ron,
     calculate_shanten,
     is_agari,
     is_tenpai,
@@ -66,11 +69,49 @@ def test_chiitoitsu_tenpai():
     assert set(get_waiting_tiles(hand)) == {create_tile("风", "南")}
 
 
-def test_quad_counts_as_one_pair_only():
-    # four of a kind is only one pair for chiitoitsu; not a win
-    hand = H("m1111 m22 p33 p44 s55 s66")  # 4+2+2+2+2 = 12... add 南南 ->14
-    hand = H("m1111 m22 p33 p44 s55 s66 南南")  # pairs: 1m,2m,3p,4p,5s,6s,南 = 7 distinct
-    assert calculate_shanten(hand) == -1   # 7 distinct pairs still wins
+def test_quad_counts_as_two_pairs_in_local_luxury_seven_pairs():
+    hand = H("m1111 m22 p33 p44 s55 s66")  # 4 + five pairs = 14
+    assert calculate_shanten(hand) == -1
+    assert is_agari(hand)
+    assert _waiting("m111 m22 p33 p44 s55 s66") == {create_tile("万", 1)}
+
+
+def test_triple_luxury_wait_and_three_pairs_two_triplets_counterexample():
+    assert _waiting("m1111 p2222 s3333 北") == {create_tile("风", "北")}
+    hand = H("m111 p222 m44 p66 s88 北")
+    assert calculate_shanten(hand) == 1
+    hand.append(create_tile("万", 1))
+    hand.remove(create_tile("饼", 2))
+    assert get_waiting_tiles(hand) == [create_tile("风", "北")]
+
+
+def test_seven_pairs_formula_matches_independent_exact_target_dp():
+    from src.core.hand_analyzer import _chiitoitsu_shanten
+    checked = 0
+    for n in (13, 14):
+        for quads in range(n//4+1):
+            for triplets in range(n//3+1):
+                for pairs in range(n//2+1):
+                    singles = n-4*quads-3*triplets-2*pairs
+                    if singles < 0:
+                        continue
+                    counts = [4]*quads+[3]*triplets+[2]*pairs+[1]*singles
+                    counts += [0]*(30-len(counts))
+                    # Select a complete seven-pair target with 0/2/4 of each type,
+                    # independently maximizing retained tiles rather than pair-counting.
+                    dp = {0: 0}
+                    for count in counts:
+                        next_dp = {}
+                        for p, retained in dp.items():
+                            for target in (0, 2, 4):
+                                total_pairs = p+target//2
+                                if total_pairs <= 7:
+                                    next_dp[total_pairs] = max(next_dp.get(total_pairs, -1),
+                                                               retained+min(count, target))
+                        dp = next_dp
+                    assert _chiitoitsu_shanten(counts) == 13-dp[7]
+                    checked += 1
+    assert checked == 86
 
 
 # --- Waiting tiles: single, two-sided, multi-decomposition -----------------
@@ -191,3 +232,21 @@ def test_flowers_not_in_ukeire():
     hand = H("m123 p456 s78 南南南 西 北")
     for u in get_ukeire(hand):
         assert u.is_flower is False
+
+
+class TestClaimDetection:
+    def test_peng_requires_two_nonflowers(self):
+        assert can_peng(H("m55 p12"), create_tile("万", 5)) is True
+        assert can_peng(H("m5 p12"), create_tile("万", 5)) is False
+        assert can_peng(H("中中"), create_tile("三元", "中")) is False
+
+    def test_chi_returns_all_shapes(self):
+        combos = can_chi(H("m122445"), create_tile("万", 3))
+        assert combos == [H("m12"), H("m24"), H("m45")]
+
+    def test_honors_cannot_chi(self):
+        assert can_chi(H("南南"), create_tile("风", "南")) == []
+
+    def test_ron_with_and_without_fuuro(self):
+        assert can_ron(H("m123 p456 s789 南南南 西"), create_tile("风", "西"))
+        assert can_ron(H("m123 p456 s78 南南"), create_tile("条", 6), fuuro=1)

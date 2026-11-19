@@ -2,15 +2,16 @@
 
 Two winning forms are supported, and the overall shanten is their minimum:
   1. Standard form: 4 melds (sequence or triplet) + 1 pair.
-  2. Seven pairs (chiitoitsu): 7 distinct pairs, concealed only.
+  2. Local seven pairs: quads count as two pairs, concealed only.
 
 Flower tiles (东风 / 中发白 / 季节) are excluded from the structure.
 Shanten convention: a complete winning hand is -1, tenpai (waiting) is 0.
 """
 from collections import Counter
+from functools import lru_cache
 from typing import List, Tuple
 
-from .tiles import PLAYABLE_TILES, Tile, tile_index
+from .tiles import PLAYABLE_TILES, Tile, create_tile, tile_index
 
 # Playable index layout (length-30 counts array):
 #   0-8   万 1-9     9-17  饼 1-9     18-26  条 1-9     27-29  南/西/北
@@ -36,10 +37,15 @@ def _decompose_suit(seg, allow_shuntsu):
     taatsu = 2-tile partials toward a meld (two-sided / edge / middle-gap)
     toitsu = pairs (can serve as the head or toward a triplet)
     """
+    return _decompose_suit_cached(tuple(seg), allow_shuntsu)
+
+
+@lru_cache(maxsize=32768)
+def _decompose_suit_cached(seg, allow_shuntsu):
     counts = list(seg)
     results = []
     _recurse_suit(counts, 0, 0, 0, 0, allow_shuntsu, results)
-    return _pareto(results)
+    return tuple(_pareto(results))
 
 
 def _recurse_suit(c, i, sets, taatsu, toitsu, allow_shuntsu, results):
@@ -125,15 +131,41 @@ def _standard_shanten(counts, fuuro=0) -> int:
 
 
 def _chiitoitsu_shanten(counts) -> int:
-    pairs = sum(1 for c in counts if c >= 2)   # distinct pair types
-    kinds = sum(1 for c in counts if c >= 1)   # distinct tile types
-    return 6 - pairs + max(0, 7 - kinds)
+    # User-confirmed 豪华七对: four identical tiles count as two pairs.
+    return 6 - min(7, sum(c // 2 for c in counts))
 
 
 # --- Public API ------------------------------------------------------------
 def calculate_shanten(hand: List[Tile], fuuro: int = 0) -> int:
     """Minimum shanten over both winning forms (lower is closer to winning)."""
     counts = _hand_to_counts(hand)
+    return _calculate_shanten_cached(tuple(counts), fuuro)
+
+
+@lru_cache(maxsize=65536)
+def _best_decomposition_cached(counts, fuuro=0):
+    """最小向听分解中块数最多的 (刻/顺, 搭, 对)——供块结构分析用。"""
+    fronts = [_decompose_suit(counts[s:e], shuntsu) for s, e, shuntsu in _SEGMENTS]
+    best_state, best_key = (0, 0, 0), None
+    for sets, taatsu, toitsu in _combine(fronts):
+        head_bonus = 1 if toitsu >= 1 else 0
+        partial_slots = taatsu + max(0, toitsu - 1)
+        usable = max(0, min(partial_slots, 4 - fuuro - sets))
+        shanten = 8 - 2 * fuuro - 2 * sets - usable - head_bonus
+        key = (shanten, -(sets + taatsu + toitsu))
+        if best_key is None or key < best_key:
+            best_key, best_state = key, (sets, taatsu, toitsu)
+    return best_state
+
+
+def best_decomposition(hand: List[Tile], fuuro: int = 0) -> tuple:
+    """最优分解的 (顺刻数, 搭子数, 对子数)。"""
+    counts = _hand_to_counts(hand)
+    return _best_decomposition_cached(tuple(counts), fuuro)
+
+
+@lru_cache(maxsize=65536)
+def _calculate_shanten_cached(counts, fuuro):
     best = _standard_shanten(counts, fuuro)
     if fuuro == 0:  # seven pairs is only possible fully concealed
         best = min(best, _chiitoitsu_shanten(counts))
@@ -182,3 +214,34 @@ def rank_discards(hand: List[Tile], fuuro: int = 0) -> List[Tuple[Tile, int]]:
         ranked.append((tile, calculate_shanten(remaining, fuuro)))
     ranked.sort(key=lambda x: (x[1], str(x[0])))
     return ranked
+
+
+def can_peng(hand: List[Tile], tile: Tile) -> bool:
+    """Return whether two concealed copies can claim ``tile`` as a peng."""
+    return not tile.is_flower and sum(t == tile for t in hand) >= 2
+
+
+def can_chi(hand: List[Tile], tile: Tile) -> List[List[Tile]]:
+    """Return every two-tile concealed combination that can chi ``tile``."""
+    if tile.suit not in ("万", "饼", "条"):
+        return []
+    value = int(tile.value)
+    combinations: List[List[Tile]] = []
+    for left, right in (
+        (value - 2, value - 1),
+        (value - 1, value + 1),
+        (value + 1, value + 2),
+    ):
+        if 1 <= left <= 9 and 1 <= right <= 9:
+            a = create_tile(tile.suit, left)
+            b = create_tile(tile.suit, right)
+            needed = Counter((a, b))
+            held = Counter(hand)
+            if all(held[t] >= count for t, count in needed.items()):
+                combinations.append([a, b])
+    return combinations
+
+
+def can_ron(hand: List[Tile], tile: Tile, fuuro: int = 0) -> bool:
+    """Return whether claiming ``tile`` completes the concealed structure."""
+    return not tile.is_flower and calculate_shanten(hand + [tile], fuuro) == -1

@@ -1,0 +1,24 @@
+:root{--bg:#101418;--card:#1a2027;--line:#2a333d;--ink:#e8e2d5;--muted:#8b949e;--gold:#f0b429;--danger:#c96a6a}
+*{box-sizing:border-box}
+body{margin:0;font:15px/1.6 "PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--ink)}
+.bar{display:flex;gap:14px;align-items:center;padding:18px 26px;border-bottom:1px solid var(--line)}
+.seal{display:inline-flex;width:44px;height:44px;border:2px solid var(--gold);border-radius:8px;align-items:center;justify-content:center;color:var(--gold);font-size:22px}
+h1{font-size:20px;margin:0}h1 small{color:var(--muted);font-weight:400}
+.bar p{margin:0;color:var(--muted);font-size:13px}
+main{max-width:720px;margin:32px auto;padding:0 20px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 26px;margin-bottom:18px}
+.card h2{margin:0 0 8px;font-size:17px}
+.hint{color:var(--muted);font-size:13px}
+label{display:block;margin:14px 0}
+input{background:#0d1114;border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:8px 10px}
+button{background:#242c35;border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:9px 16px;cursor:pointer;margin-right:8px}
+button:hover{border-color:var(--gold)}
+button.gold{background:var(--gold);border-color:var(--gold);color:#17130a;font-weight:600}
+button.danger{border-color:var(--danger);color:var(--danger)}
+button:disabled{opacity:.45;cursor:not-allowed}
+.seats{width:100%;border-collapse:collapse;margin:10px 0}
+.seats td{border:1px solid var(--line);padding:8px 12px}
+.actions{margin:14px 0 6px}
+#room-msg{min-height:20px}
+#notice{position:fixed;left:0;right:0;bottom:0;background:#242c35;border-top:1px solid var(--line);padding:10px 20px;color:var(--muted);font-size:13px;min-height:20px}
+ol#history{color:var(--muted);font-size:12px;padding-left:18px}

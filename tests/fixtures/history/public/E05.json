@@ -1,0 +1,1465 @@
+{
+  "case_id": "E05",
+  "input": {
+    "rules_version": "local-2026-10-22-desktop-v4",
+    "call_counts": [
+      [
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0
+      ]
+    ],
+    "locked_pairs": [],
+    "seat": 0,
+    "dealer": 0,
+    "stage": "turn",
+    "actor": 0,
+    "wall_count": 83,
+    "self": {
+      "hand": [
+        "1万",
+        "1万",
+        "2万",
+        "2万",
+        "3万",
+        "4万",
+        "5万",
+        "5万",
+        "7万",
+        "4饼",
+        "6饼",
+        "8饼",
+        "5条",
+        "8条"
+      ],
+      "waiting_tiles": [],
+      "discard_waits": {},
+      "waiting_note": "未见张数仅扣自己的牌与公开牌，不等于牌墙活张；未知暗杠可能耗尽进张。",
+      "ron_blocked": false,
+      "peng_blocked": [],
+      "locked_with": [],
+      "held_flower_count": 0,
+      "drawn_tile": "4万",
+      "draw_source": "replacement",
+      "structural_shanten": 2,
+      "analysis_note": "结构向听未单独评估留花换牌的策略价值；合法动作由裁判另行校验。"
+    },
+    "players": [
+      {
+        "seat": 0,
+        "hand_count": 14,
+        "melds": [],
+        "locked_with": [],
+        "call_counts": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "known_qualifying_hua": {
+          "flowers": 2,
+          "wind_triplets": 0,
+          "kongs": 0,
+          "total": 2
+        },
+        "unknown_ankan_count": 0,
+        "value_note": "仅当前可知资格花，不含未公开手牌和牌型加分；不是听牌概率或已获收入。未知暗杠每组10或12，不能据此猜名。",
+        "flowers": [
+          "冬",
+          "竹"
+        ],
+        "river": [
+          "北风"
+        ]
+      },
+      {
+        "seat": 1,
+        "hand_count": 13,
+        "melds": [],
+        "locked_with": [],
+        "call_counts": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "known_qualifying_hua": {
+          "flowers": 2,
+          "wind_triplets": 0,
+          "kongs": 0,
+          "total": 2
+        },
+        "unknown_ankan_count": 0,
+        "value_note": "仅当前可知资格花，不含未公开手牌和牌型加分；不是听牌概率或已获收入。未知暗杠每组10或12，不能据此猜名。",
+        "flowers": [
+          "梅",
+          "菊"
+        ],
+        "river": [
+          "北风"
+        ]
+      },
+      {
+        "seat": 2,
+        "hand_count": 13,
+        "melds": [],
+        "locked_with": [],
+        "call_counts": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "known_qualifying_hua": {
+          "flowers": 0,
+          "wind_triplets": 0,
+          "kongs": 0,
+          "total": 0
+        },
+        "unknown_ankan_count": 0,
+        "value_note": "仅当前可知资格花，不含未公开手牌和牌型加分；不是听牌概率或已获收入。未知暗杠每组10或12，不能据此猜名。",
+        "flowers": [],
+        "river": [
+          "北风"
+        ]
+      },
+      {
+        "seat": 3,
+        "hand_count": 13,
+        "melds": [],
+        "locked_with": [],
+        "call_counts": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "known_qualifying_hua": {
+          "flowers": 0,
+          "wind_triplets": 0,
+          "kongs": 0,
+          "total": 0
+        },
+        "unknown_ankan_count": 0,
+        "value_note": "仅当前可知资格花，不含未公开手牌和牌型加分；不是听牌概率或已获收入。未知暗杠每组10或12，不能据此猜名。",
+        "flowers": [],
+        "river": [
+          "南风"
+        ]
+      }
+    ],
+    "events": [
+      {
+        "kind": "flower_kong",
+        "seat": 0,
+        "tile": "冬"
+      },
+      {
+        "kind": "draw",
+        "seat": 0,
+        "tile": "2万",
+        "replacement": true
+      },
+      {
+        "kind": "discard",
+        "seat": 0,
+        "tile": "北风"
+      },
+      {
+        "kind": "all_pass",
+        "source": 0
+      },
+      {
+        "kind": "draw",
+        "seat": 1,
+        "replacement": false,
+        "hidden": true
+      },
+      {
+        "kind": "flower_kong",
+        "seat": 1,
+        "tile": "梅"
+      },
+      {
+        "kind": "draw",
+        "seat": 1,
+        "replacement": true,
+        "hidden": true
+      },
+      {
+        "kind": "flower_kong",
+        "seat": 1,
+        "tile": "菊"
+      },
+      {
+        "kind": "draw",
+        "seat": 1,
+        "replacement": true,
+        "hidden": true
+      },
+      {
+        "kind": "discard",
+        "seat": 1,
+        "tile": "北风"
+      },
+      {
+        "kind": "all_pass",
+        "source": 1
+      },
+      {
+        "kind": "draw",
+        "seat": 2,
+        "replacement": false,
+        "hidden": true
+      },
+      {
+        "kind": "discard",
+        "seat": 2,
+        "tile": "北风"
+      },
+      {
+        "kind": "all_pass",
+        "source": 2
+      },
+      {
+        "kind": "draw",
+        "seat": 3,
+        "replacement": false,
+        "hidden": true
+      },
+      {
+        "kind": "discard",
+        "seat": 3,
+        "tile": "南风"
+      },
+      {
+        "kind": "all_pass",
+        "source": 3
+      },
+      {
+        "kind": "draw",
+        "seat": 0,
+        "tile": "竹",
+        "replacement": false
+      },
+      {
+        "kind": "flower_kong",
+        "seat": 0,
+        "tile": "竹"
+      },
+      {
+        "kind": "draw",
+        "seat": 0,
+        "tile": "4万",
+        "replacement": true
+      }
+    ],
+    "pending": null,
+    "legal_actions": [
+      {
+        "id": "A1",
+        "kind": "discard",
+        "tiles": [
+          "1万"
+        ]
+      },
+      {
+        "id": "A2",
+        "kind": "discard",
+        "tiles": [
+          "2万"
+        ]
+      },
+      {
+        "id": "A3",
+        "kind": "discard",
+        "tiles": [
+          "3万"
+        ]
+      },
+      {
+        "id": "A4",
+        "kind": "discard",
+        "tiles": [
+          "4万"
+        ]
+      },
+      {
+        "id": "A5",
+        "kind": "discard",
+        "tiles": [
+          "4饼"
+        ]
+      },
+      {
+        "id": "A6",
+        "kind": "discard",
+        "tiles": [
+          "5万"
+        ]
+      },
+      {
+        "id": "A7",
+        "kind": "discard",
+        "tiles": [
+          "5条"
+        ]
+      },
+      {
+        "id": "A8",
+        "kind": "discard",
+        "tiles": [
+          "6饼"
+        ]
+      },
+      {
+        "id": "A9",
+        "kind": "discard",
+        "tiles": [
+          "7万"
+        ]
+      },
+      {
+        "id": "A10",
+        "kind": "discard",
+        "tiles": [
+          "8条"
+        ]
+      },
+      {
+        "id": "A11",
+        "kind": "discard",
+        "tiles": [
+          "8饼"
+        ]
+      }
+    ],
+    "observation_id": "E05",
+    "decision_options": [
+      {
+        "action_id": "A1",
+        "label": "打 1万",
+        "after": {
+          "structural_shanten": 3,
+          "unseen_improving": 79,
+          "held_flower_count": 0,
+          "ready": false,
+          "waiting_tiles": [],
+          "eligible_ron_tiles": [],
+          "wait_shapes": [],
+          "locked_with": [],
+          "conditional_zimo_payer_multipliers": {
+            "1": 1,
+            "2": 1,
+            "3": 1
+          },
+          "qualifying_hua": 2
+        },
+        "requires_tradeoff": true,
+        "improving_tiles": [
+          "1万",
+          "2万",
+          "3万",
+          "5万",
+          "6万",
+          "7万",
+          "8万",
+          "9万",
+          "2饼",
+          "3饼",
+          "4饼",
+          "5饼",
+          "6饼",
+          "7饼",
+          "8饼",
+          "9饼",
+          "3条",
+          "4条",
+          "5条",
+          "6条",
+          "7条",
+          "8条",
+          "9条"
+        ],
+        "required_accept_costs": [
+          "speed_loss"
+        ],
+        "shape_catalog": {
+          "pair:2万": "2万对子",
+          "pair:5万": "5万对子",
+          "sequence:1万+2万+3万": "1万、2万、3万顺子",
+          "taatsu:1万+2万": "1万、2万边张搭，等3万",
+          "taatsu:1万+3万": "1万、3万坎张搭，等2万",
+          "sequence:2万+3万+4万": "2万、3万、4万顺子",
+          "taatsu:2万+3万": "2万、3万两面搭，等1万、4万",
+          "taatsu:2万+4万": "2万、4万坎张搭，等3万",
+          "sequence:3万+4万+5万": "3万、4万、5万顺子",
+          "taatsu:3万+4万": "3万、4万两面搭，等2万、5万",
+          "taatsu:3万+5万": "3万、5万坎张搭，等4万",
+          "taatsu:4万+5万": "4万、5万两面搭，等3万、6万",
+          "taatsu:5万+7万": "5万、7万坎张搭，等6万",
+          "taatsu:4饼+6饼": "4饼、6饼坎张搭，等5饼",
+          "taatsu:6饼+8饼": "6饼、8饼坎张搭，等7饼"
+        }
+      },
+      {
+        "action_id": "A2",
+        "label": "打 2万",
+        "after": {
+          "structural_shanten": 3,
+          "unseen_improving": 82,
+          "held_flower_count": 0,
+          "ready": false,
+          "waiting_tiles": [],
+          "eligible_ron_tiles": [],
+          "wait_shapes": [],
+          "locked_with": [],
+          "conditional_zimo_payer_multipliers": {
+            "1": 1,
+            "2": 1,
+            "3": 1
+          },
+          "qualifying_hua": 2
+        },
+        "requires_tradeoff": true,
+        "improving_tiles": [
+          "1万",
+          "2万",
+          "3万",
+          "4万",
+          "5万",
+          "6万",
+          "7万",
+          "8万",
+          "9万",
+          "2饼",
+          "3饼",
+          "4饼",
+          "5饼",
+          "6饼",
+          "7饼",
+          "8饼",
+          "9饼",
+          "3条",
+          "4条",
+          "5条",
+          "6条",
+          "7条",
+          "8条",
+          "9条"
+        ],
+        "required_accept_costs": [
+          "speed_loss"
+        ],
+        "shape_catalog": {
+          "pair:1万": "1万对子",
+          "pair:5万": "5万对子",
+          "sequence:1万+2万+3万": "1万、2万、3万顺子",
+          "taatsu:1万+2万": "1万、2万边张搭，等3万",
+          "taatsu:1万+3万": "1万、3万坎张搭，等2万",
+          "sequence:2万+3万+4万": "2万、3万、4万顺子",
+          "taatsu:2万+3万": "2万、3万两面搭，等1万、4万",
+          "taatsu:2万+4万": "2万、4万坎张搭，等3万",
+          "sequence:3万+4万+5万": "3万、4万、5万顺子",
+          "taatsu:3万+4万": "3万、4万两面搭，等2万、5万",
+          "taatsu:3万+5万": "3万、5万坎张搭，等4万",
+          "taatsu:4万+5万": "4万、5万两面搭，等3万、6万",
+          "taatsu:5万+7万": "5万、7万坎张搭，等6万",
+          "taatsu:4饼+6饼": "4饼、6饼坎张搭，等5饼",
+          "taatsu:6饼+8饼": "6饼、8饼坎张搭，等7饼"
+        }
+      },
+      {
+        "action_id": "A3",
+        "label": "打 3万",
+        "after": {
+          "structural_shanten": 3,
+          "unseen_improving": 40,
+          "held_flower_count": 0,
+          "ready": false,
+          "waiting_tiles": [],
+          "eligible_ron_tiles": [],
+          "wait_shapes": [],
+          "locked_with": [],
+          "conditional_zimo_payer_multipliers": {
+            "1": 1,
+            "2": 1,
+            "3": 1
+          },
+          "qualifying_hua": 2
+        },
+        "requires_tradeoff": true,
+        "improving_tiles": [
+          "1万",
+          "2万",
+          "3万",
+          "4万",
+          "6万",
+          "7万",
+          "4饼",
+          "5饼",
+          "6饼",
+          "7饼",
+          "8饼",
+          "5条",
+          "8条"
+        ],
+        "required_accept_costs": [
+          "speed_loss"
+        ],
+        "shape_catalog": {
+          "pair:1万": "1万对子",
+          "pair:2万": "2万对子",
+          "pair:5万": "5万对子",
+          "taatsu:1万+2万": "1万、2万边张搭，等3万",
+          "taatsu:2万+4万": "2万、4万坎张搭，等3万",
+          "taatsu:4万+5万": "4万、5万两面搭，等3万、6万",
+          "taatsu:5万+7万": "5万、7万坎张搭，等6万",
+          "taatsu:4饼+6饼": "4饼、6饼坎张搭，等5饼",
+          "taatsu:6饼+8饼": "6饼、8饼坎张搭，等7饼"
+        }
+      },
+      {
+        "action_id": "A4",
+        "label": "打 4万",
+        "after": {
+          "structural_shanten": 3,
+          "unseen_improving": 82,
+          "held_flower_count": 0,
+          "ready": false,
+          "waiting_tiles": [],
+          "eligible_ron_tiles": [],
+          "wait_shapes": [],
+          "locked_with": [],
+          "conditional_zimo_payer_multipliers": {
+            "1": 1,
+            "2": 1,
+            "3": 1
+          },
+          "qualifying_hua": 2
+        },
+        "requires_tradeoff": true,
+        "improving_tiles": [
+          "1万",
+          "2万",
+          "3万",
+          "4万",
+          "5万",
+          "6万",
+          "7万",
+          "8万",
+          "9万",
+          "2饼",
+          "3饼",
+          "4饼",
+          "5饼",
+          "6饼",
+          "7饼",
+          "8饼",
+          "9饼",
+          "3条",
+          "4条",
+          "5条",
+          "6条",
+          "7条",
+          "8条",
+          "9条"
+        ],
+        "required_accept_costs": [
+          "speed_loss"
+        ],
+        "shape_catalog": {
+          "pair:1万": "1万对子",
+          "pair:2万": "2万对子",
+          "pair:5万": "5万对子",
+          "sequence:1万+2万+3万": "1万、2万、3万顺子",
+          "taatsu:1万+2万": "1万、2万边张搭，等3万",
+          "taatsu:1万+3万": "1万、3万坎张搭，等2万",
+          "taatsu:2万+3万": "2万、3万两面搭，等1万、4万",
+          "taatsu:3万+5万": "3万、5万坎张搭，等4万",
+          "taatsu:5万+7万": "5万、7万坎张搭，等6万",
+          "taatsu:4饼+6饼": "4饼、6饼坎张搭，等5饼",
+          "taatsu:6饼+8饼": "6饼、8饼坎张搭，等7饼"
+        }
+      },
+      {
+        "action_id": "A5",
+        "label": "打 4饼",
+        "after": {
+          "structural_shanten": 2,
+          "unseen_improving": 12,
+          "held_flower_count": 0,
+          "ready": false,
+          "waiting_tiles": [],
+          "eligible_ron_tiles": [],
+          "wait_shapes": [],
+          "locked_with": [],
+          "conditional_zimo_payer_multipliers": {
+            "1": 1,
+            "2": 1,
+            "3": 1
+          },
+          "qualifying_hua": 2
+        },
+        "requires_tradeoff": true,
+        "improving_tiles": [
+          "1万",
+          "2万",
+          "6万",
+          "7饼"
+        ],
+        "required_accept_costs": [
+          "speed_loss"
+        ],
+        "shape_catalog": {
+          "pair:1万": "1万对子",
+          "pair:2万": "2万对子",
+          "pair:5万": "5万对子",
+          "sequence:1万+2万+3万": "1万、2万、3万顺子",
+          "taatsu:1万+2万": "1万、2万边张搭，等3万",
+          "taatsu:1万+3万": "1万、3万坎张搭，等2万",
+          "sequence:2万+3万+4万": "2万、3万、4万顺子",
+          "taatsu:2万+3万": "2万、3万两面搭，等1万、4万",
+          "taatsu:2万+4万": "2万、4万坎张搭，等3万",
+          "sequence:3万+4万+5万": "3万、4万、5万顺子",
+          "taatsu:3万+4万": "3万、4万两面搭，等2万、5万",
+          "taatsu:3万+5万": "3万、5万坎张搭，等4万",
+          "taatsu:4万+5万": "4万、5万两面搭，等3万、6万",
+          "taatsu:5万+7万": "5万、7万坎张搭，等6万",
+          "taatsu:6饼+8饼": "6饼、8饼坎张搭，等7饼"
+        }
+      },
+      {
+        "action_id": "A6",
+        "label": "打 5万",
+        "after": {
+          "structural_shanten": 3,
+          "unseen_improving": 82,
+          "held_flower_count": 0,
+          "ready": false,
+          "waiting_tiles": [],
+          "eligible_ron_tiles": [],
+          "wait_shapes": [],
+          "locked_with": [],
+          "conditional_zimo_payer_multipliers": {
+            "1": 1,
+            "2": 1,
+            "3": 1
+          },
+          "qualifying_hua": 2
+        },
+        "requires_tradeoff": true,
+        "improving_tiles": [
+          "1万",
+          "2万",
+          "3万",
+          "4万",
+          "5万",
+          "6万",
+          "7万",
+          "8万",
+          "9万",
+          "2饼",
+          "3饼",
+          "4饼",
+          "5饼",
+          "6饼",
+          "7饼",
+          "8饼",
+          "9饼",
+          "3条",
+          "4条",
+          "5条",
+          "6条",
+          "7条",
+          "8条",
+          "9条"
+        ],
+        "required_accept_costs": [
+          "speed_loss"
+        ],
+        "shape_catalog": {
+          "pair:1万": "1万对子",
+          "pair:2万": "2万对子",
+          "sequence:1万+2万+3万": "1万、2万、3万顺子",
+          "taatsu:1万+2万": "1万、2万边张搭，等3万",
+          "taatsu:1万+3万": "1万、3万坎张搭，等2万",
+          "sequence:2万+3万+4万": "2万、3万、4万顺子",
+          "taatsu:2万+3万": "2万、3万两面搭，等1万、4万",
+          "taatsu:2万+4万": "2万、4万坎张搭，等3万",
+          "sequence:3万+4万+5万": "3万、4万、5万顺子",
+          "taatsu:3万+4万": "3万、4万两面搭，等2万、5万",
+          "taatsu:3万+5万": "3万、5万坎张搭，等4万",
+          "taatsu:4万+5万": "4万、5万两面搭，等3万、6万",
+          "taatsu:5万+7万": "5万、7万坎张搭，等6万",
+          "taatsu:4饼+6饼": "4饼、6饼坎张搭，等5饼",
+          "taatsu:6饼+8饼": "6饼、8饼坎张搭，等7饼"
+        }
+      },
+      {
+        "action_id": "A7",
+        "label": "打 5条",
+        "after": {
+          "structural_shanten": 2,
+          "unseen_improving": 16,
+          "held_flower_count": 0,
+          "ready": false,
+          "waiting_tiles": [],
+          "eligible_ron_tiles": [],
+          "wait_shapes": [],
+          "locked_with": [],
+          "conditional_zimo_payer_multipliers": {
+            "1": 1,
+            "2": 1,
+            "3": 1
+          },
+          "qualifying_hua": 2
+        },
+        "requires_tradeoff": false,
+        "improving_tiles": [
+          "1万",
+          "2万",
+          "6万",
+          "5饼",
+          "7饼"
+        ],
+        "required_accept_costs": [],
+        "shape_catalog": {
+          "pair:1万": "1万对子",
+          "pair:2万": "2万对子",
+          "pair:5万": "5万对子",
+          "sequence:1万+2万+3万": "1万、2万、3万顺子",
+          "taatsu:1万+2万": "1万、2万边张搭，等3万",
+          "taatsu:1万+3万": "1万、3万坎张搭，等2万",
+          "sequence:2万+3万+4万": "2万、3万、4万顺子",
+          "taatsu:2万+3万": "2万、3万两面搭，等1万、4万",
+          "taatsu:2万+4万": "2万、4万坎张搭，等3万",
+          "sequence:3万+4万+5万": "3万、4万、5万顺子",
+          "taatsu:3万+4万": "3万、4万两面搭，等2万、5万",
+          "taatsu:3万+5万": "3万、5万坎张搭，等4万",
+          "taatsu:4万+5万": "4万、5万两面搭，等3万、6万",
+          "taatsu:5万+7万": "5万、7万坎张搭，等6万",
+          "taatsu:4饼+6饼": "4饼、6饼坎张搭，等5饼",
+          "taatsu:6饼+8饼": "6饼、8饼坎张搭，等7饼"
+        }
+      },
+      {
+        "action_id": "A8",
+        "label": "打 6饼",
+        "after": {
+          "structural_shanten": 3,
+          "unseen_improving": 72,
+          "held_flower_count": 0,
+          "ready": false,
+          "waiting_tiles": [],
+          "eligible_ron_tiles": [],
+          "wait_shapes": [],
+          "locked_with": [],
+          "conditional_zimo_payer_multipliers": {
+            "1": 1,
+            "2": 1,
+            "3": 1
+          },
+          "qualifying_hua": 2
+        },
+        "requires_tradeoff": true,
+        "improving_tiles": [
+          "1万",
+          "2万",
+          "3万",
+          "4万",
+          "6万",
+          "7万",
+          "2饼",
+          "3饼",
+          "4饼",
+          "5饼",
+          "6饼",
+          "7饼",
+          "8饼",
+          "9饼",
+          "3条",
+          "4条",
+          "5条",
+          "6条",
+          "7条",
+          "8条",
+          "9条"
+        ],
+        "required_accept_costs": [
+          "speed_loss"
+        ],
+        "shape_catalog": {
+          "pair:1万": "1万对子",
+          "pair:2万": "2万对子",
+          "pair:5万": "5万对子",
+          "sequence:1万+2万+3万": "1万、2万、3万顺子",
+          "taatsu:1万+2万": "1万、2万边张搭，等3万",
+          "taatsu:1万+3万": "1万、3万坎张搭，等2万",
+          "sequence:2万+3万+4万": "2万、3万、4万顺子",
+          "taatsu:2万+3万": "2万、3万两面搭，等1万、4万",
+          "taatsu:2万+4万": "2万、4万坎张搭，等3万",
+          "sequence:3万+4万+5万": "3万、4万、5万顺子",
+          "taatsu:3万+4万": "3万、4万两面搭，等2万、5万",
+          "taatsu:3万+5万": "3万、5万坎张搭，等4万",
+          "taatsu:4万+5万": "4万、5万两面搭，等3万、6万",
+          "taatsu:5万+7万": "5万、7万坎张搭，等6万"
+        }
+      },
+      {
+        "action_id": "A9",
+        "label": "打 7万",
+        "after": {
+          "structural_shanten": 3,
+          "unseen_improving": 74,
+          "held_flower_count": 0,
+          "ready": false,
+          "waiting_tiles": [],
+          "eligible_ron_tiles": [],
+          "wait_shapes": [],
+          "locked_with": [],
+          "conditional_zimo_payer_multipliers": {
+            "1": 1,
+            "2": 1,
+            "3": 1
+          },
+          "qualifying_hua": 2
+        },
+        "requires_tradeoff": true,
+        "improving_tiles": [
+          "1万",
+          "2万",
+          "3万",
+          "4万",
+          "5万",
+          "6万",
+          "7万",
+          "2饼",
+          "3饼",
+          "4饼",
+          "5饼",
+          "6饼",
+          "7饼",
+          "8饼",
+          "9饼",
+          "3条",
+          "4条",
+          "5条",
+          "6条",
+          "7条",
+          "8条",
+          "9条"
+        ],
+        "required_accept_costs": [
+          "speed_loss"
+        ],
+        "shape_catalog": {
+          "pair:1万": "1万对子",
+          "pair:2万": "2万对子",
+          "pair:5万": "5万对子",
+          "sequence:1万+2万+3万": "1万、2万、3万顺子",
+          "taatsu:1万+2万": "1万、2万边张搭，等3万",
+          "taatsu:1万+3万": "1万、3万坎张搭，等2万",
+          "sequence:2万+3万+4万": "2万、3万、4万顺子",
+          "taatsu:2万+3万": "2万、3万两面搭，等1万、4万",
+          "taatsu:2万+4万": "2万、4万坎张搭，等3万",
+          "sequence:3万+4万+5万": "3万、4万、5万顺子",
+          "taatsu:3万+4万": "3万、4万两面搭，等2万、5万",
+          "taatsu:3万+5万": "3万、5万坎张搭，等4万",
+          "taatsu:4万+5万": "4万、5万两面搭，等3万、6万",
+          "taatsu:4饼+6饼": "4饼、6饼坎张搭，等5饼",
+          "taatsu:6饼+8饼": "6饼、8饼坎张搭，等7饼"
+        }
+      },
+      {
+        "action_id": "A10",
+        "label": "打 8条",
+        "after": {
+          "structural_shanten": 2,
+          "unseen_improving": 16,
+          "held_flower_count": 0,
+          "ready": false,
+          "waiting_tiles": [],
+          "eligible_ron_tiles": [],
+          "wait_shapes": [],
+          "locked_with": [],
+          "conditional_zimo_payer_multipliers": {
+            "1": 1,
+            "2": 1,
+            "3": 1
+          },
+          "qualifying_hua": 2
+        },
+        "requires_tradeoff": false,
+        "improving_tiles": [
+          "1万",
+          "2万",
+          "6万",
+          "5饼",
+          "7饼"
+        ],
+        "required_accept_costs": [],
+        "shape_catalog": {
+          "pair:1万": "1万对子",
+          "pair:2万": "2万对子",
+          "pair:5万": "5万对子",
+          "sequence:1万+2万+3万": "1万、2万、3万顺子",
+          "taatsu:1万+2万": "1万、2万边张搭，等3万",
+          "taatsu:1万+3万": "1万、3万坎张搭，等2万",
+          "sequence:2万+3万+4万": "2万、3万、4万顺子",
+          "taatsu:2万+3万": "2万、3万两面搭，等1万、4万",
+          "taatsu:2万+4万": "2万、4万坎张搭，等3万",
+          "sequence:3万+4万+5万": "3万、4万、5万顺子",
+          "taatsu:3万+4万": "3万、4万两面搭，等2万、5万",
+          "taatsu:3万+5万": "3万、5万坎张搭，等4万",
+          "taatsu:4万+5万": "4万、5万两面搭，等3万、6万",
+          "taatsu:5万+7万": "5万、7万坎张搭，等6万",
+          "taatsu:4饼+6饼": "4饼、6饼坎张搭，等5饼",
+          "taatsu:6饼+8饼": "6饼、8饼坎张搭，等7饼"
+        }
+      },
+      {
+        "action_id": "A11",
+        "label": "打 8饼",
+        "after": {
+          "structural_shanten": 2,
+          "unseen_improving": 12,
+          "held_flower_count": 0,
+          "ready": false,
+          "waiting_tiles": [],
+          "eligible_ron_tiles": [],
+          "wait_shapes": [],
+          "locked_with": [],
+          "conditional_zimo_payer_multipliers": {
+            "1": 1,
+            "2": 1,
+            "3": 1
+          },
+          "qualifying_hua": 2
+        },
+        "requires_tradeoff": true,
+        "improving_tiles": [
+          "1万",
+          "2万",
+          "6万",
+          "5饼"
+        ],
+        "required_accept_costs": [
+          "speed_loss"
+        ],
+        "shape_catalog": {
+          "pair:1万": "1万对子",
+          "pair:2万": "2万对子",
+          "pair:5万": "5万对子",
+          "sequence:1万+2万+3万": "1万、2万、3万顺子",
+          "taatsu:1万+2万": "1万、2万边张搭，等3万",
+          "taatsu:1万+3万": "1万、3万坎张搭，等2万",
+          "sequence:2万+3万+4万": "2万、3万、4万顺子",
+          "taatsu:2万+3万": "2万、3万两面搭，等1万、4万",
+          "taatsu:2万+4万": "2万、4万坎张搭，等3万",
+          "sequence:3万+4万+5万": "3万、4万、5万顺子",
+          "taatsu:3万+4万": "3万、4万两面搭，等2万、5万",
+          "taatsu:3万+5万": "3万、5万坎张搭，等4万",
+          "taatsu:4万+5万": "4万、5万两面搭，等3万、6万",
+          "taatsu:5万+7万": "5万、7万坎张搭，等6万",
+          "taatsu:4饼+6饼": "4饼、6饼坎张搭，等5饼"
+        }
+      }
+    ],
+    "self_facts": {
+      "hand_counts": {
+        "1万": 2,
+        "2万": 2,
+        "3万": 1,
+        "4万": 1,
+        "4饼": 1,
+        "5万": 2,
+        "5条": 1,
+        "6饼": 1,
+        "7万": 1,
+        "8条": 1,
+        "8饼": 1
+      },
+      "qualifying_hua": {
+        "flowers": 2,
+        "wind_triplets": 0,
+        "kongs": 0,
+        "total": 2,
+        "concealed_wind_triplets": 0
+      },
+      "held_flowers_are_not_structure": true,
+      "ron_blocked": false,
+      "locked_with": [],
+      "local_shapes": {
+        "pairs": [
+          "1万",
+          "2万",
+          "5万"
+        ],
+        "triplets": [],
+        "taatsu": [
+          {
+            "tiles": [
+              "1万",
+              "2万"
+            ],
+            "completions": [
+              "3万"
+            ]
+          },
+          {
+            "tiles": [
+              "1万",
+              "3万"
+            ],
+            "completions": [
+              "2万"
+            ]
+          },
+          {
+            "tiles": [
+              "2万",
+              "3万"
+            ],
+            "completions": [
+              "1万",
+              "4万"
+            ]
+          },
+          {
+            "tiles": [
+              "2万",
+              "4万"
+            ],
+            "completions": [
+              "3万"
+            ]
+          },
+          {
+            "tiles": [
+              "3万",
+              "4万"
+            ],
+            "completions": [
+              "2万",
+              "5万"
+            ]
+          },
+          {
+            "tiles": [
+              "3万",
+              "5万"
+            ],
+            "completions": [
+              "4万"
+            ]
+          },
+          {
+            "tiles": [
+              "4万",
+              "5万"
+            ],
+            "completions": [
+              "3万",
+              "6万"
+            ]
+          },
+          {
+            "tiles": [
+              "5万",
+              "7万"
+            ],
+            "completions": [
+              "6万"
+            ]
+          },
+          {
+            "tiles": [
+              "4饼",
+              "6饼"
+            ],
+            "completions": [
+              "5饼"
+            ]
+          },
+          {
+            "tiles": [
+              "6饼",
+              "8饼"
+            ],
+            "completions": [
+              "7饼"
+            ]
+          }
+        ],
+        "scope": "局部形状可能共享同一张牌，不能视为可同时成立的整手分解"
+      }
+    },
+    "hand_analysis": {
+      "baseline": {
+        "shanten": 2,
+        "unseen_improving": 16,
+        "improving_tiles": [
+          "1万",
+          "2万",
+          "6万",
+          "5饼",
+          "7饼"
+        ]
+      },
+      "structure_before": {
+        "groups_still_needed": 4,
+        "held_flowers": [],
+        "isolated_playable": [
+          "5条",
+          "8条"
+        ],
+        "decompositions": [
+          [
+            {
+              "kind": "pair",
+              "tiles": [
+                "1万",
+                "1万"
+              ]
+            },
+            {
+              "kind": "pair",
+              "tiles": [
+                "2万",
+                "2万"
+              ]
+            },
+            {
+              "kind": "sequence",
+              "tiles": [
+                "3万",
+                "4万",
+                "5万"
+              ]
+            },
+            {
+              "kind": "taatsu",
+              "tiles": [
+                "5万",
+                "7万"
+              ]
+            },
+            {
+              "kind": "single",
+              "tiles": [
+                "4饼"
+              ]
+            },
+            {
+              "kind": "taatsu",
+              "tiles": [
+                "6饼",
+                "8饼"
+              ]
+            },
+            {
+              "kind": "single",
+              "tiles": [
+                "5条"
+              ]
+            },
+            {
+              "kind": "single",
+              "tiles": [
+                "8条"
+              ]
+            }
+          ],
+          [
+            {
+              "kind": "pair",
+              "tiles": [
+                "1万",
+                "1万"
+              ]
+            },
+            {
+              "kind": "pair",
+              "tiles": [
+                "2万",
+                "2万"
+              ]
+            },
+            {
+              "kind": "sequence",
+              "tiles": [
+                "3万",
+                "4万",
+                "5万"
+              ]
+            },
+            {
+              "kind": "taatsu",
+              "tiles": [
+                "5万",
+                "7万"
+              ]
+            },
+            {
+              "kind": "taatsu",
+              "tiles": [
+                "4饼",
+                "6饼"
+              ]
+            },
+            {
+              "kind": "single",
+              "tiles": [
+                "8饼"
+              ]
+            },
+            {
+              "kind": "single",
+              "tiles": [
+                "5条"
+              ]
+            },
+            {
+              "kind": "single",
+              "tiles": [
+                "8条"
+              ]
+            }
+          ],
+          [
+            {
+              "kind": "sequence",
+              "tiles": [
+                "1万",
+                "2万",
+                "3万"
+              ]
+            },
+            {
+              "kind": "taatsu",
+              "tiles": [
+                "1万",
+                "2万"
+              ]
+            },
+            {
+              "kind": "taatsu",
+              "tiles": [
+                "4万",
+                "5万"
+              ]
+            },
+            {
+              "kind": "taatsu",
+              "tiles": [
+                "5万",
+                "7万"
+              ]
+            },
+            {
+              "kind": "single",
+              "tiles": [
+                "4饼"
+              ]
+            },
+            {
+              "kind": "taatsu",
+              "tiles": [
+                "6饼",
+                "8饼"
+              ]
+            },
+            {
+              "kind": "single",
+              "tiles": [
+                "5条"
+              ]
+            },
+            {
+              "kind": "single",
+              "tiles": [
+                "8条"
+              ]
+            }
+          ]
+        ],
+        "seven_pairs_pair_slots": 3,
+        "seven_pairs_available": true,
+        "truncated": true,
+        "scope": "每个分解内部不复用牌；不同分解是替代方案。仅展示有限分解，不是最优打法；花占位但不入结构。"
+      },
+      "strategy_facts": {
+        "local_shape_checks": [],
+        "three_identical_flower_options": []
+      },
+      "limitations": "只计算结构牌效和公开未见张；不是牌墙活张、胜率或净收益。吃碰须与放过后正常摸牌的机会比较，未做整局搜索。第三口会关闭双方全部接炮，并将双方自摸赔付乘三。"
+    },
+    "opponent_constraints": [
+      {
+        "seat": 1,
+        "excluded_patterns": [],
+        "publicly_cannot_ron": false,
+        "unknown_ankan_note": "牌名未知；你手中或公开区已有任一副本的牌，不可能再藏于此人的未知暗杠中；未见不等于已暗杠",
+        "qualifying_hua_floor": 2,
+        "ron_note": "资格花大于0即满足花分门槛；是否成牌、私有过胡未知，互锁禁止接炮"
+      },
+      {
+        "seat": 2,
+        "excluded_patterns": [],
+        "publicly_cannot_ron": false,
+        "unknown_ankan_note": "牌名未知；你手中或公开区已有任一副本的牌，不可能再藏于此人的未知暗杠中；未见不等于已暗杠",
+        "qualifying_hua_floor": 0,
+        "ron_note": "资格花大于0即满足花分门槛；是否成牌、私有过胡未知，互锁禁止接炮"
+      },
+      {
+        "seat": 3,
+        "excluded_patterns": [],
+        "publicly_cannot_ron": false,
+        "unknown_ankan_note": "牌名未知；你手中或公开区已有任一副本的牌，不可能再藏于此人的未知暗杠中；未见不等于已暗杠",
+        "qualifying_hua_floor": 0,
+        "ron_note": "资格花大于0即满足花分门槛；是否成牌、私有过胡未知，互锁禁止接炮"
+      }
+    ],
+    "flower_opportunities": [],
+    "evidence_catalog": [
+      "self.hand",
+      "seat.0.river",
+      "seat.0.flowers",
+      "seat.0.known_qualifying_hua",
+      "seat.1.river",
+      "seat.1.flowers",
+      "seat.1.known_qualifying_hua",
+      "seat.2.river",
+      "seat.2.known_qualifying_hua",
+      "seat.3.river",
+      "seat.3.known_qualifying_hua",
+      "seat.0.status",
+      "seat.0.call_counts",
+      "seat.1.status",
+      "seat.1.call_counts",
+      "seat.2.status",
+      "seat.2.call_counts",
+      "seat.3.status",
+      "seat.3.call_counts",
+      "event.0",
+      "event.1",
+      "event.2",
+      "event.3",
+      "event.4",
+      "event.5",
+      "event.6",
+      "event.7",
+      "event.8",
+      "event.9",
+      "event.10",
+      "event.11",
+      "event.12",
+      "event.13",
+      "event.14",
+      "event.15",
+      "event.16",
+      "event.17",
+      "event.18",
+      "event.19"
+    ],
+    "notebook": null,
+    "memory_invalidations": [],
+    "strategy_contract": {
+      "version": "strategy-v2",
+      "intents": [
+        "speed",
+        "defense",
+        "value",
+        "flexibility",
+        "flower_option",
+        "avoid_lock",
+        "cash_out",
+        "attack",
+        "defend",
+        "balance",
+        "flower_timing"
+      ],
+      "conditional_requirements": {
+        "focus_seats": {
+          "required_if_intent_in": [
+            "defend",
+            "defense"
+          ],
+          "required_if_priorities_contains": "defense",
+          "minimum_when_required": 1,
+          "meaning": "模型明确选择实际关注的其他家；无具体对象则不选防守意图或侧重，不由代码代填"
+        }
+      },
+      "priorities": [
+        "speed",
+        "defense",
+        "value",
+        "flexibility",
+        "flower_option",
+        "avoid_lock",
+        "cash_out"
+      ],
+      "change_triggers": [
+        "opponent_claims",
+        "opponent_value_rises",
+        "own_improves",
+        "unseen_changes",
+        "lock_changes",
+        "wall_shrinks"
+      ],
+      "costs": [
+        "speed_loss",
+        "held_flowers",
+        "lock",
+        "decline_win",
+        "forego_gangkai"
+      ],
+      "patterns": [
+        "碰碰胡",
+        "小吊车",
+        "大吊车",
+        "清一色",
+        "七对",
+        "豪华七对",
+        "双豪华",
+        "三豪华"
+      ],
+      "limits": {
+        "patterns": 4,
+        "watch_tiles": 6,
+        "ankan_candidates": 4,
+        "evidence_ids": 12,
+        "priorities": 3,
+        "change_triggers": 3,
+        "focus_seats": 3,
+        "shape_refs": "所选分支shape_catalog中的任意不重复引用；重叠形状不算独立面子"
+      }
+    },
+    "available_tools": [
+      "public_table",
+      "analyze_hand",
+      "compare_actions",
+      "conditional_payment"
+    ]
+  }
+}

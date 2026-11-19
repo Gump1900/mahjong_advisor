@@ -1,0 +1,57 @@
+/* The upstream SVGs are face artwork. Give them actual ivory tile bodies. */
+.tile-button, .tile-button:hover:not(:disabled) {
+  background: linear-gradient(120deg, #fffef3, #eae4cf);
+  border-bottom: 4px solid #b9b49a;
+}
+.small-tile, .river img, .actions img, .result-hand img {
+  background: #fffdf0;
+  border-radius: 3px;
+  border-bottom: 2px solid #b4b49b;
+}
+.concealed img { border: 1px solid #712e2555; border-radius: 3px; }
+/* Keep the desktop table usable inside narrow development/browser panels. */
+@media (max-width: 850px) {
+  :root { --tile: clamp(25px, 5.4vw, 44px); }
+  body { min-width: 480px; }
+  header { height: 76px; padding: 10px 14px; }
+  .brand h1 { font-size: 17px; letter-spacing: 1px; }
+  .brand p, #connection, .brand small { display: none; }
+  .seal { width: 34px; height: 40px; font-size: 26px; }
+  .toolbar { gap: 6px; }
+  .toolbar button { padding: 8px 10px; font-size: 12px; }
+  main { grid-template-columns: minmax(0, 1fr); padding: 6px; }
+  .table { height: max(630px, calc(100vh - 92px)); min-height: 630px; border-width: 6px; border-radius: 24px; }
+  .seat-name { font-size: 11px; }
+  .meta { font-size: 10px; }
+  .avatar { width: 30px; height: 30px; font-size: 14px; }
+  .top { top: 12px; }
+  .concealed img { width: 19px; height: 26px; }
+  .left, .right { top: 22%; width: 100px; }
+  .left { left: 10px; }
+  .right { right: 10px; }
+  .left .concealed, .right .concealed { display: none; }
+  .small-tile { width: 22px; height: 30px; }
+  .river { grid-template-columns: repeat(6, 23px); gap: 1px; }
+  .river img { width: 23px; height: 32px; }
+  .river-top { top: 130px; }
+  .river-left { left: 18%; top: 44%; }
+  .river-right { right: 18%; top: 44%; }
+  .river-bottom { bottom: 220px; }
+  .center { top: 43%; width: 112px; min-height: 130px; padding: 10px; }
+  #wall { font-size: 30px; }
+  #pending img { width: 34px; height: 46px; }
+  .wall-label { font-size: 9px; letter-spacing: 1px; }
+  .bottom { left: 12px; right: 12px; bottom: 165px; gap: 6px; }
+  .bottom .exposed { gap: 5px; }
+  .bottom .meta { display: none; }
+  .bottom .avatar { display: none; }
+  .actions { left: 12px; right: 12px; bottom: 115px; gap: 5px; }
+  .actions button { padding: 5px 9px; font-size: 12px; min-height: 38px; }
+  .actions img { width: 20px; height: 28px; }
+  .my-hand { bottom: 16px; left: 8px; right: 8px; }
+  .hand { height: 70px; gap: 1px; }
+  .hand-heading { font-size: 10px; margin-bottom: 16px; }
+  .tile-button.drawn { margin-left: 10px; }
+  .tile-button.drawn:after { top: -19px; font-size: 10px; }
+  dialog { min-width: 0; width: calc(100vw - 40px); padding: 24px; }
+}

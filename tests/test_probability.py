@@ -38,10 +38,11 @@ class TestTileCounter:
         c.remove(create_tile("万", 3))
         assert c.get_count(create_tile("万", 3)) == 1
 
-    def test_remove_clamps_at_zero(self):
+    def test_remove_rejects_overflow_without_mutation(self):
         c = TileCounter()
-        c.remove(create_tile("万", 3), 99)
-        assert c.get_count(create_tile("万", 3)) == 0
+        with pytest.raises(ValueError, match="副本上限"):
+            c.remove(create_tile("万", 3), 99)
+        assert c.get_count(create_tile("万", 3)) == 4
 
 
 class TestCountRemaining:
@@ -99,18 +100,16 @@ class TestDiscardRisk:
         # flowers can't be part of a winning structure, so never deal into one
         assert discard_risk(create_tile("三元", "中"), GameState()) == "安全"
 
-    def test_exhausted_tile_is_safe(self):
-        # all four copies visible -> no hidden copies -> safe
+    def test_exhausted_number_tile_can_complete_a_sequence(self):
         state = GameState(
             my_hand=[create_tile("万", 5)],
             discards={"left": [create_tile("万", 5)] * 3, "right": [], "opposite": []},
         )
-        assert discard_risk(create_tile("万", 5), state) == "安全"
+        assert discard_risk(create_tile("万", 5), state) != "安全"
 
-    def test_genbutu_seen_in_discard_is_safe(self):
-        # an opponent already discarded it -> low ron risk (现物 heuristic)
+    def test_past_discard_does_not_create_furiten(self):
         state = GameState(discards={"left": [create_tile("万", 5)], "right": [], "opposite": []})
-        assert discard_risk(create_tile("万", 5), state) == "安全"
+        assert discard_risk(create_tile("万", 5), state) != "安全"
 
     def test_unseen_middle_tile_is_dangerous(self):
         # 4/5/6 are the most-wanted tiles; unseen and live -> dangerous
@@ -142,33 +141,32 @@ class TestEstimateDiscardRisks:
         assert (r["chi"], r["peng"], r["ron"]) == (0.0, 0.0, 0.0)
         assert r["label"] == "安全"
 
-    def test_genbutu_ron_near_zero(self):
-        # a tile already discarded by an opponent: ron risk drops toward 0
+    def test_past_discard_does_not_zero_ron_risk(self):
         state = GameState(discards={"left": [create_tile("万", 5)], "right": [], "opposite": []})
         safe = estimate_discard_risks(create_tile("万", 5), state)
         unseen = estimate_discard_risks(create_tile("万", 5), GameState())
-        assert safe["ron"] < unseen["ron"]
-        assert safe["ron"] < 0.05
-        assert safe["label"] == "安全"
+        assert safe["ron"] > 0
+        assert safe["ron"] == unseen["ron"]
+        assert safe["label"] != "安全"
 
-    def test_exhausted_ron_zero(self):
+    def test_exhausted_target_does_not_exclude_a_neighbor_wait(self):
         state = GameState(
             my_hand=[create_tile("万", 5)],
             discards={"left": [create_tile("万", 5)] * 3, "right": [], "opposite": []},
         )
         r = estimate_discard_risks(create_tile("万", 5), state)
-        assert r["ron"] == 0.0
+        assert r["ron"] > 0.0
+        assert r["peng"] == 0.0
 
     def test_honor_cannot_be_chied(self):
         r = estimate_discard_risks(create_tile("风", "南"), GameState())
         assert r["chi"] == 0.0
 
-    def test_chi_only_from_left(self):
-        # left throwing lots of 万 -> discarding 万 is likelier to be chied
+    def test_chi_only_from_downstream(self):
         base = estimate_discard_risks(create_tile("万", 5), GameState())
         left_throws_wan = GameState(discards={
-            "left": [create_tile("万", v) for v in (1, 2, 4, 9)],
-            "right": [create_tile("饼", v) for v in (1, 2, 3)],
+            "right": [create_tile("万", v) for v in (1, 2, 4, 9)],
+            "left": [create_tile("饼", v) for v in (1, 2, 3)],
             "opposite": [],
         })
         biased = estimate_discard_risks(create_tile("万", 5), left_throws_wan)

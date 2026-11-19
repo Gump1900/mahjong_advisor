@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>太湖麻将 · 原型设计系统</title>
+    <link rel="stylesheet" href="shared/tokens.css" />
+    <style>
+      body {
+        margin: 0;
+        background: #f4f3ec;
+        color: #284633;
+        font: 15px/1.9 system-ui;
+      }
+      main {
+        max-width: 1150px;
+        margin: auto;
+        padding: 10vh 6vw;
+      }
+      small {
+        letter-spacing: 3px;
+        color: #8b967b;
+      }
+      h1 {
+        font-size: 48px;
+        line-height: 1.3;
+        font-weight: 650;
+      }
+      p {
+        color: #7b8872;
+        max-width: 650px;
+      }
+      .cards {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 22px;
+        margin: 45px 0;
+      }
+      .cards a {
+        display: block;
+        background: #fffef8;
+        border: 1px solid #d8decd;
+        border-radius: 13px;
+        padding: 30px;
+        color: inherit;
+        text-decoration: none;
+      }
+      .cards a:hover {
+        border-color: #859d77;
+        transform: translateY(-2px);
+      }
+      .cards b {
+        font-size: 25px;
+        display: block;
+        margin: 14px 0;
+      }
+      .cards p {
+        font-size: 13px;
+      }
+      .links a {
+        color: #607c50;
+        margin-right: 20px;
+        font-size: 12px;
+      }
+      @media (max-width: 700px) {
+        .cards {
+          grid-template-columns: 1fr;
+        }
+        h1 {
+          font-size: 34px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <small>太湖麻将 / DESIGN SYSTEM</small>
+      <h1>从一张牌，到一桌好体验。</h1>
+      <p>
+        基础组件定义一致性，流程表达选择与分支，App
+        串起完整体验。三个入口共用同一套组件、样式和数据，不再复制设计稿。
+      </p>
+      <a href="miniprogram/index.html" style="display:flex;justify-content:space-between;align-items:center;padding:22px 25px;margin:26px 0;background:#285a45;color:#faf7e7;border-radius:14px;text-decoration:none;gap:20px"><span><small style="font-size:10px;letter-spacing:2px;opacity:.65">WECHAT MINI PROGRAM</small><b style="display:block;font-size:21px;margin:6px 0">手机微信小程序原型</b><span style="font-size:12px;opacity:.75">竖屏大厅与房间 · 横屏牌桌 · 可点击流程与交互注释</span></span><span>进入 →</span></a>
+      <div class="cards">
+        <a href="blocks/index.html"
+          ><small>01 / BLOCK</small><b>打磨基础单元</b>
+          <p>
+            麻将牌、手牌、座位、副露、操作组、弹窗。逐个检查默认、选中、等待与空态。
+          </p>
+          进入组件库 →</a
+        ><a href="flows/product.html"
+          ><small>02 / FLOW</small><b>走完一条流程</b>
+          <p>
+            从大厅和访客进入到结算下一局。覆盖邀请、入座、准备、离开与恢复，并连接牌桌内流程。
+          </p>
+          进入流程评审 →</a
+        ><a href="app/index.html"
+          ><small>03 / APP</small><b>体验完整产品</b>
+          <p>大厅、访客房间、补齐机器人、准备、开局、牌桌与结算返回。</p>
+          进入产品原型 →</a
+        >
+      </div>
+      <div class="links">
+        <a href="app/index.html#turn">直接查看牌桌设计稿</a
+        ><a href="README.md">维护说明</a
+        ><a href="design.md">设计规范</a>
+      </div>
+      <p style="font-size: 11px">
+        本地设计原型，不连接真实裁判、房间服务或账号系统。
+      </p>
+    </main>
+  </body>
+</html>

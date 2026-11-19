@@ -1,0 +1,32 @@
+<view class="table-viewport">
+<view wx:if="{{!vm}}" class="loading"><text>{{message||'正在连接裁判…'}}</text><button bindtap="reconnect">重新连接</button><button bindtap="back">返回入口</button></view>
+<view wx:if="{{vm}}" class="board" style="transform:scale({{scale}});left:{{left}}px;top:{{top}}px">
+  <view class="table-top"><button bindtap="leave" disabled="{{busy}}">{{shared?'离开房间':'结束测试桌'}}</button><text>太湖麻将 · {{shared?room.code:'陪练'}}</text><button bindtap="sound" class="table-sound">{{audioOn?'声音开':'声音关'}}</button><button wx:if="{{!shared}}" bindtap="pause">{{paused?'继续':'暂停'}}</button><button wx:if="{{!shared}}" bindtap="step" disabled="{{busy}}">下一步</button></view>
+  <view wx:for="{{vm.opponents}}" wx:key="seat" class="opponent {{item.position}}">
+    <view class="player-name">{{item.name}} {{item.dealer?'· 庄':''}} <text>{{item.hand_count}}张</text></view>
+    <view class="opponent-rail"><view wx:for="{{item.melds}}" wx:key="key" wx:for-item="meld" class="meld"><view class="meld-tiles"><view wx:for="{{meld.tiles}}" wx:key="index" wx:for-item="t" class="meld-slot {{t.sideways?'sideways':''}}"><image src="{{t.src}}"/></view></view></view><view class="backs"><image wx:for="{{item.hand}}" wx:key="index" wx:for-item="t" src="{{t.src}}"/></view></view>
+  </view>
+  <view wx:for="{{vm.players}}" wx:key="seat" class="river {{item.position}}"><image wx:for="{{item.river}}" wx:key="index" wx:for-item="t" src="{{t.src}}"/></view>
+  <view wx:for="{{vm.players}}" wx:key="seat" class="flowers {{item.position}}"><image wx:for="{{item.flowers}}" wx:key="index" wx:for-item="t" src="{{t.src}}"/></view>
+  <view class="center"><text class="wall-label">剩余牌墙</text><text class="wall">{{vm.wall}}</text><text class="status">{{paused?'已暂停':vm.status}}</text></view>
+  <view wx:if="{{vm.pending}}" class="pending"><text>{{vm.pending.name}}打出</text><image src="{{vm.pending.src}}"/></view>
+  <view wx:if="{{vm.waits.length}}" class="waits"><text>听牌 · {{vm.waitNote}}</text><view class="wait-grid"><view wx:for="{{vm.waits}}" wx:key="value"><image src="{{item.src}}"/><text>未见{{item.unseen}}</text></view></view></view>
+  <view wx:if="{{vm.locked}}" class="lock-note">{{vm.locked}}</view>
+  <view class="action-row"><button wx:for="{{vm.actions}}" wx:key="label" data-label="{{item.label}}" bindtap="action" disabled="{{busy}}" class="response {{item.label==='胡'?'win':''}}">{{item.label}}</button></view>
+  <view class="own-info">我 {{vm.me.dealer?'· 庄':''}} <button wx:if="{{vm.flowerActions.length}}" bindtap="flowers" disabled="{{busy}}">换花</button><button wx:if="{{vm.flowerActions.length}}" bindtap="keepFlowers" disabled="{{busy}}" class="{{retainingFlowers?'retained':''}}">留花</button></view>
+  <view class="own-rail"><view class="own-melds"><view wx:for="{{vm.me.melds}}" wx:key="key" wx:for-item="meld" class="meld"><view class="meld-tiles"><view wx:for="{{meld.tiles}}" wx:key="index" wx:for-item="t" class="meld-slot {{t.sideways?'sideways':''}}"><image src="{{t.src}}"/></view></view><text>{{meld.caption}}</text></view></view><view class="hand"><view wx:for="{{vm.hand}}" wx:key="index" data-index="{{item.index}}" bindtap="tile" aria-role="button" aria-label="{{item.value}}{{item.selected?'，再次点击打出':''}}" class="hand-tile {{item.selected?'selected':''}}"><image src="{{item.src}}"/><text wx:if="{{item.flower}}">留</text></view></view></view>
+  <view wx:if="{{audioError}}" class="audio-note"><text>{{audioError}}</text></view>
+  <view wx:if="{{message}}" class="error-banner"><text>{{message}}</text><button bindtap="reconnect">重连</button></view>
+  <view wx:if="{{vm.status==='机器人已暂停'}}" class="error-banner"><text>机器人决策未完成</text><button bindtap="retry">重试</button></view>
+  <view wx:if="{{choosing}}" class="shade"><view class="choice-sheet">
+    <view wx:if="{{flowerMode}}">
+      <text class="sheet-title">选择要换的花牌</text>
+      <view class="flower-tools"><button bindtap="flowerAll" class="flower-all" disabled="{{busy}}">{{flowersAllSelected?'取消全选':'全选'}}</button><text>已选 {{flowerCount}} 张</text></view>
+      <scroll-view scroll-y="true" class="flower-scroll"><view class="flower-options"><button wx:for="{{flowerChoices}}" wx:key="index" data-index="{{item.index}}" bindtap="flowerToggle" disabled="{{busy}}" class="flower-option {{item.selected?'picked':''}}" aria-label="{{item.value}}{{item.selected?'，已选中':'，未选中'}}"><image class="flower-face" src="{{item.src}}"/><text class="flower-pickmark" wx:if="{{item.selected}}">{{item.selected?'✓':''}}</text></button></view></scroll-view>
+      <text wx:if="{{flowerCount>flowerLimit}}" class="flower-limit">牌墙仅余 {{flowerLimit}} 张，请减少选择</text>
+      <view class="flower-confirm"><button class="flower-confirm-button" bindtap="cancel" disabled="{{busy}}">取消</button><button class="primary flower-confirm-button" bindtap="flowerConfirm" disabled="{{busy||!flowerCount||flowerCount>flowerLimit}}">确认换 {{flowerCount}} 张</button></view>
+    </view>
+    <view wx:else=""><text class="sheet-title">请选择具体动作</text><scroll-view scroll-y="true" class="choice-list"><button wx:for="{{choices}}" wx:key="id" data-id="{{item.id}}" bindtap="choose" disabled="{{busy}}">{{item.label}}</button></scroll-view><button bindtap="cancel">取消</button></view>
+  </view></view>
+  <view wx:if="{{vm.result}}" class="shade"><view class="result-sheet"><text class="sheet-title">{{vm.result.title}}</text><text>{{vm.result.winners}}</text><view wx:for="{{vm.result.rows}}" wx:key="seat" class="result-row"><text>{{item.name}}</text><text class="{{item.positive?'positive':''}}">{{item.positive?'+':''}}{{item.net}} 分</text></view><view class="result-buttons"><button bindtap="leave">{{shared?'离开房间':'结束测试桌'}}</button><button class="primary" bindtap="next" disabled="{{busy}}">{{shared?'返回房间':'再来一局'}}</button></view></view></view>
+</view></view>
